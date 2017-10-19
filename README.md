@@ -42,4 +42,24 @@ Larvela supports an unlimted number of stores on the same host. This requires an
 
 An administration backend is provided to enable you to manage all aspects of the store.
 
+# To be documented:
+
+## Payment Modules
+
+## Welcome Program
+
+### Subscription Management and Customer Management
+
+## Post Sale Transaction Jobs
+
+## Cart Abandonment Jobs
+
+# Architecture
+
+Larvela has been designed to utilize the MVC architecture provided by Laravel with a lot of processing being offloaded to the Laravel "Jobs" facility and the Scheduling system. The Alpha system was implemented using Query Builder but is now being refactored to use Eloquent. Session support using memcached has been used during developemnt, testing and the production sites trialling the code to ensure support for multi-front end server configuration for front end scalability. 
+
+By using the Job command handling process a queue based back end application support processing system can be implemented in future on high volume large scale sites. More to come.
+
+A ThemeProvider is used to ensure the right theme is presented and a well defined directory structure has been implemented to ensure templating systems can be supported cleanly into the future.
+
 MORE TO COME....
