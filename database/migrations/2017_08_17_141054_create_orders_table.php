@@ -33,12 +33,6 @@ class CreateOrdersTable extends Migration
 			$table->date('order_dispatch_date')->default('0000-00-00');
 			$table->time('order_dispatch_time')->default('00:00:00');
 		});
-
-
-		| order_shipping_method | int(10) unsigned | YES  |     | NULL       |                |
-		| order_shipping_value  | decimal(13,2)    | YES  |     | NULL       |                |
-		| order_value           | decimal(13,2)    | YES  |     | NULL       |                |
-
     }
 
     /**
