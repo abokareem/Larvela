@@ -27,6 +27,12 @@ class CreateStoresTable extends Migration
 			$table->unsignedInteger('store_parent_id')->nullable();
 			$table->string('store_status');
 			$table->string('store_sales_email');
+			$table->string('store_contact');
+			$table->string('store_address');
+			$table->string('store_address2');
+			$table->string('store_country');
+			$table->string('store_country_code');
+			$table->string('store_bg_image');
         });
     }
 
