@@ -1,5 +1,23 @@
 <?php
-
+/**
+ * \class	BuildReleaseInfo
+ * \date	2017-10-24
+ *
+ *======================================================================
+ *
+ *                             IN DEVELOPMENT
+ *
+ *======================================================================
+ *
+ *
+ * \addtogroup CRON
+ * This job builds nightly release json data for code info and release notes.
+ * Every file is checked for FIX and INFO tags
+ *
+ * {FIX_<YYYY-MM-DD>_<TICKET-ID>} <Message text>
+ * {INFO_<YYYY-MM-DD>} <Message text>
+ *
+ */
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
@@ -7,9 +25,26 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
+use App\Traits\Logger;
+
 class BuildReleaseInfo implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+use Logger;
+use InteractsWithQueue, Queueable, SerializesModels;
+
+/**
+ * Release info tags [ file, date, info ]
+ * @var array $release_info
+ */
+protected $release_info;
+
+
+/**
+ * Code Fixes data [file,date,info]
+ * @var array $fixes
+ */
+protected $fixes;
+
 
     /**
      * Create a new job instance.
@@ -18,8 +53,25 @@ class BuildReleaseInfo implements ShouldQueue
      */
     public function __construct()
     {
-        //
+		$this->setFileName("release-info");
+		$this->LogStart();
+
+		$this->release_info = array();
+		$this->fixes = array();
     }
+
+
+    /**
+     * Close log file off
+     *
+     * @return void
+     */
+    public function __destruct()
+    {
+		$this->LogEnd(); 
+    }
+
+
 
     /**
      * Execute the job.
@@ -28,6 +80,76 @@ class BuildReleaseInfo implements ShouldQueue
      */
     public function handle()
     {
-        //
+		$this->LogMsg("Start scaning directories");
+		$this->LogMsg("App path: [".app_path()."]");
+
+		$directories = array("Traits","Models","Jobs","Providers","Helpers","Payments","Listeners","Console","Events","Http/Controllers");
+		foreach($directories as $dir)
+		{
+			$path = app_path()."/".$dir;
+			$this->LogMsg("Checking [".$path."]");
+
+			$glob = $path."/*.php";
+			foreach( glob( $glob ) as $file)
+			{
+				$this->LogMsg("Checking [".$file."]");
+				if(is_file($file))
+				{
+					$path_parts = pathinfo($file);
+					if(($path_parts['filename'] == "BuildReleaseInfo") &&
+					  ($path_parts['extension'] == "php")) continue;
+					$this->CheckFile($file);
+				}
+			}
+		}
+		$this->LogMsg("Done!");
+
+		#
+		# temporary dump
+		# @todo Generate a JSON file and dump in PUBLIC Directory.
+		$this->LogMsg("Report Dump:");
+		$this->LogMsg( print_r($this->fixes, true) );
+		$this->LogMsg( print_r($this->release_info, true) );
     }
+
+
+	/**
+	 * given a file, check if it has any release notes or fixes to document
+	 *
+	 * @param	string	$file
+	 * @return	void
+	 */
+	protected function CheckFile($file)
+	{
+		$this->LogMsg("Checking file [".$file."] for FIX and INFO tags.");
+
+		$pattern ='/FIX_/';
+		$fh = fopen($file,'r');
+		while (!feof($fh))
+		{
+			$line = fgets($fh, 4096);
+			if(preg_match($pattern, $line))
+			{
+				$pos = strpos($line, "{FIX_");
+				$date = substr($line,5+$pos,10);
+				$this->LogMsg("Date [".$date."]");
+				$this->fixes[] = array($file,$date,substr($line,$pos));
+			}
+		}
+		fclose($fh);
+		$pattern ='/INFO_/';
+		$fh = fopen($file,'r');
+		while (!feof($fh))
+		{
+			$line = fgets($fh, 4096);
+			if(preg_match($pattern, $line))
+			{
+				$pos = strpos($line, "{INFO_");
+				$date = substr($line,6+$pos,10);
+				$this->LogMsg("Date [".$date."]");
+				$this->release_info[] = array($file,$date,substr($line,$pos));
+			}
+		}
+		fclose($fh);
+	}
 }
