@@ -14,7 +14,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
-use App\Models\Stores;
+use App\Models\Store;
 
 /**
  * \brief AppServiceProvider is an entry point for custom code to load, configure or initialize something during bootup.
@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.
-     *
+     * {FIX_2017-10-28} "AppServiceProvider.php" - Refactored.
      * @return void
      */
     public function boot()
@@ -34,15 +34,15 @@ class AppServiceProvider extends ServiceProvider
 
 		if(Schema::hasTable('stores'))
         {
-			$Stores = new Stores;
+			$Store = new Store;
 			$store = null;
 			if(($store_code=getenv("STORE_CODE"))!=false)
 			{
-				$store = $Stores->getByCode( $store_code );
+				$store = Store::where('store_env_code', $store_code )->first();
 			}
 			else
 			{
-				$store = $Stores->getByID(1);
+				$store = Store::where('id',1)->first();
 			}
 			$this->app->instance('store', $store);
 	    }
