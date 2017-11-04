@@ -15,8 +15,6 @@ namespace App\Jobs;
 use App\Jobs\Job;
 
 
-
-
 use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
@@ -26,11 +24,12 @@ use Swift_SmtpTransport;
  *
  * Send a pre-formatted email to an address using Swift Mailer Transport. 
  */
-class EmailUserJob extends Job 
+class EmailUserJob extends Job
 {
+
+
 /**
  * Email address to send to. Cannot be blank
- *
  * @var string $to
  */
 protected $to;
@@ -38,7 +37,6 @@ protected $to;
 
 /**
  * Email address to send from.
- *
  * @var string $from
  */
 protected $from ="do-no-reply@online-sales-shop.domain";
@@ -46,7 +44,6 @@ protected $from ="do-no-reply@online-sales-shop.domain";
 
 /**
  * The email subject line - should not be blank
- *
  * @var string $subject
  */
 protected $subject = "no specified";
@@ -54,7 +51,6 @@ protected $subject = "no specified";
 
 /**
  * The email message to send.
- *
  * @var string $body
  */
 protected $body;
@@ -62,7 +58,6 @@ protected $body;
 
 /**
  * The swift mailer transporter.
- *
  * @var mixed $transport
  */
 protected $transport;
@@ -70,7 +65,6 @@ protected $transport;
 
 /**
  * The swift ailer mailer.
- *
  * @var mixed $mailer
  */
 protected $mailer;
