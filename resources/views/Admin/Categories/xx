@@ -1,0 +1,9 @@
+@extends('admin-master')
+@section('title','Confirm Category Delete')
+@section('content')
+
+<?php print_r($stores);
+
+dd($category);
+?>
+@stop

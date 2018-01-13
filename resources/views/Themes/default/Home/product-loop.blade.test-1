@@ -1,0 +1,67 @@
+<!-- START:product-loop -->
+<style>
+.prod-btn 
+{
+	display:inline-block;
+	padding:5px 10px;
+	font-size:14px;
+	color:#fff;
+	border:2px solid #4d92d9;
+	background-color:#4d92d9;
+	text-decoration:none;
+	transition:0.4s;
+}
+</style>
+
+
+<div class="container">
+	<div class="row">
+		<div id="wh"></div>
+	</div>
+	<div class="row">
+		<span class="pull-right">Sort By:
+			<button class="btn sortbtn btn-sm" data-toggle="tooltip" data-placement="top" title="Show lowest to highest price." id="byPrice">Price</button>
+			<button class="btn sortbtn btn-sm" data-toggle="tooltip" data-placement="top" title="Sort by category." id="byCategory">Category</button>
+		</span>
+	</div>
+</div>
+
+<!-- Product display loop -->
+<div class="container-fluid">
+	<div class="grid" data-grid>
+		@foreach($products as $p)
+		<div class="prod-panel class="port-1 effect-1">
+		    <img class="centered img-responsive" src="{{ $p->image }}" width="400" height="300">
+		</div>
+		@endforeach
+	</div>
+</div>
+<script src="/bricks/bricks.js"></script>
+
+<script>
+$(document).ready(function()
+{
+	console.log('On ready - init grid');
+const instance = Bricks({
+	container: '.grid',
+	packed:'data-packed',
+	position:  true,
+	sizes: [ { columns: 4, gutter: 10 },
+	{ mq: '480px', columns: 1, gutter: 15 },
+	{ mq: '962px', columns: 2, gutter: 20 },
+	{ mq: '1280px', columns: 3, gutter: 20 },
+	{ mq: '1480px', columns: 4, gutter: 20 },
+	{ mq: '1980px', columns: 5, gutter: 20 },
+	]}).resize(true).pack()
+});
+
+$(window).resize(function() {
+	var viewportWidth = $(window).width();
+	var viewportHeight = $(window).height();
+	console.log('W='+viewportWidth+' H='+viewportHeight);
+	$('#wh').val(viewportWidth);
+});
+</script>
+
+																							    </script>
+<!-- END:product-loop -->

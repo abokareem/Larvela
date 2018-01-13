@@ -1,0 +1,40 @@
+
+<?php
+#
+# While we are on the confirm page, we need to maintain the product locks,
+# call an AJAX method to update the product lock timestamps.
+# When we stop updating the lock, a background task will clear them after 5 minutes and
+# return locked stock to
+#
+# Time runs every 60 seconds
+#?>
+var POLLTIMER = 60000;
+var ALLOWEDTIME = 3;
+var timeonpage = 0;
+function UpdateLocks()
+{
+	if(timeonpage < ALLOWEDTIME)
+	{
+		console.log("Update Locks - "+timeonpage);
+		timeonpage++;
+		$.ajaxSetup({headers:{'X-CSRF-TOKEN':'{{ $token }}' } } );
+		ajaxRequest= $.ajax({ url: "/ajax/updatelocks/{{$cart->id}}", type: "post" });
+		ajaxRequest.done(function(response, textStatus, jqXHR)
+		{
+			var result = $.parseJSON(response);
+			console.log(result.S);
+		});
+		lockTimer = setTimeout(UpdateLocks,POLLTIMER);
+	}
+	else
+	{
+		var url = "/cart/error/cart-timeout";
+		window.location.href = url;
+	}
+}
+
+
+
+var lockTimer = setTimeout(UpdateLocks,POLLTIMER);
+</script>
+

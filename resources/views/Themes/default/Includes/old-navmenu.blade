@@ -1,0 +1,18 @@
+<!-- menu -->
+<link rel="stylesheet" href="/css/cssmenu.css">
+<script src="/js/cssmenu.js"></script>
+
+	<ul id="menu-bar">
+		<li><a href="/" class="active">Home</a></li>
+		@foreach($categories as $c)
+			@if($c->category_parent_id==0)
+			<li><a href="/category/{{ $c->id }}">{{ $c->category_title }}</a></li>
+			@else
+			<ul>
+			<li><a href="/category/{{ $c->id }}">{{ $c->category_title }}</a></li>
+			</ul>
+			@endif
+		@endforeach
+	</ul>
+<!-- end navmenu -->
+

@@ -1,0 +1,101 @@
+<?php
+/**
+ * Check all the cart items and any dated yesterday, are candidtaes for the abandond cart automattion.
+ *
+ */
+namespace App;
+
+
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+
+
+use App\Jobs\AbandonedCart;
+use App\Jobs\AbandonedWeekOldCart;
+
+
+
+use App\Models\Users;
+use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\Stores;
+
+
+
+	$found=0;
+	$yesterday = date("Y-m-d", strtotime("-1 days"));
+	$last_week = date("Y-m-d", strtotime("-7 days"));
+
+	echo "Yesterday: ".$yesterday." <br>";
+	echo "Last Week: ".$last_week."<br>";
+	
+	$items = CartItem::all();
+	echo "Item Count: ".sizeof($items)."<br>";
+	$fc1 = array();
+	$fc7 = array();
+	foreach($items as $item)
+	{
+		$item_date = date("Y-m-d", strtotime($item->updated_at));
+		if( $item_date == $yesterday )
+		{
+			if(in_array($item->cart_id,$fc1)==true)
+			{
+				echo "Skipping cart ".$item->cart_id." - already sent email<br/>";
+				break;
+			}
+			else
+			{
+				$cart = Cart::find($item->cart_id);
+				$user = Users::find($cart->user_id);
+				$found++;
+				echo "ID: ".$item->id." <br>";
+				print_r($user->email);
+				$cmd = new AbandonedCart($user->email, $cart, getCurrentStore());
+				dispatch($cmd);
+				#
+				# save the id so we dont send again
+				#
+				array_push($fc1,$item->cart_id);
+			}
+		}
+		if( $item_date == $last_week )
+		{
+			if(in_array($item->cart_id,$fc7)==true)
+			{
+				echo "Skipping cart ".$item->cart_id." - already sent email<br/>";
+				break;
+			}
+			else
+			{
+				$cart = Cart::find($item->cart_id);
+				$user = Users::find($cart->user_id);
+				$found++;
+				echo "ID: ".$item->id." <br>";
+				print_r($user->email);
+#				$cmd = new AbandonedWeekOldCart($user->email, $cart, getCurrentStore());
+#				dispatch($cmd);
+				#
+				# save the id so we dont send again
+				#
+				array_push($fc7,$item->cart_id);
+			}
+
+		}
+	}
+	echo "<br/><br/>Done! ".$found." - records found.<br>";
+
+
+function getCurrentStore()
+{
+	$Stores = new Stores;
+	$store = array();
+	if(($store_code=getenv("STORE_CODE"))!=false)
+	{
+		return $Stores->getByCode( $store_code );
+	}
+	else
+	{
+		return null;
+	}
+}
+
