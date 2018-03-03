@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 
 
 /**
- * \brief Eloquent Model that contains are the CRUD methods for the "stores" table.
+ * \brief Eloquent Model for the "stores" table.
  */
 class Store extends Model
 {
@@ -111,25 +111,11 @@ protected $data = array();
 	 * @param	string	$code	Store code to select by.
 	 * @return	mixed	Collection of rows of stores ordered by store name.
 	 */
-	public function getByCode($code)
+	private function getByCode($code)
 	{
 		return \DB::table('stores')->where(['store_env_code'=>$code])->first();
 	}
 
-
-
-
-	public function InsertStore($d)
-	{
-		return \DB::table('stores')->insertGetId( $d );
-	}
-
-
-
-	public function UpdateStore($d)
-	{
-		return \DB::table('stores')->where(['id'=>$d['id']])->update( $d );
-	}
 
 
 
@@ -215,7 +201,7 @@ protected $data = array();
 	 *
 	 * @return array
 	 */
-	public function getArray()
+	private function getArray()
 	{
 		$stores = array();
 		$rows = $this->getStores();
@@ -239,7 +225,7 @@ protected $data = array();
 	 * @param	boolean	$has_global 	first item is "Global - All Stores" if true
 	 * @return	string		 HTML select list as a string
 	 */
-	public function getSelectList($name, $id=0, $has_global=false)
+	private function getSelectList($name, $id=0, $has_global=false)
 	{
 		$rows = $this->getStores();
 		if(strlen($name)==0)
