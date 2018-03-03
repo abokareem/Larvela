@@ -37,8 +37,6 @@ use App\Models\ProductType;
 use App\Models\CategoryProduct;
 
 use App\Models\Attribute;
-use App\Models\ProdImageMaps;
-use App\Models\Notifications;
 
 
 use App\Traits\Logger;
