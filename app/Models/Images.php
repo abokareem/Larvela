@@ -147,19 +147,6 @@ protected $fillable = ['image_file_name','image_folder_name','image_size','image
 
 
 
-	/**
-	 * Return a collection of rows given the row ID, Collection contains a single row zero indexed.
-	 *
-	 * @pre ID is a valid integer and the row exists.
-	 * @post None
-	 * @param $id Integer row ID
-	 * @return mixed Collection of row objects zero indexed.
-	 */
-	public function getByID($id)
-	{
-		return \DB::table('images')->where(['id'=>$id])->first();
-	}
-
 
 
 
@@ -199,16 +186,6 @@ protected $fillable = ['image_file_name','image_folder_name','image_size','image
 
 
 
-	/**
-	 * Delete a row given the row ID
-	 *
-	 * @param	integer	$id	row ID
-	 * @return	integer	number of affected rows
-	 */
-	public function DeleteByID($id)
-	{
-		return \DB::table('images')->where(['id'=>$id])->delete();
-	}
 
 
 	/**

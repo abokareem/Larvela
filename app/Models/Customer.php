@@ -45,50 +45,6 @@ public $timestamps = false;
 protected $fillable = ['customer_name', 'customer_email','customer_mobile', 'customer_status', 'customer_source_id','customer_store_id', 'customer_date_created','customer_date_updated','customer_address','customer_suburb','customer_postcode','customer_city','customer_state','customer_country'];
 	
 
-	/**
-	 * Get row(s) given ID
-	 *
-	 * @param	integer	$id		Row ID to fetch from customers table.
-	 * @return	mixed
-	 */
-	public function getAll()
-	{
-		return \DB::table('customers')->orderBy('customer_name')->get();
-	}
-
-
-
-	/**
-	 * Get row(s) given ID
-	 *
-	 * @param	integer	$id		Row ID to fetch from customers table.
-	 * @return	mixed
-	 */
-	public function getActive()
-	{
-		return \DB::table('customers')->where(['customer_status'=>'A'])->orderBy('customer_date_created')->get();
-	}
-
-
-
-	/**
-	 * Get row(s) given store ID
-	 *
-	 * @param	integer	$id		Row ID to fetch from customers table.
-	 * @return	mixed
-	 */
-	public function getByStore($id)
-	{
-		return \DB::table('customers')->where(['customer_store_id'=>$id])->orderBy('customer_date_created')->get();
-	}
-
-
-	public function getByEmail($email)
-	{
-		return \DB::table('customers')->where(['customer_email'=>$email])->first();
-	}
-
-	
 
 	/**
 	 * insert a new customer into the DB given an array of column data.

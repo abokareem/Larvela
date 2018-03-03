@@ -97,22 +97,6 @@ public $fillable =['seo_token','seo_html_data'.'seo_status','seo_store_id','seo_
 
 
 	/**
-	 * Return all rows from the table from the "seo" table given the row ID.
-	 *
-	 * @pre		None
-	 * @post	None
-	 * @param	integer	$id The row ID
-	 * @return	mixed
-	 */
-#	public function getByID($id)
-#	{
-#		return \DB::table('seo')->where(['id'=>$id])->first();
-#	}
-
-
-
-
-	/**
 	 * Return a row from the table "seo" given the store ID and token name
 	 *
 	 * @pre		None

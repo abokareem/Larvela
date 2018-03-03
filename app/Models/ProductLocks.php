@@ -74,17 +74,6 @@ protected $fillable = ['product_lock_pid','product_lock_cid','product_lock_qty',
 
 
 
-	/** 
-	 * Delete a row given the ID.
-	 *
-	 * @param	integer	$id	Row id from the products table.
-	 * @return 	integer	Count of affected rows.
-	 */
-	public function DeleteByID($id)
-	{
-		return \DB::table('product_locks')->where(['id'=>$id])->delete();
-	}
-
 
 
 	/** 

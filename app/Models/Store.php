@@ -78,7 +78,7 @@ protected $data = array();
 	 *
 	 * @return	mixed	Collection of rows of stores ordered by store name.
 	 */
-	public function getStoreNames()
+	private function getStoreNames()
 	{
 		$rows = \DB::table('stores')->orderBy('store_name')->get();
 		$stores = array();
@@ -99,7 +99,7 @@ protected $data = array();
 	 *
 	 * @return	mixed	Collection of rows of stores ordered by store name.
 	 */
-	public function getStores()
+	private function getStores()
 	{
 		return \DB::table('stores')->where(['store_status'=>'A'])->orderBy('store_name')->get();
 	}

@@ -16,8 +16,8 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * \brief MVC Model to provide support for the "category" table.
  *
- * 2016-09-06 removed some query builder code and replaced with Eloquent calls.
- * 2016-09-22 Changed table name to category
+ * {FIX_2016-09-06} removed some query builder code and replaced with Eloquent calls.
+ * {FIX_2016-09-22} Changed table name to category
  */
 class Category extends Model
 {
@@ -83,7 +83,7 @@ protected $data = array();
 	 * @post none
 	 * @return	mixed	Collection of rows from the category table
 	 */
-	public function getAllCategories()
+	protected function getAllCategories()
 	{
 		return \DB::table('category')->orderBy('category_store_id')->orderBy('category_parent_id')->get();
 	}
@@ -101,7 +101,7 @@ protected $data = array();
 	 * @post none
 	 * @return Collection of rows from the category table
 	 */
-	public function getCategory()
+	protected function getCategory()
 	{
 		return \DB::table('category')->where(['category_status'=>'A'])->orderBy('category_title')->get();
 	}
@@ -117,7 +117,7 @@ protected $data = array();
 	 *
 	 * @return	array
 	 */
-	public function getArray()
+	protected function getArray()
 	{
 		$all_categories = \DB::table('category')->orderBy('category_title')->get();
 		$category_list = array();
@@ -131,20 +131,6 @@ protected $data = array();
 
 
 
-
-#/**
-#	 * Get row given the row ID
-#	 *
-#	 * @param	integer	$id	row ID
-#	 * @return	mixed	Collection of rows from the category table (single row in collection zero indexed)
-#	 */
-#	public function getByID($id)
-#	{
-#
-#		return \DB::table('category')->where(['id'=>$id])->first();
-#	}
-#
-
 	/**
 	 * Given the store ID, return a collection of rows from the category table
 	 * (single row in collection zero indexed).
@@ -152,74 +138,11 @@ protected $data = array();
 	 * @param	integer	$store_id	row ID
 	 * @return	mixed	
 	 */
-	public function getByStoreID($store_id)
+	protected function getByStoreID($store_id)
 	{
 		return \DB::table('category')->where(['category_store_id'=>$store_id])->get();
 	}
 
-
-
-#
-#	/**
-#	 * Delete the category given the row ID
-#	 *
-#	 * @param	integer	$id	row ID
-#	 * @return	integer Count of rows deleted
-#	 */
-#	public function DeletebyID($id)
-#	{
-#		return $this->destroy($id);
-#
-#		###return \DB::table('category')->where(['id'=>$id])->delete();
-#	}
-#
-
-
-#	/**
-#	 * Insert a new category into the category table
-#	 *
-#	 * @param	array $d array of data to insert
-#	 * @pre		Data must be valid
-#	 * @post	New row added to category table, internal state updated
-#	 * @return	integer Row id of newly inserted row
-#	 */
-#	public function InsertCategory($d)
-#	{
-#		return \DB::table('category')->insertGetId( array( 
-#				'category_title'=>$d['category_title'],
-#				'category_url'=>$d['category_url'],
-#				'category_description'=>$d['category_description'],
-#				'category_status'=>$d['category_status'],
-#				'category_visible'=>$d['category_visible'],
-#				'category_parent_id'=>$d['category_parent_id'],
-#				'category_store_id'=>$d['category_store_id']
-#				));
-#	}
-#
-#
-#
-#	/**
-#	 * Update row in the category table given id and new data
-#	 *
-#	 * @param	array	$d Array of data to update, row ID specified
-#	 * @pre		Data must be valid
-#	 * @post	new row added to category table, internal state updated
-#	 * @return	integer Count of affected rows
-#	 */
-#	public function UpdateCategory($d)
-#	{
-#		return \DB::table('category')->where(['id'=>$d['id']])
-#		 	->update( array(
-#				'category_title'=>$d['category_title'],
-#				'category_url'=>$d['category_url'],
-#				'category_description'=>$d['category_description'],
-#				'category_status'=>$d['category_status'],
-#				'category_visible'=>$d['category_visible'],
-#				'category_parent_id'=>$d['category_parent_id'],
-#				'category_store_id'=>$d['category_store_id']
-#				));
-#	}
-#
 
 
 	/**
@@ -342,17 +265,12 @@ protected $data = array();
 	}
 
 
-	/**
-	 * @todo Build new selectable output
-	 */
-	public function getULHTML( $id="menu-bar", $class="")
-	{
-	}
-
 
 
 
 	/**
+	 * IN PRODUCTION USE IN STOREFRONT CONTROLLER
+	 *
 	 * Return the HTML UL List as clickable items
 	 *
 	 * @pre		Categories table has valid data

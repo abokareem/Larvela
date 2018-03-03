@@ -36,16 +36,6 @@ protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_dat
 
 
 
-	/**
-	 * Return a single row given the row ID
-	 *
-	 * @param	integer	$id
-	 * @return	mixed
-	 */
-	public function getByID($id)
-	{
-		return \DB::table('subscription_request')->where(['id'=>$id])->first();
-	}
 
 
 	/**
@@ -56,14 +46,14 @@ protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_dat
 	 */
 	public function getByEmail($email)
 	{
-		return \DB::table('subscription_request')->where(['sr_email'=>$email])->first();
+		return \DB::table('subscription_requests')->where(['sr_email'=>$email])->first();
 	}
 
 
 
 	public function getByStatus($status)
 	{
-		return \DB::table('subscription_request')->where(['sr_status'=>$status])->get();
+		return \DB::table('subscription_requests')->where(['sr_status'=>$status])->get();
 	}
 
 
@@ -97,7 +87,7 @@ protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_dat
 			);
 		try
 		{
-		return \DB::table('subscription_request')->insertGetId( $d );
+		return \DB::table('subscription_requests')->insertGetId( $d );
 		}
 		catch(\Illuminate\Database\QueryException $e)
 		{
@@ -114,7 +104,7 @@ protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_dat
 	 */
 	public function InsertData($d)
 	{
-		return \DB::table('subscription_request')->insertGetId( $d );
+		return \DB::table('subscription_requests')->insertGetId( $d );
 	}
 
 
@@ -130,7 +120,7 @@ protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_dat
 	 */
 	public function UpdateSubscription($d)
 	{
-		return \DB::table('subscription_request')->where(['id'=>$d['id']])->update( $d );
+		return \DB::table('subscription_requests')->where(['id'=>$d['id']])->update( $d );
 	}
 
 
@@ -146,7 +136,7 @@ protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_dat
 	{
 		$today = date("Y-m-d");
 		$d = array( 'sr_status'=>'C', 'sr_process_value'=>0, 'sr_date_updated'=>$today);
-		return \DB::table('subscription_request')->where(['sr_email'=>$email])->update( $d );
+		return \DB::table('subscription_requests')->where(['sr_email'=>$email])->update( $d );
 	}
 
 
@@ -160,7 +150,7 @@ protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_dat
 	 */
 	public function DeleteRow($id)
 	{
-		return \DB::table('subscription_request')->where(['id'=>$id])->delete();
+		return \DB::table('subscription_requests')->where(['id'=>$id])->delete();
 	}
 
 
@@ -175,6 +165,6 @@ protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_dat
 	 */
 	public function DeleteSubscription($email)
 	{
-		return \DB::table('subscription_request')->where(['sr_email'=>$email])->delete();
+		return \DB::table('subscription_requests')->where(['sr_email'=>$email])->delete();
 	}
 }

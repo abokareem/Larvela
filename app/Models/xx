@@ -1,0 +1,26 @@
+
+	/**
+	 * Given a text string containing code, and an object containg row data
+	 * return a text string with the codes translated into data and return.
+	 *
+	 * @param   string  $text
+	 * @param   mixed   $store
+	 * @return  string
+	 */
+	public function translate($text,$c)
+	{
+		$number = sprintf("%08d", $c->id);
+		$translations = array(
+			"{ORDER_ID}"=>$number,
+			"{ORDER_REF}"=>$c->order_ref,
+			"{ORDER_SRC}"=>$c->order_src,
+			"{ORDER_SOURCE}"=>$c->order_src,
+			"{ORDER_STATUS}"=>$c->order_status,
+			"{ORDER_SHIPPING_VALUE}"=>number_format($c->order_shipping_value,2),
+			"{ORDER_VALUE}"=>number_format($c->order_value,2),
+			"{ORDER_DATE}"=>$c->order_date_created,
+			"{ORDER_TIME}"=>$c->order_date_updated
+			);
+		return str_replace(array_keys($translations), array_values($translations), $text);
+	}
+

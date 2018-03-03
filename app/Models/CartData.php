@@ -17,7 +17,18 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CartData extends Model
 {
+
+/**
+ * Table name (not in correct format)
+ * @var string $table
+ */
 protected $table = "cart_data";
+
+
+/**
+ * Columns that are mass assignable
+ * @var array $fillable
+ */
 public $fillable = ['cd_cart_id','cd_payment_method','cd_shipping_method'];
 
 
@@ -30,5 +41,4 @@ public $fillable = ['cd_cart_id','cd_payment_method','cd_shipping_method'];
 	{
 		return $this->belongsTo('App\Models\Cart','cd_cart_id');
 	}
-
 }

@@ -95,11 +95,10 @@ protected $fillable = ['image_file_name','image_folder_name','image_size','image
 
 
 
-
-
-
 	/**
 	 * Find and return the smallest thumbnail for this product
+	 *
+	 * Used in Cart Controller
 	 *
 	 * @param	integer	$image_id
 	 * @return	object or null
@@ -119,17 +118,18 @@ protected $fillable = ['image_file_name','image_folder_name','image_size','image
 
 
 
+
+
+
+
 	/**
-	 * Return a collection of rows given the parent image row ID.
+	 * Return a collection of images which are children of this parent.
 	 *
-	 * @pre ID is a valid integer
-	 * @post None
-	 * @param $id Integer row ID
-	 * @return mixed Collection of row objects.
+	 * @return	mixed
 	 */
-	public function getByParentID($id)
+	public function thumbnails()
 	{
-		return \DB::table('images')->where(['image_parent_id'=>$id])->get();
+		return $this->hasMany('App\Models\Image','image_parent_id');
 	}
 
 
@@ -143,7 +143,7 @@ protected $fillable = ['image_file_name','image_folder_name','image_size','image
 	 */
 	public function products()
 	{
-		return $this->belongsToMany('App\Models\Products','image_product','image_id','product_id');
+		return $this->belongsToMany('App\Models\Product','image_product','image_id','product_id');
 	}
 
 }

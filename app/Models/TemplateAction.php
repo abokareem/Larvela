@@ -1,9 +1,8 @@
 <?php
 /**
- * \class	Attribute
+ * \class	TemplateAction
  * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2018-01-12
- * @package App\Models
+ * @date	2016-08-18
  *
  *
  *
@@ -16,10 +15,13 @@ use Illuminate\Database\Eloquent\Model;
 
 
 /**
- * \brief Eloquent Model to provide support for the "attributes" table.
+ * \brief A list of Valid Actions (Business Processes) that we have templates for.
+ * See TemplateMapping for information on their use.
  */
-class Attribute extends Model
+class TemplateAction extends Model
 {
+
+
 /**
  * Indicates if the model should be timestamped.
  * @var bool $timestamps
@@ -27,13 +29,14 @@ class Attribute extends Model
 public $timestamps = false;
 
 
-
-
 /**
  * The attributes that are mass assignable.
  * @var array $fillable
  */
-protected $fillable = ['attribute_name','store_id'];
+protected $fillable = ['action_name'];
+
+
+
 
 
 }
