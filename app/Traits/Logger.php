@@ -70,6 +70,10 @@ protected $FILENAME = "default";
 	 */
 	public function Log($message,$status)
 	{
+		if(is_array($message)==true)
+		{
+			$message = print_r($message,true);
+		}
 		if(!file_exists($this->LOGDIR))
 		{
 			mkdir($this->LOGDIR, 0777, true);
