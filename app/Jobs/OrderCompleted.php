@@ -124,7 +124,7 @@ private $ACTION="ORDER_COMPLETED";
 		$Customer = new Customer;
 		$Store = new Store;
 		$Order = new Order;
-		$customer = Customer::where('id',$this->order->order_cid)->first();
+		$customer = Customer::find($this->order->order_cid);
 
 		$path = base_path();
 		$file = $path."/templates/".$this->store->store_env_code."/".$this->template_file_name;
@@ -150,7 +150,7 @@ private $ACTION="ORDER_COMPLETED";
 			dispatch($cmd);
 		}
 
-		$admin_user = Customer::where('id',1)->first();
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Order Completed message sent to [".$this->to."]", $text);
 		dispatch($cmd);

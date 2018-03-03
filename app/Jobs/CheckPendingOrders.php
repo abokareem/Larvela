@@ -87,7 +87,7 @@ use InteractsWithQueue, Queueable, SerializesModels;
 						if($o->order_date == $one_week_ago)
 						{
 							$this->LogMsg("Order ".$o->id." matches criteria!");
-							$customer = Customer::where('id',$o->order_cid)->first();
+							$customer = Customer::find($o->order_cid);
 							$email = $customer->customer_email;
 							$this->LogMsg("Customer email [".$email."]");
 

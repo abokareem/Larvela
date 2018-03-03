@@ -135,7 +135,7 @@ private $ACTION="WELCOME_CUSTOMER";
    			dispatch($cmd);
 		}
 
-		$admin_user = Customer::where('id', 1)->first();
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Welcome email sent to [".$this->to."]", $text);
 		dispatch($cmd);

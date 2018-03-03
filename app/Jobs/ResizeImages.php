@@ -16,7 +16,7 @@ use App\Jobs\Job;
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Image;
-use App\Models\ProdImageMaps;
+use App\Models\ProdImageMap;
 
 use App\Traits\Logger;
 
@@ -27,7 +27,7 @@ use App\Traits\Logger;
  * a series of smaller images that are then mapped to the parent Image.
  * These are used on main page and product page.
  */
-class ResizeImage extends Job
+class ResizeImages extends Job
 {
 use Logger;
 
@@ -60,18 +60,20 @@ protected $CONVERT = "/usr/bin/convert";
      * @param	int	$image_id	row id from images table.
      * @return void
      */
-    public function __construct($product_id, $image_id)
+    public function __construct($pid, $iid)
     {
 		$this->setFileName("store");
+		$this->LogStart();
 		$this->LogFunction("-- ResizeImageJob -- Constructor");
-		$this->product_id = $product_id;
-		$this->image_id = $image_id;
+		$this->product_id = $pid;
+		$this->image_id = $iid;
     }
 
 
 	public function __destruct()
     {
 		$this->LogFunction("-- ResizeImageJob -- Destructor");
+		$this->LogEnd();
 	}
 
 
@@ -88,9 +90,9 @@ protected $CONVERT = "/usr/bin/convert";
     {
 		$this->LogFunction("-- ResizeImageJob -- Handler");
 		$Image = new Image;
-		$PIM = new ProdImageMaps;
+		$PIM = new ProdImageMap;
 
-		$img = $Image->getByID($this->image_id);
+		$img = Image::find($this->image_id);
 
 		$image_source_path = public_path()."/".$img->image_folder_name;
 		$this->LogMsg("Image Source Path: ".$image_source_path );
@@ -117,22 +119,25 @@ protected $CONVERT = "/usr/bin/convert";
 			# insert into product image map with the ID and this->product_id
 			#
 			list($width, $height, $type, $attr) = getimagesize( $image_source_path."/".$new_name);
-			$data['image_file_name'] = $new_name;
-			$data['image_folder_name'] = $img->image_folder_name;
-			$data['image_size']   = filesize( $image_source_path."/".$new_name );
-			$data['image_height'] = $height;
-			$data['image_width']  = $width;
-			$data['image_order']  = $i++;
-			$data['image_parent_id'] = $this->image_id;
-
-			$rv = $Image->InsertImage($data);
+			$this->LogMsg("Save new Image [".$new_name."]");
+			$o = new Image;
+			$o->image_file_name = $new_name;
+			$o->image_folder_name = $img->image_folder_name;
+			$o->image_size   = filesize( $image_source_path."/".$new_name );
+			$o->image_height = $height;
+			$o->image_width  = $width;
+			$o->image_order  = $i++;
+			$o->image_parent_id = $this->image_id;
+			$o->save();
+			#
 			# insert this image into the DB as a thumbnail	
 			# only parent images are in "prod_image_maps table
+			#
 			foreach($data as $n=>$v)
 			{
 				$this->LogMsg("DATA [".$n."] = [".$v."]" );
 			}
-			$this->LogMsg( "New Name: [".$new_name."]" );
+			$this->LogMsg( "Done! --- New Name: [".$new_name."]" );
 		}
 	}
 

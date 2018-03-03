@@ -124,6 +124,8 @@ private $ACTION="CONFIRM_SUBSCRIPTION";
      */
     public function __construct($store, $email)
     {
+		$this->setFileName("store-jobs");
+		$this->LogStart();
 		$this->store = $store;
 		$this->to = $email;
 
@@ -135,13 +137,10 @@ private $ACTION="CONFIRM_SUBSCRIPTION";
 
 		$this->template_file_name = $this->getTemplate($this->ACTION);
 
-		echo "Template: ". $this->template_file_name. "</br>";
 		if(strlen($this->template_file_name)==0)
 		{
 			$this->template_file_name = strtolower($this->ACTION).".email";
 		}
-		
-		$this->sub_id = $this->SubscribeEmail($email);
     }
 
 
@@ -155,14 +154,22 @@ private $ACTION="CONFIRM_SUBSCRIPTION";
      */
     public function handle()
     {
+		$this->LogFunction("ConfirmSubscription::handle()");
+
+		$SubscriptionRequest = new SubscriptionRequest;
 		$Customer = new Customer;
 		$Store = new Store;
 		
+		$subscription_request = SubscriptionRequest::where('sr_email',$this->to)->first();
+		$this->sub_id = $subscription_request->id;
+
 		$path = base_path();
 		$file = $path."/templates/".$this->store->store_env_code."/".$this->template_file_name;
 		$text = "<h1>WARNING</h1><p>Subscription Request email NOT sent to: ".$this->to."</p><br/><br/>Check Template file! - <b>".$file."</b>";
+		$this->LogMsg("Template file [".$file."]");
 		if(file_exists($file))
 		{
+			$this->LogMsg("Loading Template.");
 			$text = file_get_contents($file);
 		
 			$body1 = str_replace("{CIDHASH}", $this->hash_value, $text);
@@ -177,12 +184,17 @@ private $ACTION="CONFIRM_SUBSCRIPTION";
 			$footer = SEOHelper::getText($footer_tag);
 
 			$t1 = $header.$body.$footer;
-			$text = = $Store->translate($t1, $this->store);
+			$text = $Store->translate($t1, $this->store);
 
 			$cmd = new EmailUserJob($this->to, $this->from, $this->subject, $text);
 	        dispatch($cmd);
 		}
-		$admin_user = Customer::where('id',1)->first();
+		else
+		{
+			$this->LogError("Unable to Load Template!");
+			$this->LogError("Email NOT sent");
+		}
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Subscription Confirmation Request Sent To [".$this->to."]", $text);
 		dispatch($cmd);

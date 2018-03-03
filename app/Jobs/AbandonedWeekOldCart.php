@@ -142,7 +142,7 @@ private $ACTION="CART_7DAY_ABANDONED";
    			dispatch($cmd);
 		}
 
-		$admin_user = Customer::where('id',1)->first();
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Week Old Abandoned cart message sent to [".$this->to."]", $text);
 		dispatch($cmd);

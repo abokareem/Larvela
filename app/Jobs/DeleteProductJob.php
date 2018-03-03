@@ -24,10 +24,10 @@ use App\Traits\Logger;
 
 use	App\Models\Image;
 use App\Models\Product;
-use	App\Models\ProdImageMaps;
+use	App\Models\ProdImageMap;
 use App\Models\ImageProduct;
 use App\Models\CategoryProduct;
-use App\Models\Notifications;
+use App\Models\Notification;
 
 
 /**
@@ -79,7 +79,7 @@ protected $product_id;
 
 
     /**
-     * Execute the job, remove all refereneces to it and then remove the product itself.
+     * Remove all references to product and then remove the product itself.
      *
      * @return void
      */
@@ -87,37 +87,46 @@ protected $product_id;
     {
 		$this->LogFunction("-- DeleteProductJob -- handle()");
 		$Image = new Image;
-		$ProdImageMaps = new ProdImageMaps;
-		$ImageProduct = new ImageProduct;
-		$CategoryProduct = new CategoryProduct;
 
-		$product = Product::where('id', $this->product_id )->first();
-		Notifications::where('product_code',$product->prod_sku)->delete();
+		$this->LogMsg("Fetch product ID [".$this->product_id."]");
+		$product = Product::find($this->product_id);
 
-		#
-		# get each image associated with the row, and remove the image.
-		#
-		$rows = $ImageProduct->getByProductID( $this->product_id );
-		foreach($rows as $r)
+		$this->LogMsg("Cleanup any customer notification requests");
+		Notification::where('product_code',$product->prod_sku)->delete();
+
+		$this->LogMsg("Fetch images id from pivot table");
+		$images = $product->images()->get();
+		$this->LogMsg("There are [".sizeof($images)."] images associated with this product");
+		
+		$pivot_rows = ProdImageMap::where('product_id',$product->id)->get();
+		foreach($pivot_rows as $row)
 		{
-			$img = Image::where('id',$r->id)->first();
-			if(sizeof($img)>0)
-			{
-				$this->LogMsg( "Remove image ".$img->image_file_name );
-				$path = $r->image_folder_name."/".$img->image_file_name;
-				$finalpath = public_path()."/media/".$path;
-				unlink($path);
-				$rv = $Image->DeleteByID($r->id);
-				$this->LogMsg("Image [".$r->id."] - removed [".$rv."]");
-			}
+			$this->LogMsg("Removing Pivot Table entry [".$row->id."]");
+			$row->delete();
 		}
-		$rv = $ImageProduct->DeleteByProductID( $this->product_id );
-		$this->LogMsg("Pivot Table - image_product rows removed [".$rv."]");
+		$this->LogMsg("Pivot Table - image_product rows removed");
 
-		$rv = $CategoryProduct->DeleteByProductID( $this->product_id );
+		#
+		# Remove any thumbnails associated with each base image.
+		#
+		foreach($images as $img)
+		{
+			$rv = Image::where('image_parent_id', $img->id)->delete();
+			$this->LogMsg("Removed [".$rv."] thumbnails");
+
+			$this->LogMsg( "Remove image ".$img->image_file_name );
+			$path = $img->image_folder_name."/".$img->image_file_name;
+			$finalpath = public_path()."/media/".$path;
+			unlink($path);
+
+			$rv = $img->delete();
+			$this->LogMsg("Base (parent) Image removed  RC=[".$rv."]");
+		}
+
+		$rv = CategoryProduct::where('product_id', $this->product_id )->delete();
 		$this->LogMsg("Pivot Table - category_product rows removed [".$rv."]");
 
-		$rv = Product::where('id', $this->product_id )->delete();
+		$rv = $product->delete();
 		$this->LogMsg("Product Removed [".$rv."]");
     }
 }

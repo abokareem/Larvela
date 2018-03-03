@@ -155,13 +155,13 @@ private $ACTION="RESEND_SUB_REQUEST";
 			$footer = SEOHelper::getText($footer_tag);
 	
 			$t1 = $header.$body.$footer;
-			$text = = $Store->translate($t1, $this->store);
+			$text = $Store->translate($t1, $this->store);
 
 			$cmd = new EmailUserJob($this->to, $this->from, $this->subject, $text);
 			dispatch($cmd);
 		}
 
-		$admin_user = Customer::where('id',1)->first();
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Resend Subscription Request message sent to [".$this->to."]", $text);
 		dispatch($cmd);

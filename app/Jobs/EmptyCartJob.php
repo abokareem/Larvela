@@ -82,7 +82,7 @@ protected $cart_id;
 
 		$cart_id = $this->cart_id;
 
-		$cart = Cart::where('id',$cart_id)->first();
+		$cart = Cart::find($cart_id);
 		
 		$items = CartItem::where('cart_id',$cart_id)->get();
 		$this->LogMsg("Remove cart items.");

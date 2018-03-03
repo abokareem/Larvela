@@ -17,7 +17,7 @@ namespace App\Jobs;
 use App\Jobs\Job;
 
 use App\Models\Image;
-use App\Models\ProdImageMaps;
+use App\Models\ProdImageMap;
 
 
 use App\Traits\Logger;
@@ -70,27 +70,32 @@ protected $image_id;
     public function handle()
     {
 		$this->LogFunction("-- DeleteImageJob -- handle()");
-   		$Image = new Image;
-		$ProdImageMaps = new ProdImageMaps;
 
-		$img = $Image->getByID($this->image_id);
+		$img = Image::find($this->image_id);
+		if(is_null($img)==true)
+		{
+			$this->LogMsg("Image not found, may already be removed!");
+			return;
+		}
 		$file_name = $img->image_file_name;
 		$folder = $img->image_folder_name;
 		$path = public_path()."/".$folder."/".$file_name;
+		$this->LogMsg("Checking for image file [".$path."]" );
 		if(file_exists($path))
 		{
 			$this->LogMsg("Unlinking file [".$path."]" );
 			unlink($path);
 		}
-		$mapping = $ProdImageMaps->getByImageID($this->image_id);
+		$mapping = ProdImageMap::where('image_id',$this->image_id)->get();
 		foreach($mapping as $map)
 		{
-			$this->LogMsg( "Removing Mapping ID=".$map->id."  P=".$map->product_id." I=".$map->image_id ); 
-			$ProdImageMaps->DeleteByID($map->id);
-			$Image->DeleteByID($img->id);
+			$this->LogMsg("Removing Mapping ID=[".$map->id."]  P=[".$map->product_id."] I=[".$map->image_id."]"); 
+			$count = ProdImageMap::find($map->id)->delete();
+			$this->LogMsg("Removed Count [".$count."]"); 
 		}
-		$this->LogMsg( "Get all thumb nails." );
-		$thumbnails = $Image->getByParentID($this->image_id);
+		$this->LogMsg( "Finding image thumbnails:" );
+		$thumbnails = Image::where('image_parent_id',$this->image_id)->get();
+
 		foreach($thumbnails as $tb)
 		{
 			$this->LogMsg( "Thumbnail ID [".$tb->id."] - File [".$tb->image_file_name."]" );
@@ -99,7 +104,9 @@ protected $image_id;
 			$file_name = $tb->image_file_name;
 			$folder = $tb->image_folder_name;
 
-			$rv = $Image->DeleteByID($tb->id);
+			$this->LogMsg( "Find thumbnail image to delete [".$tb->id."]" );	
+			$image = Image::find($tb->id);
+			$rv = $image->delete();
 
 			$this->LogMsg( "Delete call returned [".$rv."]" );	
 			$path = public_path()."/".$folder."/".$file_name;
@@ -109,5 +116,8 @@ protected $image_id;
 				unlink($path);
 			}
 		}
+		$this->LogMsg("Finally remove Parent Image [".$img->id."]" );
+		$img->delete();
+		$this->LogMsg("Done!");
     }
 }

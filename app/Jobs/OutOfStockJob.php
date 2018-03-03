@@ -151,7 +151,7 @@ private $ACTION="PRODUCT_OUT_OF_STOCK";
 			dispatch($cmd);
 		}
 
-		$admin_user = Customer:;where('id',1)->first();
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] OutofStock Notification", $text);
 		dispatch($cmd);

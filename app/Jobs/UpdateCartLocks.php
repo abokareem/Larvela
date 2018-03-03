@@ -69,7 +69,7 @@ use Logger;
 				{
 					$this->LogMsg("product_locks row ID [".$locked->id."] is stale - remove");
 					$this->LogMsg("Product ID [".$locked->product_lock_pid."]");
-					$product = Product::where('id',$locked->product_lock_pid)->first();
+					$product = Product::find($locked->product_lock_pid);
 					$locked_qty = $locked->product_lock_qty;
 					$stock_qty = $product->prod_qty;
 					$this->LogMsg("Product QTY [".$stock_qty."] add back [".$locked_qty."]");

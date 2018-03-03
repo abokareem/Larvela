@@ -137,9 +137,9 @@ private $ACTION="SUBSCRIPTION_CONFIRMED";
 		$Store = new Store;
 		$Customer = new Customer;
 		$SubscriptionRequest = new SubscriptionRequest;
-
-		#$record = $SubscriptionRequest->getByEmail($this->email);
+		#
 		# {FIX_2017-10-25} SubscriptionConfirmed.php - handle() - refactor code to use Eloquent
+		#
 		$record = SubscriptionRequest::where('sr_email',$this->email)->first();
 		$hash_value = hash('ripemd160', $this->email.$this->store->store_env_code);
 
@@ -163,13 +163,15 @@ private $ACTION="SUBSCRIPTION_CONFIRMED";
 			$footer = SEOHelper::getText($footer_tag);
 
 			$t1 = $header.$body.$footer;
-			$text = = $Store->translate($t1, $this->store);
+			$text = $Store->translate($t1, $this->store);
 
 			$cmd = new EmailUserJob($this->to, $this->from, $this->subject, $text);
 			dispatch($cmd);
 		}
+		#
 		# {FIX_2017-10-25} SubscriptionConfirmed.php - handle() - refactor code to use Eloquent
-		$admin_user = Customer::where('id',1)->first();
+		#
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Subscription Confirmed message sent to [".$this->to."]", $text);
 		dispatch($cmd);

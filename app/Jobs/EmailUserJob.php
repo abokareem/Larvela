@@ -19,6 +19,10 @@ use Swift_Mailer;
 use Swift_Message;
 use Swift_SmtpTransport;
 
+
+use App\Traits\Logger;
+
+
 /**
  * \brief Common Job to send an email given the TO, FROM, SUBJECT and BODY - Uses Swift Mailer Class
  *
@@ -26,6 +30,7 @@ use Swift_SmtpTransport;
  */
 class EmailUserJob extends Job
 {
+use Logger;
 
 
 /**
@@ -82,10 +87,12 @@ protected $mailer;
      */
     public function __construct($to, $from, $subject, $body)
     {
+		$this->setFileName("larvela-emails");
 		$this->to = $to;
 		$this->from = $from;
 		$this->subject = $subject;
 		$this->body = $body;
+		$this->LogMsg( "TO [".$to."]  FROM [".$from."] - ".$subject );
 
 		$this->transport = Swift_SmtpTransport::newInstance('localhost', 25);
 		$this->mailer = Swift_Mailer::newInstance($this->transport);
@@ -106,6 +113,8 @@ protected $mailer;
 		$message->setFrom($this->from);
 		$message->setBody($this->body, 'text/html');
 		$this->mailer->send($message);
+		$this->LogMsg( "Email sent.");
+
 #
 # Capture all emails
 # test code, jobs now coded to send to store owner ID=1

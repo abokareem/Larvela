@@ -120,7 +120,7 @@ private $ACTION="ORDER_CANCELLED";
 		$Customer = new Customer;
 		$Store = new Store;
 		$Order = new Order;
-		$customer = Customer::where('id',$this->order->order_cid)->first();
+		$customer = Customer::find($this->order->order_cid);
 
 		$reason = "not specified - contact store";
 		if($this->order->order_status == "C")
@@ -156,7 +156,7 @@ private $ACTION="ORDER_CANCELLED";
 			dispatch($cmd);
 		}
 
-		$admin_user = Customer::where('id',1)->first();
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Order Cancelled message sent to [".$this->to."]", $text);
 		dispatch($cmd);

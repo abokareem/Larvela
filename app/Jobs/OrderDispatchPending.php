@@ -96,7 +96,7 @@ private $ACTION="ORDER_DISPATCH_PENDING";
 		echo "Template: ". $this->template_file_name. "</br>";
 		if(strlen($this->template_file_name)==0)
 		{
-			$this->template_file_name = "template_1_".strtolower($this->ACTION).".email";
+			$this->template_file_name = strtolower($this->ACTION).".email";
 		}
     }
 
@@ -137,7 +137,7 @@ private $ACTION="ORDER_DISPATCH_PENDING";
 			dispatch($cmd);
 		}
 
-		$admin_user = Customer::where('id',1)->first();
+		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Order Dispatch Pending email sent to [".$this->to."]", $text);
 		dispatch($cmd);
