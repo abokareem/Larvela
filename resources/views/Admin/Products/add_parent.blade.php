@@ -1,6 +1,19 @@
 @extends('admin-master')
-@section('title','Add New Product')
+@section('title','Add Parent Product')
 @section('content')
+<?php
+# Notes:
+# ------
+# Parent Product is made up of Basic Products.
+# Displayed product is SKU + pieces of Child (Basic) products with matching start SKU.
+# PP has no Qty, Weight, Re-order value or actual price.
+# Price is calculated on selected basic product.
+# Can display a price range from lowest to highest when
+# rendering Parent Product in special product page.
+#
+#
+#
+#?>
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
 <script src="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/src/js/bootstrap-datetimepicker.js"></script>
@@ -8,7 +21,7 @@
 
 <div class='container'>
 	<div class="row">
-			<div class="col-lg-12"><h3 class="page-header">Add New Product</h3></div>
+			<div class="col-lg-12"><h3 class="page-header">Add a new Parent Product</h3></div>
 	</div>
 
 
@@ -49,46 +62,8 @@
 				<textarea class="form-control" id='prod_long_desc' name="prod_long_desc"></textarea>
 		 	</div>
 		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-2">Product Type:</label>
-			<div class="col-xs-4">
-				<select id="prod_type" name="prod_type" class="form-control">
-				@foreach($product_types as $pt)
-					@if($pt->id == 1)
-					<option value="{{ $pt->id }}" selected>{{ $pt->product_type }}</option>
-					@else
-					<option value="{{ $pt->id }}">{{ $pt->product_type }}</option>
-					@endif
-				@endforeach
-				</select>				
-		 	</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-2">Retail Cost:</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_retail_cost' name="prod_retail_cost" value=''>
-		 	</div>
-			<label class="control-label col-xs-2">Base Cost:</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_base_cost' name="prod_base_cost" value=''>
-		 	</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-2">Qty:</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_qty' name="prod_qty" value=''>
-		 	</div>
-			<label class="control-label col-xs-2">Reorder Qty:</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_reorder_qty' name="prod_reorder_qty" value=''>
-		 	</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-2">Weight (grams):</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_weight' name="prod_weight" value=''>
-		 	</div>
-		</div>
+
+
 		<div class="form-group">
 			<label class="control-label col-xs-2">Combine Code:</label>
 			<div class="col-xs-2">
@@ -167,6 +142,13 @@
 		 	</div>
 		</div>
 	</div>
+	<input type="hidden" name="product_type" value="{{$product_type->id}}">
+
+	<input type="hidden" name="prod_retail_cost" value='0'>
+	<input type="hidden" name="prod_base_cost" value='0'>
+	<input type="hidden" name="prod_qty" value='0'>
+	<input type="hidden" name="prod_reorder_qty" value='0'>
+	<input type="hidden" name="prod_weight" value='0'>
 	{!! Form::token() !!}
 	{!! Form::close() !!}
 </div>
@@ -187,7 +169,6 @@ $('#edit').validate(
 	{
 		prod_sku: { required: true, minlength: 3 },
 		prod_title: { required: true, minlength: 3 },
-		prod_weight: { required: true, minlength: 2 },
 		prod_short_desc: { required: true, minlength: 7 }
 	}
 });
@@ -195,7 +176,7 @@ $('#edit').validate(
 
 $('#btnsave').click( function()
 {
-	$('#edit').attr('action','/admin/product/save');
+	$('#edit').attr('action','/admin/product/save-pp');
 	$('#edit').submit();
 });
 
