@@ -26,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      * {FIX_2017-10-28} "AppServiceProvider.php" - Refactored.
+     * {FIX_2018-03-04} "AppServiceProvider.php" - Refactored find()
      * @return void
      */
     public function boot()
@@ -42,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
 			}
 			else
 			{
-				$store = Store::where('id',1)->first();
+				$store = Store::find(1);
 			}
 			$this->app->instance('store', $store);
 	    }
