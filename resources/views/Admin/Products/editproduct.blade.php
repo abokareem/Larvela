@@ -5,12 +5,14 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
 <script src="//cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/e8bddc60e73c1ec2475f827be36e1957af72e2ea/src/js/bootstrap-datetimepicker.js"></script>
 
+
+
 <?php
 function IsChecked($id, $items)
 {
 	foreach($items as $item)
 	{
-		if($item->category_id == $id) return " checked ";
+#		if($item->category_id == $id) return " checked ";
 	}
 	return "";
 }
@@ -60,7 +62,11 @@ function IsChecked($id, $items)
 		<div class="form-group">
 			<label class="control-label col-xs-2">Product Type:</label>
 			<div class="col-xs-4">
-				{!! $prod_type_select_list !!}
+				<select id="prod_type" name="prod_type" class="form-control">
+				@foreach($product_types as $pt)
+					<option value="{{ $pt->id }}">{{ $pt->product_type }}</option>
+				@endforeach
+				</select>
 		 	</div>
 		</div>
 		<div class="form-group">
@@ -151,12 +157,30 @@ function IsChecked($id, $items)
 		</div>
 	</div>
 
+
+
+	<?php
+	$store_name = array(); 
+	$store_name[0] = "Not Defined...."; ?>
+	@foreach($stores as $s)
+		<?php $store_name[$s->id] = $s->store_name; ?>
+	@endforeach
+
+	<?php $mapping = array(); ?>
+	@foreach($catmappings as $cm)
+		<?php array_push($mapping, $cm->category_id); ?>
+	@endforeach
+	
 	<div class="row">
 		<div class="control-group">
 			<label class="control-label col-xs-2">Category:</label>
 			<div class="col-xs-8">
 			@foreach($categories as $cat)
-				<input type='checkbox' name='category[]' value='{{$cat->id}}' <?php echo IsChecked($cat->id, $catmappings); ?> > {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_names[$cat->category_store_id] }}</i></span><br>
+				@if(in_array($cat->id, $mapping))
+					<input type='checkbox' name='category[]' value='{{$cat->id}}' checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+				@else
+				<input type='checkbox' name='category[]' value='{{$cat->id}}'> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+				@endif
 			@endforeach
 			</div>
 		</div>

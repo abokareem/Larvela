@@ -39,14 +39,25 @@
 
 
 	<div class="row">
-		<a href='/admin/product/addnew'><button class="btn btn-success">
-			<i class="fa fa-user-plus"></i> Add Mapping </button></a>
+		<button type="button" id="addnew" name="addnew" class="btn btn-success">
+			<i class="fa fa-user-plus"></i> Add Mapping
+		</button>
 	</div>
+
+
 <script>
+$('#addnew').click(funcion()
+{
+var url = '/admin/template/add/';
+window.location.href = url;
+});
+
+
 function select(id)
 {
 var url = '/admin/template/edit/'+id;
 window.location.href = url;
 }
 </script>
+<!-- Admin.templates.showtemplate -->
 @stop

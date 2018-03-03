@@ -26,7 +26,16 @@
 		<div class="form-group">
 			<label class="control-label col-xs-2">Store:</label>
 			<div class="col-xs-4">
-				{!! $store_select_list !!}
+				<select class="form-control" id="store_id" name="store_id">
+					<option value="0">Global - All Stores</option>
+					@foreach($stores as $s)
+						@if($s->id == $store_id)
+						<option value="{{$s->id}}" selected>{{$s->store_name}}</option>
+						@else
+						<option value="{{$s->id}}">{{$s->store_name}}</option>
+						@endif
+					@endforeach
+				</select>
 		 	</div>
 		</div>
 		<div class="form-group">
@@ -56,7 +65,7 @@
 	{!! Form::close() !!}
 </div>
 
-<script src='http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
+<script src='//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
 
 <script>
 
@@ -72,7 +81,7 @@ $('#edit').validate(
 
 $('#btnsave').click( function()
 {
-	$('#edit').attr('action','/admin/setting/save/{{ $setting->id }}');
+	$('#edit').attr('action','/admin/setting/update/{{ $setting->id }}');
 	$('#edit').submit();
 });
 

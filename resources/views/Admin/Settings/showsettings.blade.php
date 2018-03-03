@@ -4,13 +4,24 @@
 
 <div class="container">
 	<div class="row">
-		<div class='col-lg-12'><h3 class='page-header'><i class="fa fa-spanner"></i> Settings</h3></div>
+		<div class='col-lg-12'><h3 class='page-header'><i class="fa fa-spanner"></i>Global & Store Settings</h3></div>
 	</div>
 
 	@include('Templates.messages')
 	
 	<div class="row">
-		<div class='pull-right'>{!! $store_select_list !!}</div>
+		<div class='pull-right'>
+			<select class="form-control" id="store_id" name="store_id">
+				<option value="0">Global - All Stores</option>
+				@foreach($stores as $s)
+					@if($s->id == $store_id)
+					<option value="{{$s->id}}" selected>{{$s->store_name}}</option>
+					@else
+					<option value="{{$s->id}}">{{$s->store_name}}</option>
+					@endif
+				@endforeach
+			</select>
+		</div>
 	</div>
 
 	<div class="row">
@@ -21,6 +32,7 @@
 				<th>Parameter</th>
 				<th>Value</th>
 				<th>Store ID</th>
+				<th>Actions</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -29,7 +41,14 @@
 					<td>{{ $s->id }} <i style="color:green;">(Global)</i></td>
 					<td>{{ $s->setting_name }}</td>
 					<td>{{ $s->setting_value }}</td>
-					<td>{!! $stores[$s->setting_store_id] !!}</td>
+					<td>
+						@foreach($stores as $st)
+							@if($st->id == $s->setting_store_id)
+								{{ $st->store_name }}
+							@endif
+						@endforeach
+					</td>
+					<td><a href="/admin/setting/delete/{{ $s->id }}"><i class="fa fa-trash"></i> Delete</a></td>
 				</tr>
 				@endforeach
 				@foreach($settings as $s)
@@ -37,7 +56,14 @@
 					<td>{{ $s->id }}</td>
 					<td>{{ $s->setting_name }}</td>
 					<td>{{ $s->setting_value }}</td>
-					<td>{!! $stores[$s->setting_store_id] !!}</td>
+					<td>
+						@foreach($stores as $st)
+							@if($st->id == $s->setting_store_id)
+								{{ $st->store_name }}
+							@endif
+						@endforeach
+					</td>
+					<td><a href="/admin/setting/delete/{{ $s->id }}"><i class="fa fa-trash"></i> Delete</a></td>
 				</tr>
 				@endforeach
 			</tbody>
@@ -46,7 +72,7 @@
 	
 
 	<div class="row">
-		<a href='/admin/setting/addnew'><button class="btn btn-success"><i class="fa fa-user-plus"></i> Add Setting </button></a>
+		<a href='/admin/setting/add'><button class="btn btn-success"><i class="fa fa-user-plus"></i> Add Setting </button></a>
 	</div>
 </div>
 <script>
@@ -63,4 +89,5 @@ var url = '/admin/setting/edit/'+id;
 window.location.href = url;
 }
 </script>
+<!-- Admin.Settings.showsettings -->
 @stop

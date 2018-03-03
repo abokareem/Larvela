@@ -69,7 +69,13 @@
 			@foreach($mappings as $m)
 				<td>{{ $m->id }}</td>
 				<td>{{ $m->template_name }}</td>
-				<td>{{ $actions[$m->template_action_id] }}</td>
+				<td>
+					@foreach($actions as $a)
+						@if($a->id == $m->template_action_id)
+						{{ $a->action_name }}
+						@endif
+					@endforeach
+				</td>
 				<td>{{ $m->template_store_id }}</td>
 				</tr>
 			@endforeach
@@ -85,8 +91,12 @@
 
 
 	<div class="row">
-		<a href='/admin/product/addnew'><button class="btn btn-success">
-			<i class="fa fa-user-plus"></i> Add Mapping </button></a>
+		<button type="button" id="addnew" name="addnew" class="btn btn-success">
+			<i class="fa fa-user-plus"></i> Add Mapping
+		</button>
+		<button type="button" id="addaction" name="addaction" class="btn btn-success">
+			<i class="fa fa-user-plus"></i> Actions
+		</button>
 	</div>
 </div>
 <script>
@@ -97,6 +107,12 @@ var url = '/admin/templates?s='+id;
 window.location.href = url;
 });
 
+
+$('#addnew').click(function()
+{
+var url = '/admin/template/add/';
+window.location.href = url;
+}
 
 
 function select(id)

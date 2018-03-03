@@ -1,5 +1,5 @@
 @extends('admin-master')
-@section('title','Product Management')
+@section('title','Product Selection')
 @section('content')
 
 	<div class="row">
@@ -73,8 +73,6 @@
 				<td> </td>
 				@endif
 				<td>{{ $p->prod_date_created }} - {{ $p->prod_time_created }}</td>
-				<td>{{ $p->prod_combine_code }}</td>
-				<td><a href='/admin/product/copy/{{ $p->id }}'><i class="fa fa-copy"></i>Copy</a></td>
 				</tr>
 			@endforeach
 			</tbody>
@@ -82,23 +80,12 @@
 	</div>
 
 
-	<div class="row">
-		<div class='col-xs-6'>
-			{-!-!- $products->render() !-!-}
-		</div>
-	</div>
-
-
-	<div class="row">
-		<a href='/admin/products/select/type'><button class="btn btn-success">
-			<i class="fa fa-user-plus"></i> Add Product </button></a>
-	</div>
 <script>
 
 $('#category_id').change(function(){
 var cid = $('#category_id').val();
 var sid = $('#store_id').val();
-var url = '/admin/products?c='+cid+'&s='+sid;
+var url = '/admin/images?c='+cid+'&s='+sid;
 window.location.href = url;
 });
 
@@ -108,14 +95,14 @@ window.location.href = url;
 $('#store_id').change(function(){
 var cid = $('#category_id').val();
 var sid = $('#store_id').val();
-var url = '/admin/products?s='+sid+'&c='+cid;
+var url = '/admin/images?s='+sid+'&c='+cid;
 window.location.href = url;
 });
 
 
 function select(id)
 {
-var url = '/admin/product/edit/'+id+"?s={{$store_id}}&c={{$category_id}}";
+var url = '/admin/image/show/'+id+"?s={{$store_id}}&c={{$category_id}}";
 window.location.href = url;
 }
 </script>
