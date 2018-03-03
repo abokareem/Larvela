@@ -48,6 +48,7 @@ use App\Traits\Logger;
  * \brief MVC Controller to Handle the Product Administration functions.
  *
  * {INFO_2018-03-01} Removed all code except copy and product add 
+ * {INFO_2018-03-04} Coded up Parent product view call
  */
 class ProductController extends Controller
 {
@@ -129,6 +130,7 @@ use Logger;
 			}
 		}
 
+		$store = app('store');
 		$stores = Store::all();
 		$categories = Category::all();
 
@@ -138,24 +140,28 @@ use Logger;
 				return view('Admin.Products.add_parent',[
 					'product_type'=>$product_type,
 					'stores'=>$stores,
+					'store'=>$store,
 					'categories'=>$categories ]);
 				break;
 			case "Virtual Virtual Product (Limited)":
 				return view('Admin.Products.add_virtual',[
 					'product_type'=>$product_type,
 					'stores'=>$stores,
+					'store'=>$store,
 					'categories'=>$categories ]);
 				break;
 			case "Virtual Product (Unlimited)":
 				return view('Admin.Products.add_unlimited_virtual',[
 					'product_type'=>$product_type,
 					'stores'=>$stores,
+					'store'=>$store,
 					'categories'=>$categories ]);
 				break;
 			default:
 				return view('Admin.Products.add_basic',[
 					'product_type'=>$product_type,
 					'stores'=>$stores,
+					'store'=>$store,
 					'categories'=>$categories ]);
 				break;
 		}
