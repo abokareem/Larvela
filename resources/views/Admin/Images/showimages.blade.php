@@ -43,6 +43,7 @@
 			<thead>
 				<th>ID</th>
 				<th>Name</th>
+				<th>View Image</th>
 				<th>Folder</th>
 				<th>Size</th>
 				<th>HxW</th>
@@ -54,6 +55,7 @@
 				<tr>
 					<td>{{ $image->id }}</td>
 					<td>{{ $image->image_file_name }}</td>
+					<td><a href="/{{ $image->image_folder_name }}/{{ $image->image_file_name }}">View</a></td>
 					<td>{{ $image->image_folder_name }}</td>
 					<td>{{ $image->image_size }} Bytes</td>
 					<td>{{ $image->image_height }} x {{ $image->image_width }}</td>
@@ -65,6 +67,7 @@
 					<tr>
 					<td>{{ $t->id }}</td>
 					<td>{{ $t->image_file_name }}</td>
+					<td><a href="/{{ $t->image_folder_name }}/{{ $t->image_file_name }}">View</a></td>
 					<td>{{ $t->image_folder_name }}</td>
 					<td>{{ $t->image_size }} Bytes</td>
 					<td>{{ $t->image_height }} x {{ $image->image_width }}</td>
