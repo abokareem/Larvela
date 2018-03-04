@@ -118,7 +118,11 @@
 										@if($p->prod_qty == 1)
 										<p class="pull-left">Last one!</p><br>
 										@else
-										<p class="pull-left">&nbsp;&nbsp;<strong>{{ $p->prod_qty }} In Stock</strong></p>
+											@if($p->prod_qty <5)
+											<p class="pull-left">&nbsp;&nbsp;<strong>{{ $p->prod_qty }} In Stock</strong></p>
+											@else
+											<p class="pull-left">&nbsp;&nbsp;<strong>Lots (5+) In Stock</strong></p>
+											@endif
 										@endif
 									@endif
 								@endif
