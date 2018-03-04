@@ -12,6 +12,7 @@ namespace App\Http\Controllers;
 
 
 use Input;
+use Redirect;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
@@ -42,6 +43,7 @@ use App\Models\Notification;
 
 
 use App\Traits\Logger;
+use App\Traits\ProductImageHandling;
 
 
 /**
@@ -53,6 +55,7 @@ use App\Traits\Logger;
 class BasicProductController extends Controller
 {
 use Logger;
+use ProductImageHandling;
 
 
 	/**
@@ -738,15 +741,14 @@ use Logger;
 	 */
 	public function ShowAttributesPage()
 	{
-		$Store = new Store;
-		$stores = Store::all():
+		$stores = Store::all();
 		$store_names = array();
 		$store_names[0]='All Stores';
 		$html = "<select class='form-control' id='store_id' name='store_id'>";
 		$html .= "<option value='0'>Global - All Stores</option>";
 		foreach($stores as $store)
 		{
-			$store_names[$r->id] = $r->store_name;
+			$store_names[$store->id] = $store->store_name;
 			$html .= "<option value='".$store->id."'>".$store->store_name."</option>";
 		}
 		$html .="</select>";
