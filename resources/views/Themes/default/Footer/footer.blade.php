@@ -61,6 +61,7 @@
 		<div class="footer-menu pull-right">
 			<a href="/about">About</a>
 			<a href="/support">Help &amp; Support</a>
+			<a href="/returns">Returns</a>
 			<a href="/tandc">Terms of Service</a>
 			<a href="/privacy">Privacy Policy</a>
 			<a href="/contact">Contact Us</a>
@@ -69,9 +70,16 @@
 </div>
 <br/>
 <br/>
-<div class="container">
-	<div class="row">
-	(C) Present and Future Hodings Pty Ltd
+<div class="container-fluid">
+	<div class="row" style="padding:30px;">
+		<div style="margin: 0 auto;width:100px;">
+		<a href="https://larvela.org/">
+		<font face="verdana" size="1">Powered by:</font></br><img src="https://larvela.org/larvela-cart-20180211.jpg">
+		</a></br></br>
+		</div>
+		<div style="margin: 0 auto;width:300px;">
+		<font face="verdana" size="1">(C) Present and Future Holdings Pty Ltd<br>ACN 145 290 286</font>
+		</div>
 	</div>
 </div>
 <script>
