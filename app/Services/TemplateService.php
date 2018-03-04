@@ -10,7 +10,7 @@ namespace App\Services;
 use App\Http\Requests\TemplateNewRequest;
 use App\Http\Requests\TemplateUpdateRequest;
 
-use App\Models\Templates;
+use App\Models\Template;
 
 
 /**
@@ -20,12 +20,12 @@ class TemplateService
 {
 	public static function insert(TemplateRequest $request)
 	{
-		$Templates = new Templates;
-		$data = array( );
-		$rv = $Templates->InsertTemplate($request);
+		$o = new Template;
+		$rv = $o->save();
 		if($rv > 0)
 		{
 			\Session::flash('flash_message','Template Saved!');
+			return $o->id;
 		}
 		else
 		{
