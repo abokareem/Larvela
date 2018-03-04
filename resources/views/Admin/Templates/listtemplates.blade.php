@@ -112,7 +112,7 @@ $('#addnew').click(function()
 {
 var url = '/admin/template/add/';
 window.location.href = url;
-}
+});
 
 
 function select(id)
