@@ -91,7 +91,7 @@
 			<span class="input-group"><input type="radio" id="btnbank" name="payment_options" value="BD"> Bank Deposit</span>
 			<span class="input-group"><input type="radio" id="btncc" name="payment_options" value="CC" disabled> Credit Card</span>
 			<span class="input-group">
-				<input type="radio" id="btnpp" name="payment_options" value="PP"> Paypal
+				<input type="radio" id="btnpp" name="payment_options" value="PP"> Paypal / Credit Card via Paypal
 			</span>
 		</div>
 	</form>
