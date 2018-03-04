@@ -142,8 +142,7 @@
 		 	</div>
 		</div>
 	</div>
-	<input type="hidden" name="product_type" value="{{$product_type->id}}">
-
+	<input type="hidden" name="prod_type" value="{{$product_type->id}}">
 	<input type="hidden" name="prod_retail_cost" value='0'>
 	<input type="hidden" name="prod_base_cost" value='0'>
 	<input type="hidden" name="prod_qty" value='0'>

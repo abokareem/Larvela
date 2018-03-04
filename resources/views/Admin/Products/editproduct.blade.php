@@ -64,7 +64,11 @@ function IsChecked($id, $items)
 			<div class="col-xs-4">
 				<select id="prod_type" name="prod_type" class="form-control">
 				@foreach($product_types as $pt)
+					@if($product->prod_type == $pt->id)
+					<option value="{{ $pt->id }}" selected>{{ $pt->product_type }}</option>
+					@else
 					<option value="{{ $pt->id }}">{{ $pt->product_type }}</option>
+					@endif
 				@endforeach
 				</select>
 		 	</div>

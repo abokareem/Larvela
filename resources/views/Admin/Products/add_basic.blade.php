@@ -153,7 +153,7 @@
 		 	</div>
 		</div>
 	</div>
-	<input type="hidden" name="product_type" value="{{$product_type->id}}">
+	<input type="hidden" name="prod_type" value="{{$product_type->id}}">
 	{!! Form::token() !!}
 	{!! Form::close() !!}
 </div>

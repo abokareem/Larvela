@@ -1,5 +1,5 @@
 @extends('admin-master')
-@section('title','Add New Product')
+@section('title','Add Virtual Product')
 @section('content')
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
@@ -8,7 +8,7 @@
 
 <div class='container'>
 	<div class="row">
-			<div class="col-lg-12"><h3 class="page-header">Add New Product</h3></div>
+			<div class="col-lg-12"><h3 class="page-header">Add Virtual Product</h3></div>
 	</div>
 
 
@@ -49,20 +49,7 @@
 				<textarea class="form-control" id='prod_long_desc' name="prod_long_desc"></textarea>
 		 	</div>
 		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-2">Product Type:</label>
-			<div class="col-xs-4">
-				<select id="prod_type" name="prod_type" class="form-control">
-				@foreach($product_types as $pt)
-					@if($pt->id == 1)
-					<option value="{{ $pt->id }}" selected>{{ $pt->product_type }}</option>
-					@else
-					<option value="{{ $pt->id }}">{{ $pt->product_type }}</option>
-					@endif
-				@endforeach
-				</select>				
-		 	</div>
-		</div>
+
 		<div class="form-group">
 			<label class="control-label col-xs-2">Retail Cost:</label>
 			<div class="col-xs-2">
@@ -84,15 +71,16 @@
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">Weight (grams):</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_weight' name="prod_weight" value=''>
+			<label class="control-label col-xs-2">Downloadable:</label>
+			<div class="col-xs-8">
+				<input type="radio" name="prod_weight" value='1' checked> Yes &nbsp;&nbsp;
+				<input type="radio" name="prod_weight" value='0'> NO
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">Combine Code:</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_combine_code' name="prod_combine_code" value=''>
+			<label class="control-label col-xs-2">Contect Path:</label>
+			<div class="col-xs-10">
+				<input type="text" class="form-control" id='prod_combine_code' name="prod_combine_code" value='/downloadable' placeholder="Content is stored in public but with a temporary GUID">
 		 	</div>
 		</div>
 		<div class="form-group">
@@ -167,6 +155,7 @@
 		 	</div>
 		</div>
 	</div>
+	<input type="hidden" name="prod_type" value="{{ $product_type->id }}">
 	{!! Form::token() !!}
 	{!! Form::close() !!}
 </div>
@@ -187,7 +176,6 @@ $('#edit').validate(
 	{
 		prod_sku: { required: true, minlength: 3 },
 		prod_title: { required: true, minlength: 3 },
-		prod_weight: { required: true, minlength: 2 },
 		prod_short_desc: { required: true, minlength: 7 }
 	}
 });
@@ -195,7 +183,7 @@ $('#edit').validate(
 
 $('#btnsave').click( function()
 {
-	$('#edit').attr('action','/admin/product/save');
+	$('#edit').attr('action','/admin/product/save-vp');
 	$('#edit').submit();
 });
 
