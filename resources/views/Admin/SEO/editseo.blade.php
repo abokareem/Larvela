@@ -46,7 +46,15 @@
 		<div class="form-group">
 			<label class='control-label col-xs-2'>Assign to Store:</label>
 			<div class='col-xs-5'>
-				{!! $store_select_list !!}
+				<select name="seo_store_id" id="seo_store_id" class="form-control">
+				@foreach($stores as $s)
+					@if($s->id == $store->id)
+						<option value="{{$s->id}}" selected>{{$s->store_name}}</option>
+					@else
+						<option value="{{$s->id}}">{{$s->store_name}}</option>
+					@endif
+				@endforeach
+				</select>
 			</div>
 		</div>
 		<div class="form-group">

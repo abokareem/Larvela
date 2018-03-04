@@ -16,6 +16,8 @@ use App\Models\Store;
 
 /**
  * \brief Service layer for the stores model
+ *
+ * {FIX_2018-03-04} Converted to pure Eloquent insert/update
  */
 class StoreService
 {
