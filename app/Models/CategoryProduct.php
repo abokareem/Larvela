@@ -4,11 +4,9 @@
  * @author	Sid Young <sid@off-grid-engineering.com>
  * @date	2016-07-29
  *
- *
- *
- *
- *
  *  [CC]
+ *
+ * Maps the Category a Product belongs to. A Product can map to several Categories.
  */
 namespace App\Models;
 
@@ -19,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * \brief Pivot table for category_product mapping, was called prod_cat_maps
  *
- * 2016-09-22 Renamed table from prod_cat_maps to category_product
+ * {FIX_2016-09-22} Renamed table from prod_cat_maps to category_product
  */
 class CategoryProduct extends Model
 {
@@ -45,11 +43,6 @@ public $timestamps = false;
  * @var array $fillable
  */
 protected $fillable = array('category_id','product_id');
-
-
-
-
-
 
 
 

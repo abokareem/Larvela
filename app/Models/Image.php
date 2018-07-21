@@ -23,7 +23,7 @@ class Image extends Model
 
 /**
  * Table name
- * @var stirng $table
+ * @var string $table
  */
 protected $table = "images";
 
@@ -44,77 +44,6 @@ public $timestamps = false;
  */
 protected $fillable = ['image_file_name','image_folder_name','image_size','image_height','image_width','image_order','image_parent_id'];
 
-
-
-
-	/**
-	 * Insert a new row into the "images" table.
-	 *
-	 * @pre Data array must have all required data for insert operation.
-	 * @post new Row inserted into "images" table.
-	 * @param $d Array of data to insert into "images" table.
-	 * @return ID New row ID.
-	 */
-	public function InsertImage($d)
-	{
-		return \DB::table('images')->insertGetId( array(
-			'image_file_name'=>$d['image_file_name'],
-			'image_folder_name'=>$d['image_folder_name'],
-			'image_size'=>$d['image_size'],
-			'image_height'=>$d['image_height'],
-			'image_width'=>$d['image_width'],
-			'image_order'=>$d['image_order'],
-			'image_parent_id'=>$d['image_parent_id']
-			));
-	}
-
-
-
-	/**
-	 * Update a row in the "images" table given an array of data including the row ID column.
-	 *
-	 * @pre Data array must have all required data for update operation.
-	 * @post new Row in "images" table updated.
-	 * @param $d Array of data to update the row with.
-	 * @return int Number of affected rows updated.
-	 */
-	public function UpdateImage($d)
-	{
-		return \DB::table('images')->where(['id'=>$d['id'] ])
-			->update( array(
-			'image_file_name'=>$d['image_file_name'],
-			'image_folder_name'=>$d['image_folder_name'],
-			'image_size'=>$d['image_size'],
-			'image_height'=>$d['image_height'],
-			'image_width'=>$d['image_width'],
-			'image_order'=>$d['image_order'],
-			'image_parent_id'=>$d['image_parent_id']
-			));
-	}
-
-
-
-
-	/**
-	 * Find and return the smallest thumbnail for this product
-	 *
-	 * Used in Cart Controller
-	 *
-	 * @param	integer	$image_id
-	 * @return	object or null
-	 */
-	public function getThumbNail($image_id)
-	{
-		$thumbs = $this->getByParentID($image_id);
-		foreach($thumbs as $thumb)
-		{
-			if($thumb->image_order == 1)
-			{
-				return $thumb;
-			}
-		}
-		return null;
-	}
 
 
 

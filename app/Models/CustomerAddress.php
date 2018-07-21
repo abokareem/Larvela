@@ -62,18 +62,6 @@ protected $table = "customer_addresses";
 	 *
 	 * @return	mixed
 	 */
-	public function getByCID($id)
-	{
-		return \DB::table('customer_addresses')->where(['customer_cid'=>$id])->first();
-	}
-
-
-
-	/**
-	 *
-	 *
-	 * @return	mixed
-	 */
 	public function getArray()
 	{
 		$data = array();

@@ -63,17 +63,6 @@ protected $data = array();
 
 
 
-	/**
-	 * Return the array of items that are mass assignable
-	 *
-	 * @pre none
-	 * @post none
-	 * @return array
-	 */
-	public function getFillable()
-	{
-		return $this->fillable;
-	}
 
 
 	/**

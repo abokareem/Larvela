@@ -63,11 +63,6 @@ protected $data = array();
 	}
 
 
-	public function getFillable()
-	{
-		return $this->fillable;
-	}
-
 
 
 
@@ -111,7 +106,7 @@ protected $data = array();
 	 * @param	string	$code	Store code to select by.
 	 * @return	mixed	Collection of rows of stores ordered by store name.
 	 */
-	private function getByCode($code)
+	public function getByCode($code)
 	{
 		return \DB::table('stores')->where(['store_env_code'=>$code])->first();
 	}

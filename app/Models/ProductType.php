@@ -17,20 +17,27 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ProductType extends Model
 {
+
+
+/**
+ *
+ * @var string $table
+ */
+protected $table="product_types";
+
+
+/**
+ * Flag that we ar enot suing timestamped columns
+ * @var boolean $timestamps
+ */
 public $timestamps = false;
+
+
+/**
+ * Columns that are mass asignable
+ * @var array $fillable
+ */
 protected $fillable = ['product_type'];
-
-
-
-
-
-
-
-	public function UpdateProductType($id,$type)
-	{
-		return \DB::table('product_types')->where(['id'=>$id])->update(['product_type'=>$type]);
-	}
-
 
 
 }

@@ -4,9 +4,9 @@
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-07-29
  *
- *
- *
  * [CC]
+ *
+ *
  */
 namespace App\Models;
 
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 
 
 /**
- * \brief MVC Model to provide support for the "customer_addresses" table.
+ * \brief Support for the "customer_addresses" table.
  *
  * @todo Not yet used or implemented in any controllers as of 2016-09-05
  */
@@ -28,24 +28,15 @@ protected $fillable = ['customer_cid','customer_email',
 		'customer_date_created','customer_date_updated'];
 
 
-	public function dump() { print_r($this->getArray()); }
-	
 
-	public function getAll()
-	{
-		return \DB::table('customer_addresses')->orderBy('id')->get();
-	}
-
-
-
-	public function getByCID($id)
+	private function getByCID($id)
 	{
 		return \DB::table('customer_addresses')->where(['customer_cid'=>$id])->first();
 	}
 
 
 
-	public function getArray()
+	private function getArray()
 	{
 		$data = array();
 		foreach($this->fillable as $column)
@@ -56,7 +47,7 @@ protected $fillable = ['customer_cid','customer_email',
 	}
 	
 
-	public function InsertAddress($d)
+	private function InsertAddress($d)
 	{
 		$today = date("Y-m-d");
 		return \DB::table('customer_addresses')->insertGetId( array(
@@ -74,7 +65,7 @@ protected $fillable = ['customer_cid','customer_email',
 
 
 
-	public function UpdateAddress($d)
+	private function UpdateAddress($d)
 	{
 		return \DB::table('customer_addresses')->where(['id'=>$d['id']])
 			->update( array(
@@ -89,12 +80,5 @@ protected $fillable = ['customer_cid','customer_email',
 			'customer_date_created'=>$d['customer_date_created'],
 			'customer_date_updated'=>$d['customer_date_updated']
 			));
-	}
-
-
-
-	public function getByID($id)
-	{
-		return \DB::table('customer_addresses')->where(['id'=>$id])->first();
 	}
 }

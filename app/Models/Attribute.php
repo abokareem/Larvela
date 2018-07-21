@@ -5,9 +5,9 @@
  * @date	2018-01-12
  * @package App\Models
  *
- *
- *
- * [CC]
+ * Attributes are for products to group them when using a BASE Product and mapping multiple Basic products to it.
+ * - Size
+ * - Colour etc
  */
 namespace App\Models;
 

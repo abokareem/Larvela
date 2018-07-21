@@ -1,7 +1,7 @@
 <?php
 /**
- * \class	SubscriptionRequest
- * @date	2016-12-15
+ * \class	SubscriptionStat
+ * @date	2018-03-11
  * @author	Sid Young <sid@off-grid-engineering.com>
  *
  *
@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Model;
 
 
 /**
- * \brief MVC Eloquent model for the "subscriptions" table.
+ * \brief MVC Eloquent model for the "subscription_stats" table.
  */
-class SubscriptionRequest extends Model
+class SubscriptionStat extends Model
 {
 
 
@@ -25,7 +25,7 @@ class SubscriptionRequest extends Model
  * The table name (not in normal plural form)
  * @var string $table
  */
-protected $table="subscription_requests";
+protected $table="subscription_stats";
 
 
 
@@ -40,9 +40,7 @@ public $timestamps= false;
  *
  * @var array $fillable
  */
-protected $fillable = array('sr_email', 'sr_status', 'sr_process_value', 'sr_date_created', 'sr_date_updated');
+protected $fillable = array('sub_completed','sub_final_count','sub_deleted_count','sub_resent_count','sub_date_created');
 
 
 }
-
-

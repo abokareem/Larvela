@@ -3,6 +3,11 @@
  * \class	Cart
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-09-01
+ *
+ * [CC]
+ *
+ *
+ * The Cart table maps the cart and logged in User (Customer) and is the parent for the other CartXXX related Models.
  */
 namespace App\Models;
 

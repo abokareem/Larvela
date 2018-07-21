@@ -4,8 +4,10 @@
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2017-01-11
  *
- *
  * [CC]
+ *
+ * Maps a product with certain attributes when the product is a base/parent product with potentially lots of basic child products.
+ *
  */
 namespace App\Models;
 

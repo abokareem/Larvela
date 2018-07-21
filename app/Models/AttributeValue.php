@@ -4,9 +4,10 @@
  * @author	Sid Young <sid@off-grid-engineering.com>
  * @date	2018-01-13
  *
- *
- *
  * [CC]
+ *
+ * Maps the Values that an Attribute can have.
+ * Using "Size" as an attribute, you can have: SMALL, MEDIUM, LARGE etc mapped via this table.
  */
 namespace App\Models;
 
@@ -32,7 +33,7 @@ public $timestamps = false;
  * The attributes that are mass assignable.
  * @var array $fillable
  */
-protected $fillable = ['attribute_name'];
+protected $fillable = ['attr_id','attr_value','attr_sort_index'];
 
 
 }

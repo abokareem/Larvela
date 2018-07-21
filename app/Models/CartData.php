@@ -4,16 +4,17 @@
  * \date	2017-09-07
  * \author	Sid Young
  *
- *
- *
  * [CC]
+ *
+ * Cart Data holds additional data for the Cart table. This data is added to as a Customer progresses through
+ * the checkout process. 
  */
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * \brief	Cart Data holds additional data for the cart that must transition from /cart to /.shipping to /confirm etc
+ * \brief	Cart Data holds additional data for the cart that must transition from /cart to /shipping to /confirm etc
  */
 class CartData extends Model
 {

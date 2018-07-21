@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Model;
  * customers - recorded from sales on eBay and via subscriptions, contains extended data.
  * subscriptions - send email offers to these people.
  *
- * {FIX_2017-10-28} Customer.php - Removed getByID() method
+ * {FIX_2017-10-28} Customer.php - Removed obsolete Query Builder methods.
  */
 class Customer extends Model
 {
@@ -44,73 +44,6 @@ public $timestamps = false;
  */
 protected $fillable = ['customer_name', 'customer_email','customer_mobile', 'customer_status', 'customer_source_id','customer_store_id', 'customer_date_created','customer_date_updated','customer_address','customer_suburb','customer_postcode','customer_city','customer_state','customer_country'];
 	
-
-
-	/**
-	 * insert a new customer into the DB given an array of column data.
-	 *
-	 * @param	array	$d
-	 * @return	mixed
-	 */
-	public function InsertCustomer($d)
-	{
-		$today = date("Y-m-d");
-		try
-		{
-		return \DB::table('customers')->insertGetId( array(
-			'customer_name'   =>$d['customer_name'],
-			'customer_email'  =>$d['customer_email'],
-			'customer_mobile' =>$d['customer_mobile'],
-			'customer_status' =>$d['customer_status'],
-			'customer_source_id'=>$d['customer_source_id'],
-			'customer_store_id' =>$d['customer_store_id'],
-			'customer_date_created' =>$today,
-			'customer_date_updated' =>$today
-			));
-		}
-		catch(\Illuminate\Database\QueryException $e)
-		{
-			return 0;
-		}
-	}
-
-
-
-	/**
-	 * Update a customer record given an array of column data.
-	 *
-	 * @param	array	$d
-	 * @return	mixed
-	 */
-	public function UpdateCustomer($d)
-	{
-		$today = date("Y-m-d");
-		return \DB::table('customers')->where(['id'=>$d['id'] ])
-				->update( array(
-				'customer_name'   =>$d['customer_name'],
-				'customer_email'  =>$d['customer_email'],
-				'customer_mobile' =>$d['customer_mobile'],
-				'customer_status' =>$d['customer_status'],
-				'customer_source_id'=>$d['customer_source_id'],
-				'customer_store_id' =>$d['customer_store_id'],
-				'customer_date_created'=>$d['customer_date_created'],
-				'customer_date_updated'=>$today
-				));
-	}
-
-
-
-	/**
-	 * Get row(s) given date range
-	 *
-	 * @param	string	$start_date		Date in string format YYYY-MM-DD
-	 * @param	string	$end_date		Date in string format YYYY-MM-DD
-	 * @return	mixed
-	 */
-	public function getByDates($start_date, $end_date)
-	{
-		return \DB::table('customers')->whereBetween('customer_date_created', array($start_date, $end_date))->get();
-	}
 
 
 

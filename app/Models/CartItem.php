@@ -4,9 +4,9 @@
  * @date	2016-0905
  * @author	Sid Young <sid@off-grid-engineering.com>
  *
- *
- *
  * [CC]
+ *
+ * The CartItem table maps the cart ID and Product id's.
  */
 namespace App\Models;
   
