@@ -41,6 +41,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+		$schedule->call('\App\Jobs\ProcessSubscriptions@handle')->dailyAt('8:36');
 		$schedule->call('\App\Jobs\ProcessAbandonedCart@handle')->dailyAt('10:30');
 		$schedule->call('\App\Jobs\UpdateCartLocks@handle')->everyMinute();
 		$schedule->call('\App\Jobs\CheckPendingOrders@handle')->dailyAt('5:00');
