@@ -13,9 +13,7 @@
 namespace App\Jobs;
 
 
-use Hash;
 use App\Jobs\Job;
-use App\Helpers\SEOHelper;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
@@ -67,9 +65,9 @@ protected $cart;
      * Create a new job instance initialize mail transport and save store and email details away.
      * Also fetch relevant template using CONFIRM_SUBSCRIPTION action 
 	 *
-     * @param  $store     mixed - store data collection
-     * @param  $email     string - email address of customer
-     * @param  $hash_url  string - hashed URL string to substitue in.
+     * @param  $store	mixed - The Store object.
+     * @param  $email	string - email address of customer.
+     * @param  $cart	mixed - The Cart object.
      * @return void
      */
     public function __construct($store, $email, $cart)
