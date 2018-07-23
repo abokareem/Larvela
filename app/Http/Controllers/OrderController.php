@@ -26,6 +26,17 @@ use App\Jobs\OrderCompleted;
 use App\Jobs\OrderPlaced;
 use App\Jobs\OrderDispatched;
 use App\Jobs\OrderDispatchPending;
+
+use App\Mail\OrderPaidEmail;
+use App\Mail\OrderUnPaidEmail;
+use App\Mail\OrderCancelledEmail;
+use App\Mail\OrderCompletedEmail;
+use App\Mail\OrderPlacedEmail;
+use App\Mail\OrderPendingEmail;
+use App\Mail\OrderDispatchedEmail;
+use App\Mail\OrderOnHoldEmail;
+
+
 use App\Jobs\EmptyCartJob;
 use App\Jobs\OutOfStockJob;
 
@@ -34,15 +45,14 @@ use App\Models\Order;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\CustSource;
-use App\Models\ProductLocks;
+use App\Models\ProductLock;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\CartData;
-use App\Models\OrderItems;
+use App\Models\OrderItem;
 
 use App\Models\Users;
 use App\Models\CustomerAddress;
-use App\Models\CustomerAddresses;
 
 
 use App\Traits\Logger;
@@ -108,14 +118,10 @@ use Logger;
 	{
 		$this->LogFunction("InstantPaypalPurchase()");
 
-		$Customer = new Customer;
-		$CustomerAddresses = new CustomerAddresses;
-		$CustSource = new CustSource;
-
 		$store = app('store');
-		$product = Product::where('id',$id)->first();
+		$product = Product::find($id);
+		$source = CustSource::where('cs_name', "WEBSTORE")->first();
 
-		$source = $CustSource->getByName("WEBSTORE");
 		$customer_id = 0;
 		$order_id = 0;
 		if(Request::ajax())
@@ -201,7 +207,7 @@ use Logger;
 			foreach($items as $item)
 			{
 				$this->LogMsg("Product found [".print_r($product,true)."]");
-				$OrderItem = new OrderItems;
+				$OrderItem = new OrderItem;
 				$OrderItem->order_item_oid = $order->id;
 				$OrderItem->order_item_sku = $product->prod_sku;
 				$OrderItem->order_item_desc= $product->prod_title;
@@ -260,11 +266,6 @@ use Logger;
 	public function CartPaypalPurchase($id)
 	{
 		$this->LogFunction("CartPaypalPurchase()");
-
-		$Customer = new Customer;
-		$CustSource = new CustSource;
-		$Product = new Product;
-		$ProductLocks = new ProductLocks;
 
 		$store = app('store');
 		$source = CustSource::where('cs_name', "WEBSTORE")->first();
@@ -326,14 +327,18 @@ use Logger;
 				$Customer->customer_source_id = $source->id;
 				$Customer->customer_store_id = $store->id;
 				$Customer->save();
+
 				$this->LogMsg("Save customer: [".$email."]");
 				$order->order_cid = $Customer->id;
 				$customer_id = $Customer->id;
+				$order->save();
 
 				$this->LogMsg("Extracting address info");
 				$address = $this->CreateCustomerAddress($data);
-				$address->customer_cid = $customer->id;
+				$address->customer_cid = $Customer->id;
+				$this->LogMsg("Update Address CID.");
 				$address->save();
+				$this->LogMsg("Saved!");
 			}
 			else
 			{
@@ -353,9 +358,10 @@ use Logger;
 
 			$this->LogMsg("Dispatching Order Job");
 			# $store, $email, $order
-			$cmd = new OrderPlaced($store, $email, $order);
-			dispatch($cmd);
+			dispatch(new OrderPlaced($store, $email, $order));
+
 			$this->LogMsg("Dispatching Order Job - returning OK");
+			Mail::to($email)->send(new OrderPlacedEmail($store, $email, $order));
 		}
 		$data = array("S"=>"OK","CARTID"=>$id,"OID"=>$order_id,"CID"=>$customer_id);
 		$this->LogMsg("Done!");
@@ -382,21 +388,19 @@ use Logger;
 	{
 		$this->LogFunction("DelayedPurchase()");
 
-		$Customer = new Customer;
-		$CustSource = new CustSource;
-		$Product = new Product;
-		$ProductLocks = new ProductLocks;
-		$Users = new Users;
-		
 		$store = app('store');
 		$user = Users::find(Auth::user()->id);
-		$customer = Customer::where('customer_email', $user->email)->get();
+		$customer = Customer::where('customer_email', $user->email)->first();
 		$this->LogMsg("Using existing customer: [".print_r($customer,true)."]");
 
 		$payment_ref = "unknown";
 
 		$cart = Cart::find($id);
-		$cart_data = CartData::firstOrNew('cd_cart_id',$cart->id);
+		$count = CartData::where('cd_cart_id',$cart->id)->count();
+		if($count == 0)
+		$cart_data = new CartData();
+		else
+		$cart_data = CartData::where('cd_cart_id',$cart->id)->first();
 
 		$order = new Order;
 		$order->order_cart_id = $id;
@@ -414,7 +418,7 @@ use Logger;
 		$order->save();
 
 		$this->LogMsg("Find or add new customer");
-		$address = CustomerAddresses::firstOrNew(array('customer_cid'=>$customer->id));
+		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
 		
 		$this->CreateOrderItems($order);
 
@@ -423,8 +427,10 @@ use Logger;
 		dispatch($cmd);
 
 		$this->LogMsg("Dispatch Job -> OrderDispatchPending");
-		$cmd = new OrderDispatchPending($store, $user->email, $order);
-		dispatch($cmd);
+		dispatch(new OrderDispatchPending($store, $user->email, $order));
+
+		$this->LogMsg("Dispatch Email -> OrderPendingEmail");
+		Mail::to($user->email)->send(new OrderPendingEmail($store, $user->email, $order));
 
 		$this->LogMsg("Done");
 		$theme_path = \Config::get('THEME_CART')."order_pending";
@@ -509,7 +515,7 @@ use Logger;
 		{
 			$customer = Customer::where('id',$o->order_cid)->first();
 
-			$order_items = OrderItems::where('order_item_oid',$o->id)->get();
+			$order_items = OrderItem::where('order_item_oid',$o->id)->get();
 			$order_value = 0;
 			if(is_null($o->order_value))
 			{
@@ -572,12 +578,6 @@ use Logger;
 		$this->LogFunction("ShowOrder()");
 		$this->LogMsg("Order ID [".$id."]");
 
-		$Order = new Order;
-		$OrderItems = new OrderItems;
-		$Product = new Product;
-		$Product = new Product;
-		$Customer = new Customer;
-
 		$shipping_product = null;
 		$order = Order::find($id);
 		if(!is_null($order->order_shipping_method))
@@ -587,10 +587,10 @@ use Logger;
 				$shipping_product = Product::find($order->order_shipping_method);
 			}
 		}
-		$order_items = OrderItems::where('order_item_oid',$id)->get();
+		$order_items = OrderItem::where('order_item_oid',$id)->get();
 
 		$customer = Customer::find($order->order_cid);
-		$address = CustomerAddresses::firstOrNew(array('customer_cid'=>$customer->id));
+		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
 
 		return view("Admin.Orders.showorder",[
 			'order'=>$order,
@@ -622,7 +622,7 @@ use Logger;
 		$this->LogFunction("BackOrderAnItem()");
 		$this->LogMsg("Item ID [".$id."]");
 
-		$order_item = OrderItems::where('id',$id)->first();
+		$order_item = OrderItem::where('id',$id)->first();
 		$qty_purchased = $order_item->order_item_qty_purchased;
 		$qty_supplied = $order_item->order_item_qty_supplied;
 		$order_item->order_item_qty_backordered = $qty_purchased-$qty_supplied;
@@ -664,7 +664,7 @@ use Logger;
 			$parts = explode("-",$k);
 			if(sizeof($parts) == 2)
 			{
-				$order_item = OrderItems::where('id',$parts[1])->first();
+				$order_item = OrderItem::where('id',$parts[1])->first();
 				switch($parts[0])
 				{
 					case "su":
@@ -682,7 +682,7 @@ use Logger;
 		$store = app('store');
 		$order = Order::where('id',$id)->first();
 		$customer = Customer::where('id',$order->order_cid)->first();
-		$order_items = OrderItems::where('order_item_oid',$order->id)->get();
+		$order_items = OrderItem::where('order_item_oid',$order->id)->get();
 		$item_count = sizeof($order_items);
 		#
 		# Check each order item, if supplied == ordered then mark as dispatch
@@ -713,12 +713,15 @@ use Logger;
 			$order->order_dispatch_date = date("Y-m-d");
 			$order->order_dispatch_time = date("H:i:s");
 			$order->save();
-			$cmd = new OrderCompleted($store, $customer->customer_email, $order);
-			dispatch($cmd);
+			dispatch(new OrderCompleted($store, $customer->customer_email, $order));
+			Mail::to($customer->customer_email)->send(new OrderCompletedEmail($store, $customer->customer_email, $order));
 		}
 		$this->LogMsg("Dispatch Job -> OrderDispatched()");
-		$cmd = new OrderDispatched($store, $customer->customer_email, $order);
-		dispatch($cmd);
+		dispatch(new OrderDispatched($store, $customer->customer_email, $order));
+
+		$this->LogMsg("Send email using OrderDispatchedEmail");
+		Mail::to($customer->customer_email)->send(new OrderDispatchedEmail($store, $customer->customer_email, $order));
+
 		return $this->ShowCurrentOrders();
 	}
 
@@ -751,9 +754,9 @@ use Logger;
 				$shipping_product = Product::where('id', $order->order_shipping_method)->first();
 			}
 		}
-		$order_items = OrderItems::where('order_item_oid',$id)->get();
+		$order_items = OrderItem::where('order_item_oid',$id)->get();
 		$customer = Customer::where('id',$order->order_cid)->first();
-		$address = CustomerAddresses::firstOrNew(array('customer_cid'=>$customer->id));
+		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
 		$pdf = \PDF::loadView('Admin.Orders.pdf-packingslip',[
 			'order'=>$order,
 			'store'=>$store,
@@ -796,10 +799,10 @@ use Logger;
 				$shipping_product = Product::where('id', $order->order_shipping_method)->first();
 			}
 		}
-		$order_items = OrderItems::where('order_item_oid',$id)->get();
+		$order_items = OrderItem::where('order_item_oid',$id)->get();
 
 		$customer = Customer::where('id',$order->order_cid)->first();
-		$address = CustomerAddresses::firstOrNew(array('customer_cid'=>$customer->id));
+		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
 		$pdf = \PDF::loadView('Admin.Orders.pdf-showorder',[
 			'order'=>$order,
 			'orderitems'=>$order_items,
@@ -910,10 +913,10 @@ use Logger;
 	 */
 	protected function CreateCustomerAddress($data)
 	{
-		$address = new CustomerAddresses;
+		$address = new CustomerAddress;
 		$address->customer_email =    $data['payer']['payer_info']['email'];
 		$address->customer_address =  $data['payer']['payer_info']['shipping_address']['line1'];
-		$address->customer_suburb =   $data['payer']['payer_info']['shipping_address']['line2'];
+		$address->customer_suburb =   $data['payer']['payer_info']['shipping_address']['city'];
 		$address->customer_postcode = $data['payer']['payer_info']['shipping_address']['postal_code'];
 		$address->customer_city  =    $data['payer']['payer_info']['shipping_address']['city'];
 		$address->customer_state =    $data['payer']['payer_info']['shipping_address']['state'];
@@ -921,6 +924,7 @@ use Logger;
 		$address->customer_status = "A";
 		$address->customer_date_created = date("Y-m-d");
 		$address->customer_date_updated = date("Y-m-d");
+		$address->save();
 		return $address;
 	}
 
@@ -940,11 +944,8 @@ use Logger;
 	{
 		$this->LogFunction("CreateOrderItems()");
 
-		$Product = new Product;
-		$OrderItems = new OrderItems;
-
 		$cart_id = $order->order_cart_id;
-		$product_locks  = ProductLocks::where('product_lock_cid',$cart_id)->get();
+		$product_locks  = ProductLock::where('product_lock_cid',$cart_id)->get();
 		$store = app('store');
 		
 		$item_count = sizeof($product_locks);
@@ -968,9 +969,7 @@ use Logger;
 				$OrderItem->order_item_qty_supplied = 0;
 				$OrderItem->order_item_qty_backorder = 0;
 				$OrderItem->order_item_dispatch_status = "W";
-
 				$OrderItem->order_item_price= $product->prod_retail_cost;
-
 				$OrderItem->order_item_date = date("Y-m-d");
 				$OrderItem->order_item_time = date("H:i:s");
 				$OrderItem->save();
@@ -1118,38 +1117,5 @@ MariaDB [rdstore]> desc orders;
 		$cmd = new OrderCancelled($store, $customer->customer_email, $order);
 		dispatch($cmd);
 		return $this->ShowCurrentOrders();
-	}
-
-
-
-
-	/**
-	 * Test routine to send an Order Paid email using Order #25
-	 *
-	 * @return	void
-	 */
-	public function T25()
-	{
-		$store =app('store');
-#		echo "<pre>"; print_r($store); echo "</pre>";
-
-		$order = Order::where('id',25)->first();
-#		echo "<pre>"; print_r($order); echo "</pre>";
-
-		$customer = Customer::where('id',$order->order_cid)->first();
-#		echo "<pre>"; print_r($customer); echo "</pre>";
-
-		if(strlen($customer->customer_email) <3) $customer->customer_email="sid.young@gmail.com";
-		$cmd = new OrderPaid($store, $customer->customer_email, $order);
-		dispatch($cmd);
-		dd($this);
-	}
-
-	public function test()
-	{
-		$product = Product::where('id',32)->first();
-		$store = app('store');
-		$cmd = new OutOfStockJob($store,"sid.young@gmail.com",$product);
-		dispatch($cmd);
 	}
 }
