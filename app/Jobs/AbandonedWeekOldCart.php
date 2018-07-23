@@ -20,8 +20,13 @@ use App\Helpers\SEOHelper;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
-use App\Jobs\EmailUserJob;
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
+
+use App\Jobs\EmailUserJob;
 
 use App\Models\Customer;
 
@@ -31,8 +36,9 @@ use App\Models\Customer;
 /**
  * \brief Cart has been abandoned for 1 week, execute any additional business logic here.
  */
-class AbandonedWeekOldCart extends Job 
+class AbandonedWeekOldCart implements ShouldQueue
 {
+use InteractsWithQueue, Queueable, SerializesModels;
 
 /**
  * The Store object 
