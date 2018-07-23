@@ -6,7 +6,7 @@
  *
  * [CC]
  *
- * \addtogroup	 MIGRATE
+ * \addtogroup CartAbandonment
  * AbandonedCart - Send a templated email after the Customer has abandond the cart for a period of time.
  * Does not do anything to the cart.
  */
@@ -18,14 +18,40 @@ use App\Jobs\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+use App\Models\Customer;
 
 
 /**
  * @brief Place holder for any business logic needed when a Cart Has been abandonded 1 day later.
  */
-class AbandonedCart extends Job 
+class AbandonedCart implements ShouldQueue
 {
+use InteractsWithQueue, Queueable, SerializesModels;
 
+/**
+ * The Store object
+ * @var mixed $store
+ */
+protected $store;
+
+
+/**
+ * The email address of the customer
+ * @var string $email
+ */
+protected $email;
+
+
+/**
+ * The Cart object
+ * @var mixed $cart
+ */
+protected $cart;
 
 
     /**
@@ -38,6 +64,9 @@ class AbandonedCart extends Job
      */
     public function __construct($store, $email, $cart)
     {
+		$this->store = $store;
+		$this->email = $email;
+		$this->cart  = $cart;
     }
 
 
@@ -49,5 +78,12 @@ class AbandonedCart extends Job
      */
     public function handle()
     {
+		$text = "Notice: Cart abandoned email sent to: ".$this->email;
+		$subject = "[LARVELA] Cart Abandoned email sent to [".$this->email."]";
+		$from = $this->store->store_sales_email;
+
+		$admin_user = Customer::find(1);
+		dispatch( new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
     }
+
 }
