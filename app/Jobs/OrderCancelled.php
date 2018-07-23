@@ -78,10 +78,16 @@ protected $order;
 
     /**
 	 * Place holder for additonal business logic
-	 *     
+	 * -  Email the store admin that an Order has been cancelled.     
      * @return void
      */
     public function handle()
     {
+		$text = "Notice: Order ".$this->order->id." has bee cancelled. Email sent to: ".$this->email;
+		$subject = "[LARVELA] Order Cancelled email sent to [".$this->email."]";
+		$from = $this->store->store_sales_email;
+
+		$admin_user = Customer::find(1);
+		dispatch( new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
     }
 }
