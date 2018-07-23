@@ -5,8 +5,10 @@
  * \class	ProcessAbandonedCart
  *
  * \addtogroup CRON
- * Check all the cart items and any dated yesterday, are candidates for the abandond cart automattion.
- * run ONCE a day!
+ * Retrieve all the cart items and if:
+ * - Any dated yesterday then send AbandonedCartEmail.
+ * - Any dated a week old, send AbandonedWeekOldCartEmail.
+ * - Run ONCE a day!
  */
 namespace App\Jobs;
 
@@ -18,8 +20,13 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
+use App\Mail\AbandonedCart;
+use App\Mail\AbandonedWeekOldCart;
+
 use App\Jobs\AbandonedCart;
 use App\Jobs\AbandonedWeekOldCart;
+
+
 use App\Models\Users;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -93,9 +100,12 @@ use Logger;
 						$cart = Cart::find($item->cart_id);
 						$user = Users::find($cart->user_id);
 						$found++;
-						$this->LogMsg("Process cart ID [".$item->id."] - Customer was [".$user->email."]");
-						$cmd = new AbandonedCart($user->email, $cart, $store);
-						dispatch($cmd);
+						$this->LogMsg("Process cart ID [".$item->id."] - Customer [".$user->email."]");
+						$this->LogMsg("Dispatch Job");
+						dispatch(new AbandonedCart($store, $user->email, $cart));
+						$this->LogMsg("Dispatch EMail");
+						Mail::to($user->email)->send(new AbandonedCartEmail($store, $user->email, $cart));
+						$this->LogMsg("Save cart id");
 						#
 						# save the id so we dont send again
 						#
@@ -124,8 +134,10 @@ use Logger;
 						$user = Users::find($cart->user_id);
 						$found++;
 						$this->LogMsg("Process cart ID [".$item->id."] - Customer was [".$user->email."]");
-		#				$cmd = new AbandonedCart($user->email, $cart, $store );
-		#				dispatch($cmd);
+						$this->LogMsg("Dispatch Job");
+						dispatch(new AbandonedWeekOldCart($store, $user->email, $cart));
+						$this->LogMsg("Dispatch EMail");
+						Mail::to($user->email)->send(new AbandonedWeekOldCartEmail($store, $user->email, $cart));
 						array_push($fc7,$item->cart_id);
 					}
 				}
