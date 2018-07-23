@@ -20,8 +20,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-use App\Mail\AbandonedCart;
-use App\Mail\AbandonedWeekOldCart;
+use App\Mail\AbandonedCartEmail;
+use App\Mail\AbandonedWeekOldCartEmail;
 
 use App\Jobs\AbandonedCart;
 use App\Jobs\AbandonedWeekOldCart;
