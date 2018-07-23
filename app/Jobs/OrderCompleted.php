@@ -7,35 +7,39 @@
  *
  * [CC]
  * 
- * \addtogroup Transactional
- * OrderCompleted - The oder is completed (no pengin items on order).
+ * \addtogroup  Transactional
+ * OrderCompleted - This Job provides a place to execute additonal business logic when an Order is completed. 
  */
 namespace App\Jobs;
 
 
 use App\Jobs\Job;
-use App\Helpers\SEOHelper;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
 
 use App\Models\Store;
 use App\Models\Customer;
 use App\Models\Order;
 
-use App\Jobs\EmailUserJob;
-use App\Traits\TemplateTrait;
+use App\Traits\Logger;
 
 
 
 
 /**
- * \brief Send a templated email to customer informing them the their order has been cancelled.
- * {INFO_2017-10-28} Moved template to ./store_env_code/...
+ * \brief Execute additonal business logic when an Order is completed.
  */
-class OrderCompleted extends Job
+class OrderCompleted implements ShouldQueue
 {
-use TemplateTrait;
+use InteractsWithQueue, Queueable, SerializesModels;
+use Logger;
 
 
 
@@ -55,104 +59,33 @@ protected $order;
 
 /**
  * The email address to send the Subscription Confirmation to.
- * @var string $to
+ * @var string $email
  */
-protected $to;
-
-
-protected $from;
-
-
-/**
- * The subject line for this email
- * @var string $subject
- */
-protected $subject;
-
-
-/**
- * The filename and path for email template to use.
- *
- * Note: Template may also be made of SEOHelper calls.
- *
- * @var string template_file_name
- */
-protected $template_file_name;
-
-
-private $ACTION="ORDER_COMPLETED";
+public $email;
 
 
     /**
-     * Create a new job instance initialize mail transport and
-	 * save store and email details away.
-     * Also fetch relevant template using "$ACTION" 
+     * Create a new Job instance
+	 * - Save store and email details away.
 	 *
-     * @param  mixed	$store	Store data (object)
+     * @param  mixed	$store
      * @param  string	$email 	email address of customer
+     * @param  mixed	$order
      * @return void
      */
     public function __construct($store, $email, $order)
     {
 		$this->store = $store;
-		$this->to = $email;
+		$this->email = $email;
 		$this->order = $order;
-
-		$number = sprintf("%08d",$order->id);
-		$this->subject = "Order #".$number." Completed";
-		$this->from = $this->store->store_sales_email;
-
-		$this->template_file_name = $this->getTemplate($this->ACTION);
-		if(strlen($this->template_file_name)==0)
-		{
-			$this->template_file_name = strtolower($this->ACTION).".email";
-		}
     }
 
 
 
     /**
-     * Fetch the template, parse with the store helper and
-	 * then send using Swift Mailer. 
-	 *
-	 * {FIX_2017-11-05} - OrderCompleted.php - removed call to StrReplace
+	 * Execute any extra business logic when an Order is Completed
 	 *     
      * @return void
      */
     public function handle()
-    {
-		$Customer = new Customer;
-		$Store = new Store;
-		$Order = new Order;
-		$customer = Customer::find($this->order->order_cid);
-
-		$path = base_path();
-		$file = $path."/templates/".$this->store->store_env_code."/".$this->template_file_name;
-		$text = "<h1>WARNING</h1><p>Order Completed email NOT sent to: ".$this->to."</p><br/><br/>Check Template file! - <b>".$file."</b>";
-		if(file_exists($file))
-		{
-			$body = file_get_contents($file);
-
-			$store_name_lower = strtoupper($this->store->store_name);
-			$store_name = str_replace(" ","_", $store_name_lower);
-			$header_tag = $store_name."_EMAIL_HEADER";
-			$footer_tag = $store_name."_EMAIL_FOOTER";
-
-			$header = SEOHelper::getText($header_tag);
-			$footer = SEOHelper::getText($footer_tag);
-		
-			$t1 = $header.$body.$footer;
-			$t2 = $Customer->translate($t1, $customer);
-			$t3 = $Order->translate($t2, $this->order);
-			$text = $Store->translate($t3, $this->store);
-		
-			$cmd = new EmailUserJob($this->to, $this->from, $this->subject, $text);
-			dispatch($cmd);
-		}
-
-		$admin_user = Customer::find(1);
-		$admin_email = $admin_user->customer_email;
-		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Order Completed message sent to [".$this->to."]", $text);
-		dispatch($cmd);
-    }
 }
