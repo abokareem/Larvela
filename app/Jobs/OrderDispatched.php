@@ -7,34 +7,34 @@
  * [CC]
  *
  * \addtogroup Transactional
- * OrderDispatched - Notify the customer that their order has been dispatched.
+ * OrderDispatched - Provide an entry point for additonal business logic when an Order is dispatched.
+ * - Currently email the store admin that an order has been disatched.
  */
 namespace App\Jobs;
 
 use App\Jobs\Job;
-use App\Helpers\SEOHelper;
 
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 use App\Models\Order;
 use App\Models\Store;
 use App\Models\Customer;
 
 use App\Jobs\EmailUserJob;
-use App\Traits\TemplateTrait;
 
 
 /**
- * \brief Send a templated email confirming dispatching of the order.
- *
- * Fetch and send the templated email, template mapping is: "ORDER_DISPATCHED"
- * {INFO_2017-10-28} OrderDispatched.php - Moved template to ./store_env_code/...
+ * \brief Send an email to the admin that an Order has been dispatched.
  */
-class OrderDispatched extends Job 
+class OrderDispatched implements ShouldQueue
 {
-use TemplateTrait;
-
+use InteractsWithQueue, Queueable, SerializesModels;
 
 /**
  * The order placed by the customer.
@@ -79,8 +79,8 @@ protected $email;
 
 
     /**
-     * Fetch the template, parse with the store helper and
-	 * then send using Job Dispatch.
+     * Provide an entry point for additional business logic.
+	 * - Notify the store admin that a dispatch email has gone out.
 	 *
      * @return void
      */
@@ -92,6 +92,5 @@ protected $email;
 
 		$admin_user = Customer::find(1);
 		dispatch( new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
-
     }
 }
