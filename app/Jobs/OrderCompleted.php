@@ -9,6 +9,7 @@
  * 
  * \addtogroup  Transactional
  * OrderCompleted - This Job provides a place to execute additonal business logic when an Order is completed. 
+ * - Currently emails the store admin that an order has been dispatched.
  */
 namespace App\Jobs;
 
@@ -88,4 +89,13 @@ public $email;
      * @return void
      */
     public function handle()
+	{
+		$text = "Notice: Order ".$this->order->id." Completed. Email sent to: ".$this->email;
+		$subject = "[LARVELA] Order Completed email sent to [".$this->email."]";
+		$from = $this->store->store_sales_email;
+
+		$admin_user = Customer::find(1);
+		dispatch( new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
+
+	}
 }
