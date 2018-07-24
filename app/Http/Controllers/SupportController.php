@@ -4,8 +4,12 @@
  * \date	2017-08-30
  * \author	Sid Young <sid@off-grid-engineering.com>
  *
- *
- * [CC]
+ * \addtogroup RequiredControllers
+ * SupportController - The SupportController manages the routing to pre-defined support pages within
+ * the Larvela themed environment. These are typically "/about" /contact" etc.
+ * - If a requested route is not found then we test if it is located in the Support directory.
+ * - If found, formulate the path and call the support page.
+ * - Use defined pages are not apssed any system variables but can stil laccess the "store" object.
  */
 namespace App\Http\Controllers;
 
@@ -18,7 +22,6 @@ use App\Traits\Logger;
  * The SupportController manages the routing to pre-defined support pages within
  * the Larvela themed environment.
  *
- * @todo Add support for user defined pages.
  * If requested route is not found then test if it is located in the Support directory,
  * formulate path and call.
  */
@@ -106,7 +109,7 @@ use Logger;
 
 
 	/**
-	 * invoke the route for the about us page
+	 * Invoke the route for the about us page - this is a "Standard" route that would be on most sites.
 	 * @return	mixed
 	 */ 
 	public function about()
