@@ -2,7 +2,10 @@
 
 **Updated 2018-07-24**
 
-A number of Job files which only sent emails are now free to be used as "hook" files for additional Business Logic. The email code has been converted to using the Mailable interface and placed in app/Mail with the correspnding "blade" put in resources/views/Mailable/<store_code>/ directory structure. This will be documented in the final release candidate.
+- A number of Job files which only sent emails are now free to be used as "hook" files for additional Business Logic.
+- The email code that was in the Job file has been converted to use the Mailable interface and placed in app/Mail with the corresponding "blade" put in resources/views/Mailable/<store_code>/ directory structure.
+- Controllers are being modified to call both the Job and the Mail::() interfaces.
+- This will be documented in the final release candidate.
 
 
 **Updated 2017-10-31**
