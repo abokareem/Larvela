@@ -68,6 +68,8 @@ use App\Mail\OrderOnHoldEmail;
 use App\Mail\OrderDispatchedEmail;
 use App\Mail\OrderCancelledEmail;
 
+use App\Mail\AbandonedCartEmail;
+use App\Mail\AbandonedWeekOldCartEmail;
 
 use App\Models\Customer;
 use App\Models\Order;
@@ -89,7 +91,7 @@ class TestController extends Controller
 	public function fs()
 	{
 		$store=app('store');
-		dispatch(new FinalSubRequest($store, "sid.young@gmail.com"));
+		dispatch(new FinalSubRequest($store, $email));
 	}
 
 
@@ -113,7 +115,7 @@ class TestController extends Controller
 	public function test_footer()
 	{
 		$store=app('store');
-		$email = "sid.young@gmail.com";
+		$email = Config::get("app.test_email");
 		$customer = Customer::where('customer_email',$email)->first();
 		$order = Order::find(28);
 		$order_items = OrderItem::where('order_item_oid',$order->id)->get();
@@ -128,6 +130,42 @@ class TestController extends Controller
 			]);
 	}
 
+
+/*============================================================
+ *
+ *
+ *                          CART 
+ *
+ *
+ *============================================================
+ */
+
+	/**
+	 *
+	 *
+	 *
+	 * @return	mixed
+	 */
+	public function test_cart_abandoned()
+	{
+		$store=app('store');
+		$email = Config::get("app.test_email");
+		$customer = Customer::where('customer_email',$email)->first();
+		$cart = Cart::where('user_id',1)->first();
+		Mail::to($email)->send(new AbandonedCartEmail($store, $email, $cart));
+		$hash="1234";
+		return view('Mail.RD.cart_abandoned',[
+			'store'=>$store,
+			'email'=>$email,
+			'customer'=>$customer,
+			'cart'=>$cart,
+			'hash'=>$hash
+			]);
+	}
+
+
+
+
 /*============================================================
  *
  *
@@ -137,12 +175,10 @@ class TestController extends Controller
  *============================================================
  */
 
-
-
 	public function test_backinstock()
 	{
 		$store=app('store');
-		$email = "sid.young@gmail.com";
+		$email = Config::get("app.test_email");
 		$product = Product::find(1);
 		$hash="1234";
 		return view('Mail.RD.back_in_stock',[
@@ -173,7 +209,8 @@ class TestController extends Controller
 	public function test_subscription_confirm()
 	{
 		$store=app('store');
-		dispatch(new ConfirmSubscription($store, "sid.young@gmail.com"));
+		$email = Config::get("app.test_email");
+		dispatch(new ConfirmSubscription($store, $email));
 	}
 
 
@@ -186,7 +223,8 @@ class TestController extends Controller
 	public function test_subscription_confirmed()
 	{
 		$store=app('store');
-		dispatch(new SubscriptionConfirmed($store, "sid.young@gmail.com"));
+		$email = Config::get("app.test_email");
+		dispatch(new SubscriptionConfirmed($store, $email));
 	}
 
 
@@ -199,7 +237,8 @@ class TestController extends Controller
 	public function test_subscription_sendwelcome()
 	{
 		$store=app('store');
-		dispatch(new SendWelcome($store,"sid.young@gmail.com"));	
+		$email = Config::get("app.test_email");
+		dispatch(new SendWelcome($store,$email));	
 	}
 
 
@@ -212,7 +251,8 @@ class TestController extends Controller
 	public function test_subscription_resend()
 	{
 		$store=app('store');
-		dispatch(new ReSendSubRequest($store,"sid.young@gmail.com"));	
+		$email = Config::get("app.test_email");
+		dispatch(new ReSendSubRequest($store,$email));	
 	}
 
 
@@ -225,7 +265,8 @@ class TestController extends Controller
 	public function test_subscription_finalrequest()
 	{
 		$store=app('store');
-		dispatch(new FinalRequest($store,"sid.young@gmail.com"));	
+		$email = Config::get("app.test_email");
+		dispatch(new FinalRequest($store,$email));	
 	}
 
 
@@ -248,7 +289,7 @@ class TestController extends Controller
 	public function test_order_cancelled()
 	{
 		$store = app("store");
-		$email = "sid.young@gmail.com";
+		$email = Config::get("app.test_email");
 		$order = Order::find(28);
 		Mail::to($email)->send(new OrderCancelledEmail($store, $email, $order));
 		dd($this);
@@ -262,7 +303,7 @@ class TestController extends Controller
 	public function test_order_dispatched()
 	{
 		$store = app("store");
-		$email = "sid.young@gmail.com";
+		$email = Config::get("app.test_email");
 		$order = Order::find(28);
 		Mail::to($email)->send(new OrderDispatchedEmail($store, $email, $order));
 		dd($this);
@@ -278,7 +319,7 @@ class TestController extends Controller
 	public function test_order_paid()
 	{
 		$store = app("store");
-		$email = "sid.young@gmail.com";
+		$email = Config::get("app.test_email");
 		$order = Order::find(28);
 		Mail::to($email)->send(new OrderPaidEmail($store, $email, $order));
 		dd($this);
@@ -294,7 +335,7 @@ class TestController extends Controller
 	public function test_order_placed()
 	{
 		$store = app("store");
-		$email = "sid.young@gmail.com";
+		$email = Config::get("app.test_email");
 		$order = Order::find(28);
 		Mail::to($email)->send(new OrderPlacedEmail($store, $email, $order));
 		dd($this);
@@ -310,7 +351,7 @@ class TestController extends Controller
 	public function test_order_pending()
 	{
 		$store = app("store");
-		$email = "sid.young@gmail.com";
+		$email = Config::get("app.test_email");
 		$order = Order::find(28);
 		Mail::to($email)->send(new OrderPendingEmail($store, $email, $order));
 		dd($this);
@@ -326,7 +367,7 @@ class TestController extends Controller
 	public function test_order_onhold()
 	{
 		$store = app("store");
-		$email = "sid.young@gmail.com";
+		$email = Config::get("app.test_email");
 		$order = Order::find(28);
 		Mail::to($email)->send(new OrderOnHoldEmail($store, $email, $order));
 		dd($this);
@@ -338,13 +379,14 @@ class TestController extends Controller
 	{
 		$products = Product::where('prod_qty',0)->get();
 		$store = app('store');
+		$email = Config::get("app.test_email");
 		echo "<table>";
 		foreach($products as $p)
 		{
 			echo "<tr><td>".$p->id."</td><td></td><tr>";
 		}
 		echo "</table>";
-		$cmd = new OutOfStockJob($store,"sid.young@gmail.com",$product);
+		$cmd = new OutOfStockJob($store,$email,$product);
 		dispatch($cmd);
 	}
 
@@ -354,8 +396,7 @@ class TestController extends Controller
 	public function mailrun()
 	{
 		$store=app('store');
-		#$email = "sid.young@gmail.com";
-		$email = "janelle.blavius@gmail.com";
+		$email = Config::get("app.test_email");
 		$subject = "TEST - Empty handed on Valentines day?";
 
 		$hash = "";
