@@ -5,8 +5,10 @@
  * @date	2016-08-18
  *
  *
- *
  * [CC]
+ *
+ * \addtogroup Store_Administration
+ * BasicProductController - This controller provides admin functions for Basic Products.
  */
 namespace App\Http\Controllers;
 
@@ -27,6 +29,7 @@ use App\Services\ProductService;
 use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
+use App\Mail\BackInStockEmail;
 use App\Jobs\ResizeImages;
 
 
@@ -51,6 +54,7 @@ use App\Traits\ProductImageHandling;
  *
  * {INFO_2017-09-11} Added support for prod_has_free_shipping
  * {INFO_2017-10-26} Added Support for BackInStock Job dispatch
+ * {INFO_2018-07-26} Added Support for BackInStockEmail dispatch
  */
 class BasicProductController extends Controller
 {
@@ -260,7 +264,7 @@ use ProductImageHandling;
 		{
 			\Session::flash('flash_error','ERROR - Product SKU alreay in Database!');
 		}
-		return $this->ShowProductsPage($request);
+		return Redirect::to("/admin/products");
 	}
 
 
@@ -299,7 +303,7 @@ use ProductImageHandling;
 			$this->LogError("Invalid product id.");
 			\Session::flash('flash_error',"ERROR - Product ID is invalid!");
 		}
-		return $this->ShowProductsPage($request);
+		return Redirect::to("/admin/products");
 	}
 
 
@@ -556,10 +560,10 @@ use ProductImageHandling;
 	 * POST ROUTE: /admin/product/update/{id}
 	 *
 	 * @pre form must present all valid columns
-	 * @post new row inserted into database table "products" 
-	 * @param $request mixed Validation request object
-	 * @param $id int row id to be checked against before insert
-	 * @return mixed - view object
+	 * @post new rows inserted into database table "category_products" 
+	 * @param	mixed	$request - Validation request object
+	 * @param	integer	$id - Row id to be checked against before insert
+	 * @return	mixed
 	 */
 	public function UpdateProduct(ProductRequest $request, $id)
 	{
@@ -597,6 +601,10 @@ use ProductImageHandling;
 			if($request['prod_qty'] > 0)
 			{
 				$this->LogMsg("Stock Level increased to [".$request['prod_qty']."]");
+				#
+				# This may need to be spun off into a separate task with a flag set somewhere with the product ID
+				# thats been updated.
+				#
 				$notify_list = Notification::where('product_code',$product->prod_sku)->get();
 				$this->LogMsg("Count of notifications to send is [".sizeof($notify_list)."]");
 				foreach($notify_list as $n)
@@ -604,8 +612,8 @@ use ProductImageHandling;
 					if(strlen($n->email_address)>3)
 					{
 						$this->LogMsg("Send notify to [".$n->email_address."]");
-						$cmd = new BackInStock($store, $n->email_address, $product);
-						dispatch($cmd);
+						dispatch(new BackInStock($store, $n->email_address, $product));
+						Mail::to($n->email_address)->send(new BackInStockEmail($store, $n->email_address, $product));
 					}
 					$n->delete();
 				}
@@ -614,7 +622,7 @@ use ProductImageHandling;
 		$request['id'] = $id;
 		ProductService::update($request);
 		$this->SaveUploadedImage($id);
-		return $this->ShowProductsPage($request);
+		return Redirect::to("/admin/products");
 	}
 
 
@@ -628,8 +636,8 @@ use ProductImageHandling;
 	 *
 	 * @pre form must present all valid columns
 	 * @post new row inserted into database table "products" 
-	 * @param $request mixed Validation request object
-	 * @return mixed - view object
+	 * @param	ProductRequest	$request mixed Validation request object
+	 * @return	mixed 
 	 */
 	public function SaveNewProduct(ProductRequest $request)
 	{
@@ -659,7 +667,25 @@ use ProductImageHandling;
 			$this->LogMsg("No categories to assign (yet)");
 		}
 		$this->SaveUploadedImage($pid);
-		return $this->ShowProductsPage($request);
+        $store_id = $store->id;
+        $category_id = 0;
+		$this->LogMsg("Default store ID [".$store->id."]");
+		$query = $request->input();
+		foreach($query as $n=>$v)
+		{
+			if(is_string($n)== true)
+			{
+				if(is_string($v)== true)
+				{
+					$this->LogMsg("Checking query N= $n while V= $v");
+					if($n=="s") $store_id = $v;
+					if($n=="c") $category_id = $v;
+				}
+			}
+		}
+		$this->LogMsg("Required store ID [".$store_id."]");
+		$this->LogMsg("Required Category ID [".$category_id."]");
+		return Redirect::to("/admin/products?c=".$category_id."&s=".$store_id);
 	}
 
 
@@ -734,8 +760,7 @@ use ProductImageHandling;
 
 
 	/**
-	 * Display the product attributes
-	 *
+	 * Display the product attributes for this store.
 	 *
 	 * @return	mixed
 	 */
