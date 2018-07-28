@@ -59,45 +59,12 @@ protected $data = array();
 
 	function __construct()
 	{
-		$this->BuildData();
+#		$this->BuildData();
 	}
 
 
 
 
-
-
-	/**
-	 * Return an arry of store names as an array with store ID as the index.
-	 *
-	 *
-	 * @return	mixed	Collection of rows of stores ordered by store name.
-	 */
-	private function getStoreNames()
-	{
-		$rows = \DB::table('stores')->orderBy('store_name')->get();
-		$stores = array();
-		$stores[0]='All Stores';
-		foreach($rows as $r)
-		{
-			$stores[$r->id] = $r->store_name;
-		}
-		return $stores;
-	}
-
-
-
-
-
-	/**
-	 * Get all ACTIVE stores ordered by Store Name (active is where store_status is set to "A").
-	 *
-	 * @return	mixed	Collection of rows of stores ordered by store name.
-	 */
-	private function getStores()
-	{
-		return \DB::table('stores')->where(['store_status'=>'A'])->orderBy('store_name')->get();
-	}
 
 
 	/**
@@ -106,7 +73,7 @@ protected $data = array();
 	 * @param	string	$code	Store code to select by.
 	 * @return	mixed	Collection of rows of stores ordered by store name.
 	 */
-	public function getByCode($code)
+	private function getByCode($code)
 	{
 		return \DB::table('stores')->where(['store_env_code'=>$code])->first();
 	}
@@ -116,7 +83,7 @@ protected $data = array();
 
 
 
-	public function getData() { return $this->data; }
+	private  function getData() { return $this->data; }
 
 
 
@@ -147,7 +114,7 @@ protected $data = array();
 	 * or
 	 *        Display(BuildTree($this->getData()));
 	 */
-	public function BuildTree(array $elements, $parentId = 0)
+	private function BuildTree(array $elements, $parentId = 0)
 	{
 		$branch = array();
 		foreach ($elements as $element)
@@ -167,7 +134,7 @@ protected $data = array();
 	
 	
 
-	public function Display($array)
+	private function Display($array)
 	{
 		echo "<ul class='ul-store'>\n";
 		foreach($array as $key => $value)	# key is numeric index  value is array
@@ -186,70 +153,6 @@ protected $data = array();
 		}
 		echo "</ul>\n";
 	}
-
-
-
-
-	/**
-	 * Return an array of store names indexed by ID
-	 *
-	 *
-	 * @return array
-	 */
-	private function getArray()
-	{
-		$stores = array();
-		$rows = $this->getStores();
-		$stores[0]="Global";
-		foreach($rows as $row)
-		{
-			$stores[$row->id] = $row->store_name;
-		}
-		return $stores;
-	}
-
-
-
-
-
-	/**
-	 * Generic HTML select list of sorted stores.
-	 *
-	 * @param	string	$name	HTML Name of select list, default is "store_id"
-	 * @param	integer	$id		row id to mark as selected, if not specified AND not global then first item is "Please select..."
-	 * @param	boolean	$has_global 	first item is "Global - All Stores" if true
-	 * @return	string		 HTML select list as a string
-	 */
-	private function getSelectList($name, $id=0, $has_global=false)
-	{
-		$rows = $this->getStores();
-		if(strlen($name)==0)
-		{
-			$name="store_id";
-		}
-		$html = "<select class='form-control' id='".$name."' name='".$name."'>";
-		if($has_global == true)
-		{
-			$html .= "<option value='0'>Global - All Stores</option>";
-		}
-		else
-		{
-			if($id==0)
-			{
-				$html .= "<option value='0' selected>Please Select....</option>";
-			}
-		}
-		foreach($rows as $row)
-		{
-			if($row->id == $id)
-				$html .= "<option value='".$row->id."' selected>".$row->store_name."</option>";
-			else
-				$html .= "<option value='".$row->id."'>".$row->store_name."</option>";
-		}
-		$html .="</select>";
-		return $html;
-	}
-
 
 
 	

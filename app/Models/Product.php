@@ -40,67 +40,6 @@ public $timestamps = false;
 protected $fillable = ['prod_sku','prod_title','prod_short_desc','prod_long_desc','prod_visible','prod_weight','prod_qty','prod_reorder_qty','prod_base_cost','prod_retail_cost','prod_combine_code','prod_date_created','prod_time_created','prod_date_updated','prod_time_updated','prod_date_valid_from','prod_date_valid_to','prod_type'];
 
 
-#	public function InsertProduct($d)
-#	{
-#		return \DB::table('products')->insertGetId(
-#			array(
-#				'prod_sku'       =>$d['prod_sku'],
-#				'prod_title'     =>$d['prod_title'],
-#				'prod_short_desc'=>$d['prod_short_desc'],
-#				'prod_long_desc' =>$d['prod_long_desc'],
-#				'prod_visible'   =>$d['prod_visible'],
-#				'prod_weight'    =>$d['prod_weight'],
-#				'prod_qty'       =>$d['prod_qty'],
-#				'prod_reorder_qty' =>$d['prod_reorder_qty'],
-#				'prod_base_cost'   =>$d['prod_base_cost'],
-#				'prod_retail_cost' =>$d['prod_retail_cost'],
-#				'prod_combine_code'=>$d['prod_combine_code'],
-#				'prod_date_created'=>date("Y-m-d"),
-#				'prod_time_created'=>date("H:i:s"),
-#				'prod_date_updated'=>date("Y-m-d"),
-#				'prod_time_updated'=>date("H:i:s"),
-#				'prod_date_valid_from'=>$d['prod_date_valid_from'],
-#				'prod_date_valid_to'  =>$d['prod_date_valid_to'],
-#				'prod_type'  =>$d['prod_type']
-#			));
-#	}
-#
-#
-#	/**
-#	 *
-#	 *
-#	 *
-#	 * @param	array	$d
-#	 * @return	integer
-#	 */
-#	public function UpdateProduct($d)
-#	{
-#		return \DB::table('products')->where(['id'=>$d['id'] ])->update([
-#			'prod_sku'=>$d['prod_sku'],
-#			'prod_title'=>$d['prod_title'],
-#			'prod_short_desc'=>$d['prod_short_desc'],
-#			'prod_long_desc'=>$d['prod_long_desc'],
-#			'prod_visible'=>$d['prod_visible'],
-#			'prod_weight'=>$d['prod_weight'],
-#			'prod_qty'=>$d['prod_qty'],
-#			'prod_reorder_qty' =>$d['prod_reorder_qty'],
-#			'prod_base_cost'   =>$d['prod_base_cost'],
-#			'prod_retail_cost' =>$d['prod_retail_cost'],
-#			'prod_combine_code'   =>$d['prod_combine_code'],
-#			'prod_date_updated'   =>$d['prod_date_updated'],
-#			'prod_time_updated'   =>$d['prod_time_updated'],
-#			'prod_date_valid_from'=>$d['prod_date_valid_from'],
-#			'prod_date_valid_to'  =>$d['prod_date_valid_to'],
-#			'prod_type'  =>$d['prod_type']
-#			]);
-#	}
-#
-
-
-
-
-
-
 
 	/**
 	 * Get all images from the image_product pivot table
