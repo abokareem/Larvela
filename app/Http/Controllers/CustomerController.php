@@ -74,14 +74,13 @@ use Logger;
 	 */
 	public function UpdateMyAccount($id)
 	{
-		$Customer = new Customer;
 		$CustomerAddress = new CustomerAddress;
 
 		$customer = array();
 		$address = array();
 		if($id>0)
 		{
-			$customer = Customer::where('id',$id)->first();
+			$customer = Customer::find($id);
 			$address  = CustomerAddress::where('customer_cid', $id)->first();
 		}
 		$form = Input::all();
@@ -99,7 +98,11 @@ use Logger;
 			$address_array['customer_city'] = ucwords($form['customer_city']);
 			$address_array['customer_state'] = ucwords($form['customer_state']);
 			$address_array['customer_country'] = $form['customer_country'];
-			$Customer->UpdateCustomer($customer_array);
+
+			$customer = Customer::find($id);
+			$customer->customer_mobile = $form['customer_mobile'];
+			$customer->customer_date_updated = date("Y-m-d");
+			$customer->save();
 			if(sizeof($address) == 0)
 			{
 				$CustomerAddress->InsertAddress($address_array);
@@ -127,14 +130,16 @@ use Logger;
 	{
 		if(is_numeric($id))
 		{
-			$Customer = new Customer;
-
-			$row = Customer::where('id',$id)->first();
-
 			$form = Input::all();
-			$form['customer_date_created'] = $row->customer_date_created;
-			$cid = $Customer->UpdateCustomer($form);
-			if($cid>0)
+			$o = Customer::find($id);
+			$o->customer_name = $form['customer_name'];
+			$o->customer_email = $form['customer_email'];
+			$o->customer_mobile = $form['customer_mobile'];
+			$o->customer_status = $form['customer_status'];
+			$o->customer_source_id= $form['customer_source_id'];
+			$o->customer_store_id = $form['customer_store_id'];
+			$o->customer_date_updated  = date("Y-m-d");
+			if($o->save() >0)
 			{
 				\Session::flash('flash_message','Customer Updated!');
 			}
@@ -187,18 +192,16 @@ use Logger;
 	{
 		if(is_numeric($id))
 		{
-			$Store = new Store;
-			$CustSource = new CustSource;
 
 			$store = app('store');
-			$customer = Customer::where('id', $id)->first();
-			$stores   = $Store->getSelectList("customer_store_id",$customer->customer_store_id, true);
-			$sources  = $CustSource->getSelectList("customer_source_id",$customer->customer_source_id,true);
+			$customer = Customer::find($id);
+			$stores   = Store::all();
+			$sources  = CustSource::all();
 			return view('Admin.Customers.editcustomer',[
 				'store'=>$store,
 				'customer'=>$customer,
-				'store_select_list'=>$stores,
-				'source_select_list'=>$sources]);
+				'stores'=>$stores,
+				'customer_sources'=>$sources]);
 		}
 	}
 
@@ -217,15 +220,14 @@ use Logger;
 	 */
 	public function ShowAddCustomerPage()
 	{
-		$Store = new Store;
-		$stores = $Store->getSelectList("customer_store_id", 0, true);
-
-		$CustSource = new CustSource;
-		$sources = $CustSource->getSelectList("customer_source_id", 0, true);
+		$store = app('store');
+		$stores = Store::all();
+		$sources = CustSource::all();
 
 		return view('Admin.Customers.addcustomer',[
-			'store_select_list'=>$stores,
-			'source_select_list'=>$sources
+			'store'=>$store,
+			'stores'=>$stores,
+			'sources'=>$sources
 			]);
 	}
 
@@ -248,34 +250,25 @@ use Logger;
 		$user = Auth::user();
 		if (Auth::check())
 		{
-			$Customer = new Customer;
-
 			$form = Input::all();
-			$data = array();
-			$fields = $Customer->getFillable();
-			foreach($form as $k=>$v) array_push($data,$k);
-			array_push($fields,'id');
-			array_push($fields,'_token');
-			array_push($fields,'customer_date_created');
-			array_push($fields,'customer_date_updated');
-			$missing = array_diff($data,$fields);
-			if(sizeof($missing)==0)
+			$o = new Customer();
+			$o->customer_name = $form['customer_name'];
+			$o->customer_email = $form['customer_email'];
+			$o->customer_mobile = $form['customer_mobile'];
+			$o->customer_status = $form['customer_status'];
+			$o->customer_source_id= $form['customer_source_id'];
+			$o->customer_store_id = $form['customer_store_id'];
+			$o->customer_date_created = date("Y-m-d");
+			$o->customer_date_updated = date("Y-m-d");
+			if($o->save() >0)
 			{
-				$cid = $Customer->InsertCustomer($form);
-				if($cid>0)
-				{
-					$cmd = new AutoSubscribeJob($store,$form['customer_email']);
-					dispatch($cmd);
-					\Session::flash('flash_message','Customer inserted!');
-				}
-				else
-				{
-					\Session::flash('flash_error','Customer already in Database!');
-				}
+				$cmd = new AutoSubscribeJob($store,$form['customer_email']);
+				dispatch($cmd);
+				\Session::flash('flash_message','Customer inserted!');
 			}
 			else
 			{
-				\Session::flash('flash_error','Customer fields missing!');
+				\Session::flash('flash_error','Customer already in Database!');
 			}
 			return $this->ShowCustomers();
 		}
@@ -289,7 +282,7 @@ use Logger;
 
 	/**
 	 *
-	 * GET ROUTE: ?
+	 * GET ROUTE: /admin/customers
 	 *
 	 * @return	mixed
 	 */
@@ -298,13 +291,15 @@ use Logger;
 		$user = Auth::user();
 		if (Auth::check())
 		{
-			$Store = new Store;
-			$CustSource = new CustSource();
-
-			$stores = $Store->getArray();
-			$sources = $CustSource->getArray();
+			$store = app('store');
+			$stores = Store::all();
+			$sources = CustSource::all();
 			$customers = \DB::table('customers')->paginate(20);
-			return view('Admin.Customers.showcustomers',['customers'=>$customers,'source'=>$sources,'store'=>$stores]);
+			return view('Admin.Customers.showcustomers',[
+				'customers'=>$customers,
+				'sources'=>$sources,
+				'stores'=>$stores
+				]);
 		}
 		else
 		{
