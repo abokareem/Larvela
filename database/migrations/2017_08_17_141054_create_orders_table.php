@@ -28,8 +28,8 @@ class CreateOrdersTable extends Migration
 			$table->decimal('order_value',3,2);
 			$table->decimal('order_shipping_value',13,2);
 			$table->string('order_shipping_method');
-			$table->date('order_date')->default('0000-00-00');
-			$table->time('order_time')->default('00:00:00');
+			$table->date('order_date')->nullable();
+			$table->time('order_time')->nullable();
 			$table->date('order_dispatch_date')->default('0000-00-00');
 			$table->time('order_dispatch_time')->default('00:00:00');
 		});

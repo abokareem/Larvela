@@ -19,6 +19,7 @@ class CreateAttributesProductsTable extends Migration
 			$table->integer('attribute_id')->unsigned();
 			$table->foreign('attribute_id')->references('id')->on('attributes');
 			$table->unique(array('product_id','attribute_id'));
+			$table->integer('combine_order')->default(1);
         });
     }
 
