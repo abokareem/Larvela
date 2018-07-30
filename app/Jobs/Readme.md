@@ -1,4 +1,19 @@
-# Theory of Operation - Jobs
+# Larvela Jobs
+
+Larvela uses Laravel Jobs to perform many tasks to offload processing from Controllers and for scheduled background tasks. Most Jobs are run using Queuing via Redis as it has a built in Queuing system and also provides session handling so you get more functionality over Memcached.
+
+In the course of developing Larvela, many Jobs were previously used to email customers and the store admins using a crude templating system, but this has mostly been replaced using the Mailable interface and so the Jobs have provided an ideal place to put additonal Business Logic for store Automation and Marketing purposes.
+
+
+## Why use Jobs
+
+- If a task needs to be done twice or it can be done asynchronously to the main code then it should be put into a Job.
+- By using Jobs for background tasks, the offloading of these to a secondary server using a queue based engine is possible in later versions of the code. This allows for some degree of scalability in future relases, this is a design goal of Larvela.
+- In the present release of code, scheduled tasks called from the Kernel.php file which is located in the app/Console directory are implemented as Jobs.
+
+## Historical Notes
+
+Please note, **not all the Job files have yet been release**, a refactor is occuring at present to make the code more user friendly and neater.
 
 **Updated 2018-07-24**
 
@@ -10,17 +25,5 @@
 
 **Updated 2017-10-31**
 
-Larvela uses Laravel Jobs to perform many tasks, particularly scheduled background tasks.
-
-If a task needs to be done twice or it can be done asynchronously to the main code then it should be put into a Job.
-
-In the present release of code, most Jobs are run synchronously unless they are scheduled from the Kernel.php file which is located in the app/Console directory.
-
-By using Jobs for background tasks, the offloading of these to a secondary server using a queue based engine is possible in later versions of the code. This allows for some degree of scalability in future relases, this is a design goal of Larvela.
-
-Many Jobs are also a hook into the business logic of the controller. It is preferred that you hook additonal logic into the Jobs files rather than into the Controller code.
-
-# Notes
-
-Please note, **not all the Job files have yet been release**, a refactor is occuring at present to make the code more user friendly and neater.
+- Refactoring of Templates to Mailabel interface started.
 
