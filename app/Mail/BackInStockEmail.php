@@ -6,9 +6,12 @@
  *
  * [CC]
  *
- * \addtogroup ProductReplenishment
- * BackInStockEmail - Send an email notifying customer that the product is back in stock.
- *
+ * \addtogroup Product_Replenishment
+ * BackInStockEmail - Return a templated email notifying customer that the product is back in stock.
+ * - uses Blade to implement templated email.
+ * - See related BackInStock Job for related business logic for additional processing
+ * - Doesn't actually do the sending part, called from Mail::to() call.
+ * - See: TestController::test_stock_backinstock()
  */
 namespace App\Mail;
 
@@ -37,7 +40,6 @@ class BackInStockEmail extends Mailable
 use Queueable, SerializesModels;
 
 
-
 /**
  * The store object from the database tables stores, has all the details about the seelcted store.
  * @var object $store
@@ -52,6 +54,10 @@ public $store;
 public $email;
 
 
+/**
+ * The selected Product
+ * @va mixed $product
+ */
 public $product;
 
 
