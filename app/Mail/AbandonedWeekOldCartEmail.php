@@ -1,6 +1,6 @@
 <?php
 /**
- * \class	AbandonedCartEmail
+ * \class	AbandonedWeekOldCartEmail
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-07-20
  *
@@ -38,7 +38,7 @@ use App\Traits\Logger;
 /**
  * @brief Send a templated email after the Customer has abandond the cart for a period of time.
  */
-class AbandonedCart extends Mailable
+class AbandonedWeekOldCartEmail extends Mailable
 {
 use Queueable, SerializesModels;
 use Logger;
