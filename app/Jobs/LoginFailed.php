@@ -14,8 +14,10 @@ namespace App\Jobs;
 
 use App\Jobs\Job;
 
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -23,7 +25,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 
-
+use App\Mail\LoginFailedEmail;
 use App\Jobs\EmailUserJob;
 
 
@@ -75,6 +77,30 @@ protected $email;
      */
     public function handle()
     {
+		$this->EmailCustomer();
+		$this->EmailStoreAdmin();
+	}
+
+
+	/*!
+	 *
+	 *
+	 * return void
+	 */
+	protected function EmailCustomer()
+	{
+		Mail::to($this->email)->send(new LoginFailedEmail($this->store, $this->email));
+	}
+
+
+
+	/*!
+	 *
+	 *
+	 * return void
+	 */
+	protected function EmailStoreAdmin()
+	{
 		$subject = "[LARVELA] Failed Email Sent to [".$this->email."]";
 		$text = "Failed Login attempt for [".$this->email."]. Email sent to Customer. ";
 		$from = $this->store->store_sales_email;
