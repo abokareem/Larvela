@@ -2,6 +2,11 @@
 /**
  * @date 2016-12-31
  * @author	Sid Young	<sid@off-grid-engineering.com>
+ *
+ * \addtogroup Traits
+ * TemplateTrait - Used in early version for templating emails etc.
+ * - Obsoleted by implemntation of app/Mail classes.
+ * - Will be removed in future versions.
  */
 namespace App\Traits;
 
@@ -55,4 +60,19 @@ trait TemplateTrait
 		}
 		return $template_file_name;
 	}
+
+
+
+	/**
+	 * Return the path to the templates for the given store.
+	 *
+	 * @param	mixed	$store
+	 * @return	string
+	 */
+	public function getTemplatePath($store)
+	{
+		return base_path()."/templates/".$store->store_env_code."/";
+	}
+
+
 }

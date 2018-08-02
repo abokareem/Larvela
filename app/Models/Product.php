@@ -67,6 +67,9 @@ protected $fillable = ['prod_sku','prod_title','prod_short_desc','prod_long_desc
 	 * Given a text string containing codes, and a producte object containg row data
 	 * return a text string with the codes translated into data.
 	 *
+	 * @deprecated Do not use, being removed due to Mailable interface being implemented.
+	 *
+	 *
 	 * @param	string	$text
 	 * @param	mixed	$obj
 	 * @return	string

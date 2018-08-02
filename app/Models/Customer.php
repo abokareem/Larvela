@@ -51,6 +51,9 @@ protected $fillable = ['customer_name', 'customer_email','customer_mobile', 'cus
 	 * Given a text string containing code, and an object containg row data
 	 * return a text string with the codes translated into data and return.
 	 *
+	 * @deprecated Do Not use translate() being removed and replaced with Mailable template.
+	 *
+	 *
 	 * @param   string  $text
 	 * @param   mixed   $store
 	 * @return  string

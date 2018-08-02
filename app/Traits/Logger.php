@@ -1,12 +1,12 @@
 <?php
 /**
- * Larvela
- * Copyright (C) 2017
+ * Larvela eCommerce Engine
+ * Copyright (C) 2017-2018
  * by Present & Future Holdings Pty Ltd Trading as Off Grid Engineering
  * https://off-grid-engineering.com
  *
  *
- * \addtogroup Internal
+ * \addtogroup  Trait
  * Logger - Generic Logger class, not PSR compliant but does the job nicely.
  */
 namespace App\Traits;
@@ -19,6 +19,8 @@ trait Logger
 {
 protected $LOGDIR= '/logs';
 protected $FILENAME = "default";
+protected $OWNER = "apache";
+protected $GROUP = "apache";
 
 
 
@@ -83,6 +85,8 @@ protected $FILENAME = "default";
 		$str = $today.'|'.$now.'|'.$status.'|'.$message."\r\n";
 		$LOGFILE = $this->LOGDIR.'/'.$this->FILENAME."-".$today.".log";
 		file_put_contents($LOGFILE, $str, FILE_APPEND);
+		chown($LOGFILE,"apache");
+		chgrp($LOGFILE,"apache");
 	}
 
 
