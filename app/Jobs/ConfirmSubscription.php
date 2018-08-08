@@ -7,8 +7,10 @@
  * [CC]
  *
  * \addtogroup	Subscription
- * ConfirmSubscription - A customer has visited the site and entered their email address in a subscription box,
- * in this job we can add additional business logic.
+ * ConfirmSubscription - A customer has visited the site and entered their email address in a subscription box.
+ * - Add an entry to the subscripton_requests table
+ * - Email the store admin that we are sending an email.
+ * - Provide an entry point for additional business logic.
  */
 namespace App\Jobs;
 
@@ -36,7 +38,7 @@ use App\Traits\Logger;
 
 
 /**
- * \brief Send a templated email asking for confirmation of the email address and subscription to site.
+ * \brief Add Customer to subscription_requests table and provide an entry point for additional Business Logic when a subscription confirmation is sent out. This Job can be Queued if needed.
  */
 class ConfirmSubscription implements ShouldQueue
 {
