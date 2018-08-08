@@ -101,7 +101,7 @@ private $ACTION="back_in_stock";
     /**
      * Fetch the data and pass into the view
 	 *
-     * @return void
+     * @return mixed
      */
     public function build()
     {
