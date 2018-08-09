@@ -6,9 +6,11 @@
  *
  *
  *
- * \addtogroup	CRON
+ * \addtogroup	Cart_Abandonment
  * AbandonedWeekOldCart - Place holder for additonal business Logic.
+ * - CRON Calls this via ProcessAbandonedCart Job.
  * - Cart has been abandoned for 1 week now.
+ * - Email sent via a Mailable Job.
  */
 namespace App\Jobs;
 
@@ -26,9 +28,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 use App\Jobs\EmailUserJob;
 
+use App\Models\Cart;
+use App\Models\Store;
 use App\Models\Customer;
-
-
 
 
 /**
@@ -62,8 +64,7 @@ protected $cart;
 
 
     /**
-     * Create a new job instance initialize mail transport and save store and email details away.
-     * Also fetch relevant template using CONFIRM_SUBSCRIPTION action 
+     * Save passed in parameters for later use. 
 	 *
      * @param  $store	mixed - The Store object.
      * @param  $email	string - email address of customer.
