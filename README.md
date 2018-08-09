@@ -2,11 +2,11 @@
 
 # What is it
 
-Larvela is a Web Based eCommerce Shopping Cart built on a Laravel 5.3+ Framework. It is designed to be fast and light weight with a GT metrics score of 95% and an AA rating.
+Larvela is a Web Based eCommerce Shopping Cart built on a Laravel 5.4+ Framework. It is designed to be fast and light weight with a GT metrics score of 95% and an AA rating.
 
 Larvela was initially aimed at small Magento sites who wish to move to an inexpensive easy to develop eCommerce platform with an easy to use templating environment (using Laravel Blade Templates).
 
-Support for v5.4, v5.5 and v5.6 are in the works and code migration should occur shortly.
+Support for v5.5 and v5.6 are in the works and code migration should occur shortly.
 
 
 # Status
