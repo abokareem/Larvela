@@ -236,8 +236,7 @@ use Logger;
 				}
 			}
 			$this->LogMsg("Dispatching Order Job");
-			$cmd = new OrderPlaced($store, $email, $order);
-			dispatch($cmd);
+			dispatch(new OrderPlaced($store, $email, $order));
 			$this->LogMsg("Dispatching Order Job - returning OK");
 		}
 		$data = array("S"=>"OK","OID"=>$order_id,"CID"=>$customer_id);

@@ -23,7 +23,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Customer;
 use App\Models\ProdImageMap;
-use App\Models\ProductLocks;
+use App\Models\ProductLock;
 use App\Models\CustomerAddress;
 use App\Models\Image;
 use App\Models\Users;
@@ -93,12 +93,6 @@ use Logger;
 	public function ShowCart()
 	{
 		$this->LogFunction("ShowCart()");
-
-		$Customer = new Customer;
-		$Users = new Users;
-
-		$Product = new Product;
-		$Image = new Image;
 
 		#
 		# The logged in user
@@ -205,10 +199,6 @@ use Logger;
 							break;
 						}
 					}
-					#
-					# {FIX_2018-02-25} Replaced with Eloquent Call
-					#
-					##$thumbnail = $Image->getThumbNail($bimage->id);
 				}
 			}
 			if(is_object($thumbnail))
@@ -404,7 +394,6 @@ use Logger;
 							break;
 						}
 					}
-					##$thumbnail = $Image->getThumbNail($bimage->id);
 				}
 			}
 			if(is_object($thumbnail))
@@ -669,8 +658,7 @@ use Logger;
 		$this->LogFunction("ReverseProductLocks( $cart_id )");
 		
 		$Product = new Product;
-		$ProductLocks = new ProductLocks;
-		$product_locks  = ProductLocks::where('product_lock_cid',$cart_id)->get();
+		$product_locks = ProductLock::where('product_lock_cid',$cart_id)->get();
 
 		foreach($product_locks as $locked)
 		{
@@ -710,10 +698,13 @@ use Logger;
 	public function UpdateLocks($id)
 	{
 		$this->LogFunction("UpdateLocks( $id )");
+		$time = time();
 		if(Request::ajax())
 		{
 			$this->LogMsg("Cart to update [".$id."]");
-			$cnt = $this->UpdateProductLocks($id);
+			$o = ProductLock::where('product_lock_cid',$id)->first();
+			$o->product_lock_utime = $time;
+			$cnt = $o->save();
 			$data = array("S"=>"OK","C"=>$cnt);
 	        return json_encode($data);
 		}
@@ -738,19 +729,19 @@ use Logger;
 	{
 		$this->LogFunction("UpdateProductLocks( $cart_id )");
 		
-		$Product = new Product;
-		$ProductLocks = new ProductLocks;
 		
 		$now = time();
 		$this->LogMsg("Unix time is [".$now."]");
-		$rows = $ProductLocks->getByCID($cart_id);
+		$rows = ProductLock::where('product_lock_cid',$cart_id)->get();
 		if(sizeof($rows) > 0)
 		{
 			$this->LogMsg("There are [".sizeof($rows)."] row items for Cart [".$cart_id."]");
 			foreach($rows as $row)
 			{
 				$this->LogMsg("Uptime time for product lock row [".$row->id."]");
-				$rv = $ProductLocks->UpdateTimeStamp($row->id);
+				$o = ProductLock::find($row->id);
+				$o->product_lock_utime = $now;
+				$rv = $o->save();
 			}
 			return sizeof($rows);
 		}
@@ -860,7 +851,6 @@ use Logger;
 		$this->ReverseProductLocks($cart_id);
 
 		$Product = new Product;
-		$ProductLocks = new ProductLocks;
 
 		$cartitems = CartItem::where('cart_id',$cart_id)->get();
 		$this->LogMsg("There are [".sizeof($cartitems)."] rows in cart items");
@@ -878,7 +868,7 @@ use Logger;
 		# get existing rows for this cart
 		#
 		$this->LogMsg("Get any existing product locks.");
-		$product_lock_rows = $ProductLocks->getByCID($cart_id);
+		$product_lock_rows = ProductLock::where('product_lock_cid',$cart_id)->get();
 		$this->LogMsg("There are [".sizeof($product_lock_rows)."] rows locked");
 		#
 		# for each product, check for a row, if not there (newly added, insert it)
@@ -887,12 +877,17 @@ use Logger;
 
 		foreach($cartitems as $item)
 		{
-			$rv = $ProductLocks->InsertProductLock($cart_id, $item->product_id, $item->qty);
+			$o = new ProductLock();
+			$o->product_lock_pid = $item->product_id;
+			$o->product_lock_cid = $cart_id;
+			$o->product_lock_qty = $item->qty;
+			$o->product_lock_utime = time();
+			$rv = $o->save();
 			$this->LogMsg("Insert a new product lock for [".$item->product_id."] with a QTY of [".$item->qty."]");
 #
 # @todo check prod_type if basic or virtual (limited) then deduct from stock
 # 
-			$product = Product::where('id',$item->product_id)->first();
+			$product = Product::find($item->product_id);
 			$this->LogMsg("Product type [".$product->prod_type."]");
 			if(($product->prod_type == 1)||($product->prod_type == 3))
 			{

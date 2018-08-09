@@ -133,10 +133,12 @@ use Logger;
 		{
 		    $dates[$i] = date("Y-m-d", strtotime('-'.$i.' days'));
 		}
-		#
-		# @todo Remove this call into Customer and use Eloquent call
-		#
-		$new_customers = $Customer->getByDates(date("Y-m-d", strtotime("-30 days")), date("Y-m-d"));
+		$new_customers = Customer::whereBetween(
+			'customer_date_created',
+			array(
+				date("Y-m-d", strtotime("-30 days")),
+				date("Y-m-d")
+				))->get();
 
 		array_push($dates, date("Y-m-d"));
 		if(Auth::check())

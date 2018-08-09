@@ -150,8 +150,7 @@ use Logger;
 	 */
 	public function Update(Request $request, $id)
 	{
-		$this->LogFunction("UpdateProductType()");
-		$ProductType = new ProductType;
+		$this->LogFunction("Update()");
 		if(is_numeric($id))
 		{
 			if($id == $request['id'])

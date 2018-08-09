@@ -5,6 +5,11 @@
  *
  *
  * [CC]
+ *
+ * \addtogroup Subscription
+ * SubscriptionController - Process the subscribe and unsubscribe business logic.
+ * - Dispatches a ConfirmSubscription Job on a subscribe request and
+ * - sends a SubscriptionConfirmed confirmed email via the SubscriptionConfirmed Job.
  */
 namespace App\Http\Controllers;
 
@@ -12,6 +17,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Redirect;
 use Input;
+use Hash;
 use Session;
 use App\Http\Requests;
 use App\Http\Requests\SubscribeRequest;
@@ -19,13 +25,19 @@ use App\Http\Requests\SubscribeRequest;
 
 use App\Jobs\ConfirmSubscription;
 use App\Jobs\SubscriptionConfirmed;
+use App\Jobs\ReSendSubRequest;
+
+
+use App\Mail\ConfirmSubscriptionEmail;
+use App\Mail\SubscriptionConfirmedEmail;
+
 
 use App\Helpers\StoreHelper;
+
 
 use App\Models\Store;
 use App\Models\Customer;
 use App\Models\SubscriptionRequest;
-use App\Models\ReSendSubRequest;
 
 
 
@@ -51,13 +63,21 @@ use Logger;
 
 
 
+	/**
+	 * Unsubscribe the customer given a "hash" value which contains
+	 * 2 parts, the first is the subscription row ID and the second 
+	 * is the hash of the email+security key.
+	 *
+	 * {FIX_2018-03-07} Added HASH check and more logging.
+	 *
+	 * @param	string	$hash
+	 * @return	mixed
+	 */
 	public function UnSubscribe($hash)
 	{
 		$this->LogFunction("UnSubscribe()");
 		$this->LogMsg("URL Hash [".$hash."]");
-
-		$SubscriptionRequest = new SubscriptionRequest;
-
+		$store = app('store');
 		# format:
 		# SRID-HASH (of email);
 		#
@@ -73,12 +93,31 @@ use Logger;
 				{
 					$this->LogMsg("Subcription fetched: ".print_r($entry, true));
 					$email = $entry->sr_email;
-					$this->LogMsg("Now Deleted: ".print_r($entry, true));
-					$SubscriptionRequest->DeleteRow($entry->id);
+					$hash_value = hash('ripemd160', $email.$store->store_env_code);
+					$this->LogMsg("Hash Recevied   [".$items[1]."]");
+					$this->LogMsg("Hash calculated [".$hash_value."]");
+					if($items[1] == $hash_value)
+					{
+						$this->LogMsg("Now Deleted: ".print_r($entry, true));
+						#
+						# @todo Add a Job to process Pre Subscription Delete logic
+						#
+						SubscriptionRequest::find($entry->id)->delete();
+						#
+						# @todo Add a Job to process Post Subscription Removed logic
+						#
 
-					$theme_path = \Config::get('THEME_SUPPORT')."SubscriptionRemoved";
-					return view($theme_path);
-					##### -----return view('Frontend.SubscriptionRemoved');
+						$theme_path = \Config::get('THEME_SUPPORT')."SubscriptionRemoved";
+						return view($theme_path);
+					}
+					else
+					{
+						$this->LogMsg("ERROR - Hash value does not match!");
+					}
+				}
+				else
+				{
+					$this->LogMsg("Subscription not found using ID [".$items[0]."]");
 				}
 			}
 			else
@@ -89,7 +128,6 @@ use Logger;
 		}
 		$theme_path = \Config::get('THEME_ERRORS')."SubscriptionError";
 		return view($theme_path);
-		#### -----return view('Frontend.SubscriptionError');
 	}
 
 
@@ -106,9 +144,7 @@ use Logger;
 	{
 		$this->LogFunction("ProcessConfirmed()");
 		$this->LogMsg("URL Hash [".$hash."]");
-
-		$SubscriptionRequest = new SubscriptionRequest;
-
+		$store = app('store');
 		# format:
 		# SRID-HASH (of email);
 		#
@@ -124,10 +160,23 @@ use Logger;
 				{
 					$this->LogMsg("Subcription fetched: ".print_r($entry, true));
 					$email = $entry->sr_email;
-					$cmd = new SubscriptionConfirmed(StoreHelper::StoreData(), $email);
-					$this->dispatch( $cmd );
-					$theme_path = \Config::get('THEME_SUPPORT')."SubscriptionConfirmed";
-					return view($theme_path);
+					$hash_value = hash('ripemd160', $email.$store->store_env_code);
+					if($items[1] == $hash_value)
+					{
+						$cmd = new SubscriptionConfirmed($store, $email);
+						$this->dispatch( $cmd );
+						#
+						#
+						#
+						Mail::to($email)->send(new SubscriptionConfirmedEmail($store, $email));
+
+						$theme_path = \Config::get('THEME_SUPPORT')."SubscriptionConfirmed";
+						return view($theme_path);
+					}
+					else
+					{
+						$this->LogMsg("ERROR - Hash values do not match!");
+					}
 				}
 				else
 				{

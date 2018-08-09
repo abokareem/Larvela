@@ -1,14 +1,12 @@
 <?php
 /**
- * \class	BasicProductController
+ * \class	VirtualProductController
  * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2016-08-18
+ * @date	2018-04-03
+ *
  *
  *
  * [CC]
- *
- * \addtogroup Store_Administration
- * BasicProductController - This controller provides admin functions for Basic Products.
  */
 namespace App\Http\Controllers;
 
@@ -20,7 +18,6 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Support\Facades\Mail;
 
 
 use App\Helpers\StoreHelper;
@@ -30,9 +27,9 @@ use App\Services\ProductService;
 use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
-use App\Mail\BackInStockEmail;
 use App\Jobs\ResizeImages;
 
+use App\Mail\BackInStockEmail;
 
 use App\Models\Store;
 use App\Models\Product;
@@ -55,9 +52,9 @@ use App\Traits\ProductImageHandling;
  *
  * {INFO_2017-09-11} Added support for prod_has_free_shipping
  * {INFO_2017-10-26} Added Support for BackInStock Job dispatch
- * {INFO_2018-07-26} Added Support for BackInStockEmail dispatch
+ * {INFO_2018-07-19} Added Support for BackInStockEMail
  */
-class BasicProductController extends Controller
+class VirtualProductController extends Controller
 {
 use Logger;
 use ProductImageHandling;
@@ -561,10 +558,10 @@ use ProductImageHandling;
 	 * POST ROUTE: /admin/product/update/{id}
 	 *
 	 * @pre form must present all valid columns
-	 * @post new rows inserted into database table "category_products" 
-	 * @param	mixed	$request - Validation request object
-	 * @param	integer	$id - Row id to be checked against before insert
-	 * @return	mixed
+	 * @post new row inserted into database table "products" 
+	 * @param $request mixed Validation request object
+	 * @param $id int row id to be checked against before insert
+	 * @return mixed - view object
 	 */
 	public function UpdateProduct(ProductRequest $request, $id)
 	{
@@ -602,10 +599,6 @@ use ProductImageHandling;
 			if($request['prod_qty'] > 0)
 			{
 				$this->LogMsg("Stock Level increased to [".$request['prod_qty']."]");
-				#
-				# This may need to be spun off into a separate task with a flag set somewhere with the product ID
-				# thats been updated.
-				#
 				$notify_list = Notification::where('product_code',$product->prod_sku)->get();
 				$this->LogMsg("Count of notifications to send is [".sizeof($notify_list)."]");
 				foreach($notify_list as $n)
@@ -637,8 +630,8 @@ use ProductImageHandling;
 	 *
 	 * @pre form must present all valid columns
 	 * @post new row inserted into database table "products" 
-	 * @param	ProductRequest	$request mixed Validation request object
-	 * @return	mixed 
+	 * @param $request mixed Validation request object
+	 * @return mixed - view object
 	 */
 	public function SaveNewProduct(ProductRequest $request)
 	{
@@ -761,7 +754,8 @@ use ProductImageHandling;
 
 
 	/**
-	 * Display the product attributes for this store.
+	 * Display the product attributes
+	 *
 	 *
 	 * @return	mixed
 	 */

@@ -39,19 +39,24 @@ class TemplateController extends Controller
 	 */
 	public function Show(Request $request)
 	{
-		$store_id = 0;
 		$query = $request->input();
-
+		$store = app('store');
+		$store_id = $store->id;
 		foreach($query as $n=>$v)
 		{
-			if($n=="s") $store_id = $v;
+			if($n=="s")
+			{
+				$store_id = $v;
+				$store = Store::find($store_id);
+			}
 		}
 		$actions = TemplateAction::all();
 		$mappings = TemplateMapping::all();
+		$stores = Store::all();
 
 		$templates = array();
 
-		$template_dir = base_path()."/"."templates/";
+		$template_dir = base_path()."/"."templates/".$store->store_env_code."/";
 		if(file_exists($template_dir))
 		{
 			$files = scandir($template_dir);
@@ -74,16 +79,7 @@ class TemplateController extends Controller
 				$template->store_id  = 0;
 				foreach($mappings as $m)
 				{
-					$length = strlen($f);
-					$file_name = $f;
-					$parts = explode("_", $f);
-					if(sizeof($parts)>2)
-					{
-						$pre_length = strlen($parts[0])+strlen($parts[1])+2;
-						$file_name = substr($f, $pre_length );
-					}
-
-					if($m->template_name == $file_name)
+					if($m->template_name == $f)
 					{
 						$template->mapping_id = $m->id;
 						$template->action_id  = $m->template_action_id;
@@ -93,13 +89,13 @@ class TemplateController extends Controller
 				array_push($templates, $template);
 			}
 		}
-		$stores = Store::all();
 
 		return view('Admin.Templates.listtemplates',[
-			'templates'=>$templates,
-			'actions'=>$actions,
-			'mappings'=>$mappings,
+			'store'=>$store,
 			'stores'=>$stores,
+			'actions'=>$actions,
+			'templates'=>$templates,
+			'mappings'=>$mappings,
 			'selected'=>$store_id
 			]);
 	}
@@ -179,8 +175,6 @@ class TemplateController extends Controller
 	 */
 	public function Update(TemplateRequest $request)
 	{
-		$TemplateMappings = new TemplateMappings;
-
 		$filename = $request['filename'];
 		$mid = $request['mid'];
 		$content = $request['content'];
@@ -204,8 +198,7 @@ class TemplateController extends Controller
 		{
 			if($mid!=0)
 			{
-				#$row = $TemplateMappings->get By ID($mid); # {FIX_2017-10-25} Converted calls to Eloquent where clauses in UpdateTemplate()
-				$row = TemplateMappings::where('id', $mid)->first();
+				$row = TemplateMapping::find($mid);
 				$TemplateMappings->DeleteByAIDSID($row->template_action_id, $row->template_store_id);
 				$text = "Removing mapping for ".$filename;
 				\Session::flash('flash_message', $text );
@@ -223,20 +216,20 @@ class TemplateController extends Controller
 				#
 				# remove current mapping and set this as the action.
 				#
-				$TemplateMappings->DeleteByAIDRID($action, $user->reseller_id);
-				$d = array('template_name'=>$filename,'template_action_id'=>$action,'template_store_id'=>$store_id);
-				$TemplateMappings->InsertMapping($d);
 				$text = "Inserting new mapping for ".$filename;
 				\Session::flash('flash_message', $text );
 			}
 			else /* mid != 0 = entry in DB */
 			{
-				$row = TemplateMappings::where('id', $mid)->first();
+				$row = TemplateMapping::find($mid);
 				if($row->template_action_id != $action)
 				{
 					$TemplateMappings->DeleteByAIDRID($row->template_action_id, $user->reseller_id);
-					$d = array('template_name'=>$filename,'template_action_id'=>$action,'template_reseller_id'=>$user->reseller_id);
-					$TemplateMappings->InsertMapping($d);
+					$o = new TemplateMapping;
+					$o->template_name = $filename;
+					$o->template_action_id = $action;
+					$o->template_store_id = $store_id;
+					$o->save;
 					$text = "Replacing mapping with ".$filename;
 					\Session::flash('flash_message', $text );
 				}

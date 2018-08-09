@@ -23,20 +23,20 @@ use App\Models\Advert;
 use App\Models\Attribute;
 use App\Models\AttributeProduct;
 use App\Models\AttributeValue;
+use App\Models\Category;
+use App\Models\CategoryProduct;
 use App\Models\Cart;
-use App\Models\Store;
 use App\Models\CartItem;
+use App\Models\Customer;
+use App\Models\CustSource;
 use App\Models\Product;
 use App\Models\ProductType;
-use App\Models\Customer;
+use App\Models\ProdImageMap;
 use App\Models\Image;
 use App\Models\ImageProduct;
-use App\Models\Category;
+use App\Models\Store;
 use App\Models\StoreSetting;
-
 use App\Models\Notification;
-use App\Models\CategoryProduct;
-use App\Models\ProdImageMap;
 use App\Models\SubscriptionRequest;
 
 
@@ -74,6 +74,13 @@ class StoreFrontController extends Controller
 {
 use Logger;
 
+/**
+ * Store settings from DB
+ * @var array $settings
+ */
+protected $global_settings;
+protected $store_settings;
+
 
 	/**
 	 * Setup logging and test cookie
@@ -82,6 +89,22 @@ use Logger;
 	 */
 	public function __construct()
 	{
+		$store = app("store");
+		#
+		# gather settings that we are interested in and apply them.
+		#
+		$this->global_settings = StoreSetting::where('setting_store_id',0)->get();
+		$this->store_settings  = StoreSetting::where('setting_store_id',$store->id)->get();
+		foreach($this->global_settings as $entry)
+		{
+			if($entry->setting_name == "ENABLE_LOGGING")
+			{
+				if($entry->setting_value == "1")
+				{
+				# 
+				}
+			}
+		}
 		$this->setFileName("store");
 		$this->LogStart();
 		$this->LogMsg("CLASS:StoreFrontController");
@@ -476,7 +499,7 @@ use Logger;
 			if($id > 0)
 			{
 				$product = Product::where('id',$id)->first();
-				Amqp::publish('product_view', "{'product_id':'".$product->id."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
+				##Amqp::publish('product_view', "{'product_id':'".$product->id."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
 				$image_list = ProdImageMap::where('product_id',$product->id)->get();
 				$this->LogMsg("Fetch images for this product");
 				foreach($image_list as $i)
@@ -555,19 +578,31 @@ use Logger;
 	{
 		$this->LogFunction("ShowStoreCategory()");
 
-		$Product = new Product;
-		$Category = new Category;
-		$Image = new Image;
-		$CategoryProduct  = new CategoryProduct;
+#		$Product = new Product;
+#		$Category = new Category;
+#		$Image = new Image;
+#		$CategoryProduct  = new CategoryProduct;
 
 		$category_data = Category::find($id);
+		#
+		# {FIX_2018-04-03} If invalid category then trap here
+		#
+		$store = app('store');
+		if(is_null($category_data))
+		{
+			$theme_path = \Config::get('THEME_ERRORS')."category-not-found";
+			return view($theme_path,['store'=>$store]);
+		}
+
+
+
 		$size_attribute = Attribute::where('attribute_name','Size')->first();
 		$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
 
 		$colour_attribute = Attribute::where('attribute_name','Colour')->first();
 		$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
 
-		Amqp::publish('category_view', "{'category_id':'".$category_data->id."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
+		##Amqp::publish('category_view', "{'category_id':'".$category_data->id."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
 
 		$current_store = app('store');
 		$this->LogMsg("Current Store: ".print_r( $current_store, true) );
@@ -594,8 +629,10 @@ use Logger;
 
 		if( is_null($current_store) == false)
 		{
-			###$cat_prod_rows = $CategoryProduct->getByCategoryID($id);
 			$cat_prod_rows = CategoryProduct::where('category_id',$id)->get();
+			#
+			#
+			#
 			foreach($cat_prod_rows as $cat_prod_row)
 			{
 				$product = Product::where('id', $cat_prod_row->product_id)->first();
@@ -621,22 +658,17 @@ use Logger;
 				$row->category = $category_data->category_title;
 				$row->category_id = $id;
 
-#				if(($row->prod_qty == 0)&&($row->prod_type==1))
-#					$row->image = '/media/out-of-stock.jpg';
-#				else
-#				{
-					$found = 0;
-					$product_images = ProdImageMap::where('product_id',$product_id)->get();
-					$row->image = '/media/product-image-missing.jpeg';
-	
-					foreach($product_images as $prod_img_map_entry)
-					{
-						$id = array($prod_img_map_entry);
-						$image_id = $id[0]->image_id;
-						$image_row = Image::where('id',$image_id)->first();
-						$row->image = "/".$image_row->image_folder_name."/".$image_row->image_file_name;
-					}
-#				}
+				$found = 0;
+				$product_images = ProdImageMap::where('product_id',$product_id)->get();
+				$row->image = '/media/product-image-missing.jpeg';
+
+				foreach($product_images as $prod_img_map_entry)
+				{
+					$id = array($prod_img_map_entry);
+					$image_id = $id[0]->image_id;
+					$image_row = Image::where('id',$image_id)->first();
+					$row->image = "/".$image_row->image_folder_name."/".$image_row->image_file_name;
+				}
 				$this->LogMsg("Row data: ".print_r($row,true));
 				array_push($products,$row);
 			}
@@ -696,7 +728,7 @@ use Logger;
 
 			if(filter_var($email_address, FILTER_VALIDATE_EMAIL))
 			{
-				Amqp::publish('subscribe_out_of_stock', "{'email_address':'".$email_address."','sku':'".$sku."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
+				##Amqp::publish('subscribe_out_of_stock', "{'email_address':'".$email_address."','sku':'".$sku."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
 				try
 				{
 					$o = new Notification;
@@ -780,30 +812,33 @@ use Logger;
 	public function CaptureForm()
 	{
 		$this->LogFunction("CaptureForm()");
-
+		$store = app('store');
 		if(Request::ajax())
 		{
 			$data_in = Input::all();
 			$name = $data_in['na'];
 			$emailaddress = $data_in['ea'];
+			$this->LogMsg("Captured [".$name."]");
 			$this->LogMsg("Captured [".$emailaddress."]");
 			if((strlen($name)>1) && (strlen($emailaddress)>4))
 			{
-				Amqp::publish('subscribe', "{'email_address':'".$email_address."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
-				\Session::set('capture','done');
-				$Customer = new Customer;
-				#
-				# add source as '2' - WEBSTORE
-				#
-				$d = array('customer_status'=>'A',
-					'customer_name'=>$name,
-					'customer_mobile'=>'',
-					'customer_email'=>$emailaddress,
-					'customer_source_id'=>2,
-					'customer_store_id'=>0);
-				$cid = $Customer->InsertCustomer($d);
-				$this->LogMsg("Subscribed - CID [".$cid."]");
-				$cmd = new ConfirmSubscription(StoreHelper::StoreData(), $emailaddress );
+				$this->LogMsg("Get Customer Source Data");
+				$source = CustSource::where('cs_name',"WEBSTORE")->first();
+#				##Amqp::publish('subscribe', "{'email_address':'".$emailaddress."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
+
+				$o = new Customer;
+				$o->customer_name = $name;
+				$o->customer_mobile = '';
+				$o->customer_email = $emailaddress;
+				$o->customer_source_id = $source->id;
+				$o->customer_store_id = $store->id;
+				$o->customer_status = 'A';
+				$o->customer_date_created = date("Y-m-d");
+				$o->customer_date_updated = date("Y-m-d");
+				$o->save();
+				$cid = $o->id;
+				$this->LogMsg("Saved new customer  ID [".$o->id."]");
+				$cmd = new ConfirmSubscription($store, $emailaddress );
 				if(is_object($cmd))
 				{
 					dispatch($cmd);
@@ -815,6 +850,7 @@ use Logger;
 			}
 			else
 			{
+				$this->LogMsg("FAIL - AJAX call failed Name or Email address length failure");
 				$data = array('status'=>'FAIL');
 				return json_encode($data);
 			}
@@ -876,57 +912,6 @@ use Logger;
 		$Category = new Category;
 		return $Category->getHTML();
 	}
-
-
-
-	/**
-	 * Test code to call various jobs via the dispatch() method of the controller
-	 *
-	 * @param	Route	$route
-	 * @return	void
-	 */
-	public function testemail(Route $route)
-	{
-		$Store = new Store;
-		$s = Store::find(1);
-
-		$uri = $route->getPath();
-
-		echo "URI $uri <br>";
-		$cmd = "";
-		switch($uri)
-		{
-			case "we":
-				$cmd = new BackInStock($s, "sid.young@gmail.com");
-
-				#$cmd = new Welcome($s, "sid.young@gmail.com");
-				break;
-			case "cs":
-				$SubscriptionRequest = new SubscriptionRequest;
-				$SubscriptionRequest->DeleteSubscription("sid.young@gmail.com");
-				$cmd = new ConfirmSubscription($s, "sid.young@gmail.com");
-				break;
-			case "sc":
-				$cmd = new SubscriptionConfirmed($s, "sid.young@gmail.com");
-				break;
-			case "op":
-				$cmd = new OrderPlaced($s, "sid.young@gmail.com", "order object here");
-				break;
-			case "od":
-				$cmd = new OrderDispatched($s, "sid.young@gmail.com", "order object here");
-				break;
-
-		}
-		if(is_object($cmd))
-		{
-			dispatch($cmd);
-		}
-		else
-		{
-			dd($route);
-		}
-	}
-
 
 
 
@@ -1021,11 +1006,14 @@ use Logger;
 	 */
 	protected function FindProduct($products, $id)
 	{
-		foreach($products as $p)
-		{
-			if($p->id == $id) return $p;
-		}
-		return null;
+		$product = array_filter($products, function($p) use ($id) { if($p['id'] == $id) { return $p;} });
+		return reset($product);
+
+		#foreach($products as $p)
+		#{
+		#if($p->id == $id) return $p;
+		#}
+		#return null;
 	}
 
 

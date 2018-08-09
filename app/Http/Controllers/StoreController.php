@@ -73,10 +73,6 @@ use Logger;
 	public function ShowMyAccount() 
 	{
 		$this->LogFunction("ShowMyAccount()");
-
-		$Customer = new Customer;
-		$CustomerAddress = new CustomerAddress;
-		$CustSource = new CustSource;
 	
 		$address = new \stdClass;
 		$address->customer_cid= 0;
@@ -90,7 +86,7 @@ use Logger;
 		$user = Auth::user();
 		if (Auth::check())
 		{
-			$source =  $CustSource->getByName("WEBSTORE");
+			$source = CustSource::where('cs_name',"WEBSTORE")->first();
 			$store = app('store');
 			$customer = Customer::where('customer_email', $user->email)->first();
 
@@ -98,18 +94,27 @@ use Logger;
 			if(sizeof($customer)==0)
 			{
 				$this->LogMsg("No Customer Data! - create a new customer");
-				$data = array('customer_name'=>$user->name, 'customer_email'=>$user->email,'customer_mobile'=>'','customer_status'=>'A',
-					'customer_source_id'=>$source->id,
-					'customer_store_id'=>$store->id
-					);
-				$Customer->InsertCustomer($data);
+				$o = new Customer;
+				$o->customer_name = $user->name;
+				$o->customer_email = $user->email;
+				$o->customer_mobile = '';
+				$o->customer_status = "A";
+				$o->customer_source_id = $source->id;
+				$o->customer_store_id = $store->id;
+				$o->save();
 				$customer = Customer::where('customer_email', $user->email)->first();
 				$this->LogMsg("Customer Data [".print_r($customer,true)."]");
-				$data = $CustomerAddress->getArray();
-				$data['customer_cid'] = $customer->id;
-				$data['customer_email'] = $user->email;
 				$this->LogMsg("Insert a blank address");
-				$CustomerAddress->InsertAddress($data);
+				#
+				# {FIX_2018-07-23} - Added customer address using Eloquent.
+				#
+				$ca = new CustomerAddress;
+				$ca->customer_cid = $customer->id;
+				$ca->customer_email = $user->email;
+				$ca->customer_date_created = date("Y-m-d");
+				$ca->customer_date_updated = date("Y-m-d");
+				$ca->save();
+
 				$address = CustomerAddress::where('customer_cid',$customer->id)->first();
 				$this->LogMsg("Fetch Address Data [".print_r($address,true)."]");
 
@@ -120,11 +125,13 @@ use Logger;
 				$address = CustomerAddress::where('customer_cid',$customer->id)->first();
 				if(sizeof($address)==0)
 				{
-					$data = $CustomerAddress->getArray();
-					$data['customer_cid'] = $customer->id;
-					$data['customer_email'] = $user->email;
 					$this->LogMsg("Insert a blank address");
-					$CustomerAddress->InsertAddress($data);
+					$ca = new CustomerAddress;
+					$ca->customer_cid = $customer->id;
+					$ca->customer_email = $user->email;
+					$ca->customer_date_created = date("Y-m-d");
+					$ca->customer_date_updated = date("Y-m-d");
+					$ca->save();
 					$address = CustomerAddress::where('customer_cid',$customer->id)->first();
 				}
 			}
@@ -209,10 +216,13 @@ use Logger;
 
 
 	/**
-	 * Process the posted data in the validation class and update back to the DB using the servie layer.
+	 * Given the store ID, Process the posted data in the validation class and
+	 * update the stores table using the service layer.
 	 *
 	 * POST ROUTE: /admin/store/update/{id}
 	 *
+	 * @param	app/Http/Request/StoreRequest	$request
+	 * @param	integer	$id
 	 * @return	mixed
 	 */
 	public function UpdateStore(StoreRequest $request, $id)
@@ -228,7 +238,12 @@ use Logger;
 
 
 	/**
+	 *
+	 *
 	 * POST ROUTE: /admin/store/save
+	 *
+	 * @param	app/Http/Request/StoreRequest	$request
+	 * @return	mixed
 	 */
 	public function SaveNewStore(StoreRequest $request)
 	{

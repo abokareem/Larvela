@@ -26,6 +26,7 @@ use App\Models\Category;
 use App\Models\CategoryProduct;
 
 
+use App\Traits\Logger;
 
 
 /**
@@ -35,6 +36,7 @@ use App\Models\CategoryProduct;
  */
 class CategoryController extends Controller
 {
+use Logger;
 
 	/**
 	 * Show a Delete confirmation page, a category should not be deleted unles there 
@@ -175,14 +177,16 @@ class CategoryController extends Controller
 	 */
 	public function ShowEditCategoryPage($id)
 	{
-		$Category = new Category;
-		$Store = new Store;
-
 		$cat = Category::find($id);
-		$html_select_list = $Category->getSelectList("category_parent_id",$cat->category_parent_id);
-		$store_select_list = $Store->getSelectList('category_store_id', $cat->category_store_id, true);
-
-		return view('Admin.Categories.editcategory',['category'=>$cat,'html_select_list'=>$html_select_list, 'stores'=>$store_select_list]);
+		$categories = Category::all();
+		$stores = Store::all();
+		$store = app('store');
+		return view('Admin.Categories.editcategory',[
+			'category'=>$cat,
+			'categories'=>$categories,
+			'store'=>$store,
+			'stores'=>$stores
+			]);
 	}
 
 
@@ -197,13 +201,14 @@ class CategoryController extends Controller
 	 */
 	public function ShowAddCategoryPage()
 	{
-		$Category = new Category;
-		$Store = new Store;
-
-		$html_select_list = $Category->getSelectList("category_parent_id",0);
-		$store_select_list = $Store->getSelectList('category_store_id', 0, true);
-		
-		return view('Admin.Categories.addcategory',['html_select_list'=>$html_select_list, 'stores'=>$store_select_list]);
+		$categories = Category::all();
+		$stores = Store::all();
+		$store = app('store');
+		return view('Admin.Categories.addcategory',[
+			'categories'=>$categories,
+			'store'=>$store,
+			'stores'=>$stores
+			]);
 	}
 
 

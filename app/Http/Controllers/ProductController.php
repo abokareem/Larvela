@@ -10,7 +10,7 @@
  */
 namespace App\Http\Controllers;
 
-
+use Redirect;
 use Input;
 
 use Illuminate\Http\Request;
@@ -29,16 +29,15 @@ use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
 
 
-use App\Models\Store;
-use App\Models\Product;
-use App\Models\Image;
-use App\Models\Category;
-use App\Models\ProductType;
-use App\Models\CategoryProduct;
-
 use App\Models\Attribute;
-use App\Models\ProdImageMap;
+use App\Models\Category;
+use App\Models\CategoryProduct;
+use App\Models\Image;
 use App\Models\Notification;
+use App\Models\Product;
+use App\Models\ProductType;
+use App\Models\ProdImageMap;
+use App\Models\Store;
 
 
 use App\Traits\Logger;
@@ -64,7 +63,7 @@ use Logger;
 	{
 		$this->setFileName("store-admin");
 		$this->LogStart();
-		$this->LogMsg("CLASS:BasicProductController");
+		$this->LogMsg("CLASS:ProductController");
 	}
 	
 	/**
@@ -74,20 +73,116 @@ use Logger;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS:BasicProductController");
+		$this->LogMsg("CLASS:ProductController");
 		$this->LogEnd();
 	}
 
 
 
+	/**
+	 * Return an administration view listing the selected products.
+	 *
+	 * GET ROUTE: /admin/products
+	 *
+	 * @pre		none
+	 * @post	none
+	 *
+	 * @param	Request	$request
+	 * @return	mixed
+	 */
+	public function ShowProductsPage(Request $request)
+	{
+		$this->LogFunction("ShowProductsPage()");
+
+		$store = app('store');
+		$stores = Store::all();
+		$categories = Category::all();
+		$product_types = ProductType::all();
+		$store_id = $store->id;
+		$category_id = 0;
+		$this->LogMsg("Default store ID [".$store->id."]");
+		$query = $request->input();
+		foreach($query as $n=>$v)
+		{
+			if(is_string($n)== true)
+			{
+				if(is_string($v)== true)
+				{
+					$this->LogMsg("Checking query N= $n while V= $v");
+					if($n=="s") $store_id = $v;
+					if($n=="c") $category_id = $v;
+				}
+			}
+		}
+		$this->LogMsg("Required store ID [".$store_id."]");
+		$this->LogMsg("Required Category ID [".$category_id."]");
+
+		$products = array();
+		#
+		# Get all products in the matching category
+		#
+		if(($store_id > 0)&&($category_id>0))
+		{
+			$this->LogMsg("Processing for Store/Category [".$store_id."/".$category_id."]");
+			$products_in_category = CategoryProduct::where('category_id', $category_id )->get();
+			foreach($products_in_category as $pic)
+			{
+				array_push($products, Product::find($pic->product_id));
+			}
+		}
+		elseif($store_id > 0)
+		{
+			$this->LogMsg("Processing for Store Only [".$store_id."/".$category_id."]");
+			#
+			# {FIX_2018-02-25} Disabled code that gets all products for all categories for store.
+			# get all products in all categories for the selected store
+			#
+#			$store_categories = Category::where('category_store_id',$store_id)->get();
+#			$this->LogMsg("   There are [".count($store_categories)."] categories");
+#			foreach($store_categories as $sc)
+#			{
+#				$products_in_category = CategoryProduct::where('category_id', $sc->id )->get();
+#				$this->LogMsg("   Category [".$sc->id."]  Number of Products [".count($products_in_category)."]");
+#				foreach($products_in_category as $pic)
+#				{
+#					array_push($products, Product::find($pic->product_id) );
+#				}
+#			}
+			#
+			# {FIX_2018-02-25} Converted to first category to reduce number of products show
+			#
+			$first_category = Category::where('category_store_id',$store_id)
+				->where('category_status',"A")
+				->first();
+			$products_in_category = CategoryProduct::where('category_id', $first_category->id )->get();
+			foreach($products_in_category as $pic)
+			{
+				array_push($products, Product::find($pic->product_id) );
+			}
+		}
+		else
+		{
+			$this->LogMsg("Processing for All Products [".$store_id."/".$category_id."]");
+			#
+			# Just get ALL products
+			#
+			$products = Product::where('prod_status',"A")->get();
+		}
+		return view('Admin.Products.products',[
+			'store_id'=>$store_id,
+			'category_id'=>$category_id,
+			'store'=>$store,
+			'stores'=>$stores,
+			'categories'=>$categories,
+			'products'=>$products,
+			'product_types'=>$product_types
+			]);
+	}
+
+
 
 
 	/**
-	 * CHANGE TO SHOW PRODUCT TYPES, Then ROute to correct view
-	 *
-	 *
-	 *
-	 *
 	 * Call the view to present the "Add New" Product page
 	 * was "/admin/product/addnew"
 	 * GET ROUTE: /admin/select/type
@@ -117,15 +212,13 @@ use Logger;
 	public function RouteToPage($id)
 	{
 		$this->LogFunction("RouteToPage()");
-		$product_types = ProductType::all();
-		$selected_type = "";
 		$product_type = ProductType::where('product_type',"Basic Product")->first();
+		$product_types = ProductType::all();
 		foreach($product_types as $pt)
 		{
 			if($id == $pt->id)
 			{
 				$product_type = $pt;
-				$selected_type=$pt->product_type;
 				break;
 			}
 		}
@@ -134,23 +227,23 @@ use Logger;
 		$stores = Store::all();
 		$categories = Category::all();
 
-		switch($selected_type)
+		switch($product_type->id)
 		{
-			case "Parent Product":
+			case 2:
 				return view('Admin.Products.add_parent',[
 					'product_type'=>$product_type,
 					'stores'=>$stores,
 					'store'=>$store,
 					'categories'=>$categories ]);
 				break;
-			case "Virtual Virtual Product (Limited)":
+			case 3:
 				return view('Admin.Products.add_virtual',[
 					'product_type'=>$product_type,
 					'stores'=>$stores,
 					'store'=>$store,
 					'categories'=>$categories ]);
 				break;
-			case "Virtual Product (Unlimited)":
+			case 4:
 				return view('Admin.Products.add_unlimited_virtual',[
 					'product_type'=>$product_type,
 					'stores'=>$stores,
@@ -190,7 +283,8 @@ use Logger;
 
 
 	/**
-	 * Using the new SKU, read the existing product using the ID, insert a new product with the new SKU.
+	 * Using the new SKU, read the existing product using the ID,
+	 * insert a new product with the new SKU.
 	 * Dont copy the images.
 	 * Dont match the categories.
 	 *
@@ -242,13 +336,6 @@ use Logger;
 		{
 			\Session::flash('flash_error','ERROR - Product SKU alreay in Database!');
 		}
-		return $this->ShowProductsPage($request);
+		return Redirect::to("/admin/products");
 	}
-
-
-
-
-
-
-
 }
