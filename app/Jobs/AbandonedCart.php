@@ -6,9 +6,10 @@
  *
  * [CC]
  *
- * \addtogroup CartAbandonment
- * AbandonedCart - Send a templated email after the Customer has abandond the cart for a period of time.
- * Does not do anything to the cart.
+ * \addtogroup Cart_Abandonment
+ * AbandonedCart -  Provide an entry point for additional business logic when a cart is abandoned after 24 hours.
+ * - Send an emial to the store admin informaing them the cart has been abandoned
+ * - Does not do anything to the cart.
  */
 namespace App\Jobs;
 
@@ -23,6 +24,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
+use App\Models\Store;
 use App\Models\Customer;
 
 
