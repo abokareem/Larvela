@@ -24,6 +24,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
+use App\Jobs\EmailUserJob;
+
 use App\Models\Store;
 use App\Models\Customer;
 
