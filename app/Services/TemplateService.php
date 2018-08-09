@@ -47,7 +47,7 @@ class TemplateService
 		else
 		{
 			\Session::flash('flash_error','Template update failed!');
-		}`
+		}
 		return $rv;
 	}
 }
