@@ -11,6 +11,7 @@
  */
 
 namespace App\Providers;
+use Config;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
@@ -33,10 +34,10 @@ class AppServiceProvider extends ServiceProvider
     {
 		\Blade::extend(function($value) { return preg_replace('/\@define(.+)/', '<?php ${1}; ?>', $value); });
 
+		$store = null;
 		if(Schema::hasTable('stores'))
         {
 			$Store = new Store;
-			$store = null;
 			if(($store_code=getenv("STORE_CODE"))!=false)
 			{
 				$store = Store::where('store_env_code', $store_code )->first();
@@ -45,7 +46,13 @@ class AppServiceProvider extends ServiceProvider
 			{
 				$store = Store::find(1);
 			}
+			if(is_null($store))
+			{
+				$store = new Store;
+				$store->store_name = "DEMO";
+			}
 			$this->app->instance('store', $store);
+			Config::set("app.url", $store->store_url);
 	    }
     }
 
@@ -56,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-		foreach(glob(app_path().'/Payments/*_Payment.php') as $filename)
+		foreach(glob(app_path().'/PaymentGateways/*_Payment.php') as $filename)
 		{
 			require_once($filename);
 		}
