@@ -1,10 +1,9 @@
 <?php
 /**
- * \class	AbandonedWeekOldCart
+ * \class	AddToCart
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \date	2017-08-30
+ * \date	2018-08-09
  * \version	1.0.0
- *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -27,11 +26,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  *
- * \addtogroup	Cart_Abandonment
- * AbandonedWeekOldCart - Place holder for additonal business Logic.
- * - CRON Calls this via ProcessAbandonedCart Job.
- * - Cart has been abandoned for 1 week now.
- * - Email sent via a Mailable Job.
+ * \addtogroup Cart
+ * AddToCart - Entry point for additional business logic when an item is added to a cart.
+ * - Send the store admin an email about item and cart.
  */
 namespace App\Jobs;
 
@@ -46,33 +43,25 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-
-use App\Jobs\EmailUserJob;
-
 use App\Models\Cart;
-use App\Models\Store;
+use App\Models\CartItem;
 use App\Models\Customer;
+use App\Models\Product;
+use App\Models\Store;
 
 
 /**
- * \brief Cart has been abandoned for 1 week, execute any additional business logic here.
+ * @brief Place holder for any business logic needed when an item has been added to a Cart.
  */
-class AbandonedWeekOldCart implements ShouldQueue
+class AddToCart implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
 
 /**
- * The Store object 
+ * The Store object
  * @var mixed $store
  */
 protected $store;
-
-
-/**
- * The email address of the customer
- * @var string $email
- */
-protected $email;
 
 
 /**
@@ -82,46 +71,34 @@ protected $email;
 protected $cart;
 
 
-
-
     /**
-     * Save passed in parameters for later use. 
+     * Create a new job instance save store and email details away.
 	 *
-     * @param  $store	mixed - The Store object.
-     * @param  $email	string - email address of customer.
-     * @param  $cart	mixed - The Cart object.
+     * @param  $store	mixed - The Store object
+     * @param  $cart	mixed - The Cart onject
      * @return void
      */
-    public function __construct($store, $email, $cart)
+    public function __construct($store, $cart)
     {
 		$this->store = $store;
-		$this->email = $email;
 		$this->cart  = $cart;
     }
 
 
 
     /**
-	 * Send an email to the Store administrator and provide a place for additional business logic.
-	 *
-     * @return integer
+	 * Pleace holder for aditional business logic to run prior to customer notification.
+	 * - May run as Queue Job, so may execute before/durng or after Email gets sent.
+     * @return void
      */
     public function handle()
     {
-		#
-		# Your business logic here - suggestion - use Queued Jobs for asynchronous tasks.
-		#
-
-
-		#
-		# Email the store administrator
-		#
-		$from = $this->store->store_sales_email;	
-		$subject = "[LARVELA] Week Old Abandoned cart message sent to [".$this->email."]";
-		$text = "Notice: Cart ".$this->cart->id." abandoned 1 week ago by customer ".$this->email;
+		$text = "Notice: Item added to Cart [] by [] ";
+		$subject = "[LARVELA] Item added to Cart [".$this->cart->id."]";
+		$from = $this->store->store_sales_email;
 
 		$admin_user = Customer::find(1);
-		dispatch(new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
-		return 0;
+		dispatch( new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
     }
+
 }

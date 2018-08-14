@@ -2,6 +2,30 @@
 /**
  * \class	CheckPendingOrders
  * \date	2017-09-20
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \version	1.0.0
+ *
+ *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  *
  * \addtogroup CRON
  * Iterate through the 'orders' table, get all rows that are on 'W" status and NOT PAID.
@@ -12,7 +36,7 @@ namespace App\Jobs;
 
 use App\Models\Product;
 use App\Models\Order;
-use App\Models\OrderItems;
+use App\Models\OrderItem;
 use App\Traits\Logger;
 use App\Jobs\OrderCancelled;
 use DB;
@@ -28,16 +52,20 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
- * \brief Iterate through the 'orders' table,
- * get all rows that are on 'W" status and NOT PAID
- * check if they are older than 7 days, if so reverse the
- * products back into stock and send an email to the customer,
- * the store and admin and then update the order as "cancelled".
+ * \brief Iterate through the 'orders' table and get all rows that are on 'W" status and NOT PAID and check if they are older than 7 days.
+ * - If older than 7 days then:
+ * -- Reverse the products back into stock
+ * -- Update the order as "cancelled".
+ * To be added shortly:
+ * -- Send an email to the customer,
+ * -- Send an email to the store sales team 
+ * -- Send an email to the system admin and
  */
 class CheckPendingOrders implements ShouldQueue
 {
-use Logger;
 use InteractsWithQueue, Queueable, SerializesModels;
+use Logger;
+
 
     /**
      * Create a new job instance.
@@ -63,7 +91,9 @@ use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * Locate orders that are on waiting status and more than 7 days old.
-     * Reverse the order and inform user.
+     * Reverse the order.
+	 *
+	 * @todo inform the Customer and Sales team.
 	 *
      * @return void
      */
@@ -95,7 +125,7 @@ use InteractsWithQueue, Queueable, SerializesModels;
 							# Order matches, need to add all product back to stop and mark order items cancelled 
 							# and then order as cancelled, set updated date
 							#
-							$order_items = OrderItems::where('order_item_oid',$o->id)->get();
+							$order_items = OrderItem::where('order_item_oid',$o->id)->get();
 							$this->LogMsg("Loaded ".sizeof($order_items)." items for Order");
 							\DB::beginTransaction();
 							foreach($order_items as $item)
@@ -116,8 +146,7 @@ use InteractsWithQueue, Queueable, SerializesModels;
 							$o->order_status = "C";
 							$o->save();
 							\DB::commit();
-							$cmd = new OrderCancelled($store, $email, $o);
-							dispatch($cmd);
+							dispatch(new OrderCancelled($store, $email, $o));
 							$this->LogMsg("TX Complete.");
 						}
 						else
