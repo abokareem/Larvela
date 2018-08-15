@@ -36,17 +36,17 @@ namespace App\Events\Larvela;
 /**
  * \brief An abstract template class for crafting and dispatching Business Process Messages.
  */
-abstract class MsgTemplate
+abstract class MessageTemplate
 {
 public $msg=null;
 
 	public final function dispatch()
 	{
-		$this->processMsg();
+		$json = $this->processMsg();
 		#
 		# dispatch below using Job dispatch with queuing
 		#
-		
+		dd($json);
 	}
 
 	abstract protected function processMsg();
