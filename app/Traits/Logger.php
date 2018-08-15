@@ -1,12 +1,19 @@
 <?php
 /**
- * Larvela eCommerce Engine
- * Copyright (C) 2017-2018
- * by Present & Future Holdings Pty Ltd Trading as Off Grid Engineering
- * https://off-grid-engineering.com
  *
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2018-01-01
+ * \version 1.0.0
  *
- * \addtogroup  Trait
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * \addtogroup  Traits
  * Logger - Generic Logger class, not PSR compliant but does the job nicely.
  */
 namespace App\Traits;
@@ -21,7 +28,7 @@ protected $LOGDIR= '/logs';
 protected $FILENAME = "default";
 protected $OWNER = "apache";
 protected $GROUP = "apache";
-
+protected $CLASSNAME = "";
 
 
 	/**
@@ -35,6 +42,17 @@ protected $GROUP = "apache";
 		{
 			$this->FILENAME = $name;
 		}
+	}
+
+
+	/**
+	 *
+	 *
+	 * @return  void
+	 */
+	public function setClassName($name)
+	{
+		$this->CLASSNAME = $name;
 	}
 
 
@@ -82,7 +100,18 @@ protected $GROUP = "apache";
 		}
 		$today = date('Y-m-d');
 		$now = date('H:i:s');
-		$str = $today.'|'.$now.'|'.$status.'|'.$message."\r\n";
+		#
+		# WAS $str = $today.'|'.$now.'|'.$status.'|'.$message."\r\n";
+		#
+		$str = $today."|".$now."|".$status;
+		if(strlen($this->CLASSNAME)>2)
+		{
+			$str .= "|".$this->CLASSNAME."|".$message."\r\n";
+		}
+		else
+		{
+			$str .= "|".$message."\r\n";
+		}
 		$LOGFILE = $this->LOGDIR.'/'.$this->FILENAME."-".$today.".log";
 		file_put_contents($LOGFILE, $str, FILE_APPEND);
 		chown($LOGFILE,"apache");
