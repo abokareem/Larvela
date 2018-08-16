@@ -1,8 +1,36 @@
 <?php
 /**
- * \class AdvertService
- * @date 2016-12-08
- * @author Sid Young <sid@off-grid-engineering.com>
+ * \class	AdvertService
+ * \date	2016-12-08
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \version	1.0.0
+ *
+ *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *
+ * \addtogroup Services
+ * AdvertService - Placeholder for future module to provide advertising content
+ * into the store, usually in place of a product in a group of products. 
+ * - Exact design yet to be finalized.
  */
 namespace App\Services;
 
@@ -16,58 +44,4 @@ use App\Models\Advert;
  */
 class AdvertService
 {
-
-	/**
-	 * Insert a new row
-	 *
-	 * @return	integer
-	 */
-	public static function insert(AdvertRequest $request)
-	{
-		$rv = 0;
-		$o = new Advert;
-		$o->advert_name = $request['advert_name'];
-		$o->advert_html_code = $request['advert_html_code'];
-		$o->advert_status = $request['advert_status'];
-		$o->advert_date_from = $request['advert_date_from'];
-		$o->advert_date_to = $request['advert_date_to'];
-		$o->advert_store_id = $request['advert_store_id'];
-		if(($rv=$o->save()) > 0)
-		{
-			\Session::flash('flash_message','Advert Saved!');
-		}
-		else
-		{
-			\Session::flash('flash_error','Not Saved!');
-		}
-		return $rv;
-	}
-
-
-
-	/**
-	 * Update an existing row
-	 *
-	 * @return	integer
-	 */
-	public static function update(AdvertRequest $request)
-	{
-		$rv = 0;
-		$o = Advert::find($request['id']);
-		$o->advert_name = $request['advert_name'];
-		$o->advert_html_code = $request['advert_html_code'];
-		$o->advert_status = $request['advert_status'];
-		$o->advert_date_from = $request['advert_date_from'];
-		$o->advert_date_to = $request['advert_date_to'];
-		$o->advert_store_id = $request['advert_store_id'];
-		if(($rv=$o->save()) > 0)
-		{
-			\Session::flash('flash_message','Advert Updated!');
-		}
-		else
-		{
-			\Session::flash('flash_error','Update failed!');
-		}
-		return $rv;
-	}
 }
