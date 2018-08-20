@@ -3,7 +3,8 @@
  * \class	AddToCartMessage
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-12
- * \version 1.0.0
+ * \version 1.0.1
+ *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -31,32 +32,76 @@
  */
 namespace App\Events\Larvela;
 
-
+use App\Models\Cart;
+use App\Models\CartItem;
+use App\Models\Store;
 
 use App\Events\Larvela\MessageTemplate;
-
+use App\Traits\Logger;
 
 /**
  * \brief Formulate a JSON message containing data about what has been added to a cart in which store
  */
 class AddToCartMessage extends MessageTemplate
 {
-	public function __construct($store,$cart,$user,$product)
+use Logger;
+
+
+/**
+ * @var mixed $store
+ */
+protected $store;
+
+
+/**
+ * @var mixed $cart
+ */
+protected $cart;
+
+
+/**
+ * @var mixed $user
+ */
+protected $user;
+
+
+/**
+ * @var mixed $product
+ */
+protected $product;
+
+
+	/**
+	 * Take the data given and save it for processing later.
+	 *
+	 * @return	void
+	 */
+	public function __construct($store,$user,$cart,$product)
 	{
-		$data = array();
-		$this->msg = json_encode($data);
+		$this->setFileName('store');
+		$this->setClassName('AddToCartMessage');
+		$this->store = $store;
+		$this->user = $user;
+		$this->cart = $cart;
+		$this->product = $product;
 	}
 
 
 	/**
+	 * Take the data given and format up a JSON response.
 	 *
-	 *
+	 * Called via the dispatch method in the Abstract Base Class.
+	 * Provides a uniform way to dispatch messages.
+	 * @return	string;
 	 */
 	protected function processMsg()
 	{
+		$this->LogFunction("processMsg()");
+		$this->LogMsg("Store Code [".$this->store->store_env_code."]");
+		$msg = array('store_code'=>$this->store->store_env_code);
 		#
-		# @todo Add code to process the message from the 
+		# @todo Add code to process the message from the add code dispatch()
 		#
-		return $this->msg;
+		return json_encode($msg);
 	}
 }
