@@ -8,14 +8,13 @@ be built to monitor the internal flow of the store independant of the typical me
 
 ## Status
 
-Alpha development phase at present.
+Initial deployment phase, more work on message JSON format and content. Mechanism for dispatch is working.
 
 ## Overview
 
 The MessageTemplate class is an abstract class that contains the common dispatch() method that calls the derived class to implement and return the JSON data from the parameters that were passed to it.
 
-The dispatch mechanism in the Message Template will then kick off a Job and dispatch as per the prefered transport method,
-which can be disabled as needed.
+The dispatch mechanism in the Message Template will then instanciate the required objects to transport the JSON data to the target service end point. End points are defined in the config/app.php file.
 
 Ideally a Message Queue system or Elastic search implementation can push the JSON data that is returned to an external system.
 
