@@ -3,7 +3,7 @@
  * \class	MsgTemplate
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-12
- * \version 1.0.0
+ * \version 1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -32,21 +32,34 @@
  */
 namespace App\Events\Larvela;
 
+use Config;
 
 /**
  * \brief An abstract template class for crafting and dispatching Business Process Messages.
  */
 abstract class MessageTemplate
 {
-public $msg=null;
 
+	/**
+	 * Get the resultant JSON data from the calling Message Generator
+	 * - Dispatch it using the required transport which is configured in cong/app.php
+	 * - Add more transport options into the directory as needed, the AppServiceProvider will autoload them in.
+	 */
 	public final function dispatch()
 	{
 		$json = $this->processMsg();
 		#
-		# dispatch below using Job dispatch with queuing
+		# Dispatch type is in app.php as an array, only add type with a supported class.
 		#
-		dd($json);
+		$transport_types = Config::get("app.metrics_transport");
+		#
+		# Use the Factory to find and dispatch using the selected transport.
+		#
+		array_map(function($transport_type) use ($json)
+		{
+			$dispatcher = DispatcherFactory::build($transport_type);
+			$dispatcher->send($json);
+		}, $transport_types);
 	}
 
 	abstract protected function processMsg();
