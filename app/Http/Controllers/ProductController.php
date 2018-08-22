@@ -230,7 +230,7 @@ use Logger;
 
 		$ProductType = \App\Services\ProductTypeFactory::BuildRoute($product_type->id);
 		$route = "Admin.Products.".$ProductType;
-		return view($route,[ 'product_type'=>$product_type, 'stores'=>$stores, 'store'=>$store,'categories'=>$categories]);
+		return view($route,[ 'product_types'=>$product_types,'product_type'=>$product_type, 'stores'=>$stores, 'store'=>$store,'categories'=>$categories]);
 	}
 
 
