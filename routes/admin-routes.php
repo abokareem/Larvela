@@ -12,21 +12,22 @@ Route::post('/admin/mailrun/control','MailRunController@StartMailRun');
 Route::get('/admin','AdminController@ShowDashboard');
 Route::get('/dashboard','AdminController@ShowDashboard');
 #
-Route::get('/admin/orders','OrderController@ShowCurrentOrders');
-Route::get('/admin/order/view/{id}','OrderController@ShowOrder');
+Route::get('/admin/orders','AdminOrderController@ShowCurrentOrders');
+Route::get('/admin/order/view/{id}','AdminOrderController@ShowOrder');
 #
 #
 # TO ADD TO PROD
-Route::get('/admin/order/boitem/{id}','OrderController@BackOrderAnItem');
+Route::get('/admin/order/boitem/{id}','AdminOrderController@BackOrderAnItem');
 #
-Route::get('/admin/order/cancel/{id}','OrderController@MarkOrderAsCancelled');
-Route::post('/admin/order/dispatch/{id}','OrderController@OrderDispatched');
-Route::get('/admin/order/update/paid/{id}','OrderController@MarkOrderPaid');
-Route::get('/admin/order/update/unpaid/{id}','OrderController@MarkOrderUnPaid');
-Route::get('/admin/order/update/onhold/{id}','OrderController@MarkOrderOnHold');
-Route::get('/admin/order/update/waiting/{id}','OrderController@MarkOrderAsWaiting');
-Route::get('/admin/order/pdf/shopinvoice/{id}','OrderController@DispayPDFShopInvoice');
-Route::get('/admin/order/pdf/packingslip/{id}','OrderController@DispayPDFPackingSlip');
+Route::get('/admin/order/cancel/{id}','AdminOrderController@MarkOrderAsCancelled');
+Route::post('/admin/order/dispatch/{id}','AdminOrderController@OrderDispatched');
+Route::get('/admin/order/update/paid/{id}','AdminOrderController@MarkOrderPaid');
+Route::get('/admin/order/update/unpaid/{id}','AdminOrderController@MarkOrderUnPaid');
+Route::get('/admin/order/update/onhold/{id}','AdminOrderController@MarkOrderOnHold');
+Route::get('/admin/order/update/waiting/{id}','AdminOrderController@MarkOrderAsWaiting');
+Route::get('/admin/order/pdf/shopinvoice/{id}','AdminOrderController@DispayPDFShopInvoice');
+Route::get('/admin/order/pdf/packingslip/{id}','AdminOrderController@DispayPDFPackingSlip');
+#
 #
 Route::get('/admin/images', 'ImageManagement@Show');
 Route::get('/admin/image/show/{pid}', 'ImageManagement@ShowByProduct');

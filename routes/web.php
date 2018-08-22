@@ -6,6 +6,11 @@ if( env("APP_ENV", "NOT_DEFINED") == "DEV")
 {
 	require('test-routes.php');
 }
+$install_files = base_path('routes/install-routes.php');
+if(file_exists($install_files))
+{
+	require($install_files);
+}
 
 Auth::routes();
 

@@ -5,6 +5,7 @@
 
 Route::get('/test/product/show/{id}','TestController@test_product_show');
 
+Route::get('/test/dispatch/email','TestController@test_dispatch_email');
 #
 #
 #
@@ -17,7 +18,7 @@ Route::get('/test/login/failed','TestController@test_login_failed');
 
 
 
-Route::get('/test/cart/abandoned','TestController@test_cart_abandoned');
+Route::get('/test/cart/abandoned/{days}','TestController@test_cart_abandoned');
 #
 # 2018-07-17 - New route formats /test/<section>/<method>
 #
@@ -48,19 +49,6 @@ Route::get('/test/header', 'TestController@test_header');
 Route::get('/admin/search', 'SearchController@Search');
 Route::get('/mailrun', 'TestController@mailrun');
 Route::get('/themeinfo', function()  { return View::make('themeinfo'); });
-
-/**
- * Laravel routes files for a 5.2.x installation
-  *
-  Route::get('/we', 'StoreFrontController@testemail');
-  Route::get('/cs', 'StoreFrontController@testemail');
-  Route::get('/sc', 'StoreFrontController@testemail');
-  Route::get('/od', 'StoreFrontController@testemail');
-  Route::get('/op', 'StoreFrontController@testemail');
-  Route::get('/delete/{id}', 'StoreFrontController@testimagedelete');
-  Route::get('/mr', 'AdminController@MailRun');
-*/
-
 
 #
 # TEST code to do a bulk update - started but not finished.
