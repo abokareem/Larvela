@@ -3,9 +3,28 @@
  * \class	OrderPlaced
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-22
+ * \version	1.0.0
  *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
- * [CC]
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  * 
  * \addtogroup Transactional
  * OrderPlaced - Provides a hook when an Order is placed.
@@ -31,7 +50,7 @@ use App\Models\Customer;
 
 
 /**
- * \brief an Order has been placed, o we have a point here where we can insert additional business logic.
+ * \brief an Order has been placed, we have a point here where we can insert additional business logic.
  * - Order will still need to be picked and dispatched.
  * - Customer email sent via a Mailable job.
  */
@@ -89,7 +108,7 @@ protected $email;
 		$admin_user = Customer::find(1);
 		$from = $this->store->store_sales_email;
 		$subject = "[LARVELA] Order #".$this->order->id." placed -> message sent to [".$this->to."]";
-		$text = Order #".$this->order->id." placed and email sent to [".$tis->email."]";
+		$text = "Order #".$this->order->id." placed and email sent to [".$tis->email."]";
 		dispatch(new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
     }
 }
