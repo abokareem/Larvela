@@ -34,7 +34,7 @@
 	{!! Form::close() !!}
 </div>
 
-<script src='https://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
+<script src='//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
 
 <script>
 

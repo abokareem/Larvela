@@ -2,6 +2,14 @@
 @section('title','Product Management')
 @section('content')
 
+<?php
+$types = array();
+$types[0] = '<span style="color:red;">Undefined</span>';
+foreach($product_types as $pt)
+{
+	$types[$pt->id] = $pt->product_type;
+}
+?>
 	<div class="row">
 		<div class='col-lg-12'><h3 class='page-header'><i class="fa fa-users"></i> Products</h3></div>
 	</div>
@@ -43,6 +51,7 @@
 				<th>Name</th>
 				<th>Short Description</th>
 				<th>Visible</th>
+				<th>Type</th>
 				<th>Base Cost</th>
 				<th>Retail Cost</th>
 				<th>Weight</th>
@@ -62,6 +71,7 @@
 				<td>{{ $p->prod_title }}</td>
 				<td>{{ $p->prod_short_desc }}</td>
 				<td>{{ $p->prod_visible }}</td>
+				<td>{{ $types[$p->prod_type] }}</td>
 				<td>${{ number_format($p->prod_base_cost,2) }}</td>
 				<td>${{ number_format($p->prod_retail_cost,2) }}</td>
 				<td>{{ $p->prod_weight }}g</td>

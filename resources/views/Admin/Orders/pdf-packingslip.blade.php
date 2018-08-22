@@ -1,4 +1,4 @@
-@extends("admin-pdfmaster")
+@extends("Templates.admin-pdfmaster")
 @section("title","Packing Slip")
 <?php
 #

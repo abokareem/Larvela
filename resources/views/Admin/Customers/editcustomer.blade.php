@@ -43,13 +43,29 @@
 		<div class="form-group">
 			<label class="control-label col-xs-2">Source:</label>
 			<div class="col-xs-5">
-				{!! $source_select_list !!}
+				<select class="form-control" name="customer_source_id" id="customer_source_id">
+				@foreach($customer_sources as $cs)
+					@if($customer->customer_source_id == $cs->id)
+					<option value="{{$cs->id}}" selected>{{ $cs->cs_name }}</option>
+					@else
+					<option value="{{$cs->id}}">{{ $cs->cs_name }}</option>
+					@endif
+				@endforeach
+				</select>
 		 	</div>
 		</div>
 		<div class="form-group">
 			<label class="control-label col-xs-2">Store:</label>
 			<div class="col-xs-5">
-				{!! $store_select_list !!}
+				<select class="form-control" name="customer_store_id" id="customer_store_id">
+				@foreach($stores as $s)
+					@if($customer->customer_store_id == $s->id)
+					<option value="{{$s->id}}" selected>{{ $s->store_name }}</option>
+					@else
+					<option value="{{$s->id}}">{{ $s->store_name }}</option>
+					@endif
+				@endforeach
+				</select>
 		 	</div>
 		</div>
 		<div class="form-group">
@@ -77,7 +93,7 @@
 </div>
 
 
-<script src='http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
+<script src='//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
 <script src='/bootstrap-switch.js'></script>
 
 

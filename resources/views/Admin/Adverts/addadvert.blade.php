@@ -85,7 +85,7 @@ $(function() { $('#datetimepicker1').datetimepicker({ format: 'YYYY-MM-DD', show
 $(function() { $('#datetimepicker2').datetimepicker({ format: 'YYYY-MM-DD', showTodayButton: true }); });
 </script>
 
-<script src='http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
+<script src='//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
 
 <script>
 

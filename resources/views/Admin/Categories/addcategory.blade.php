@@ -24,7 +24,11 @@
 		<div class="form-group">
 			<label class="control-label col-xs-2">Store:</label>
 			<div class="col-xs-6">
-				{!! $stores !!}
+				<select id="category_store_id" name="category_store_id" class="form-control">
+				@foreach($stores as $s)
+					<option value="{{$s->id}}">{{$s->store_name}}</option>
+				@endforeach
+				</select>
 		 	</div>
 		</div>
 		<div class="form-group">
@@ -48,7 +52,12 @@
 		<div class="form-group">
 			<label class="control-label col-xs-2">Parent:</label>
 			<div class="col-xs-5">
-				{!! $html_select_list !!}
+				<select id="category_parent_id" name="category_parent_id" class="form-control">
+				<option value="0">No parent</option>
+				@foreach($categories as $c)
+					<option value="{{$c->id}}">{{$c->category_title}}</option>
+				@endforeach
+				</select>
 		 	</div>
 		</div>
 		<div class="control-group">

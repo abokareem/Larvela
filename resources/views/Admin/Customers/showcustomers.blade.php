@@ -4,7 +4,9 @@
 
 <div class='container'>
 	<div class="row">
-		<div class="col-lg-12"><h3 class="page-header"><i class='fa fa-users fa-fw'></i> Customer Management</h3></div>
+		<div class="col-lg-12"><h3 class="page-header"><i class='fa fa-users fa-fw'></i> Customer Management</h3>
+			<button id='btnaddnew' type="button" class="btn btn-sm btn-success">Add</button>
+		</div>
 	</div>
 
 	@include('Templates.messages')
@@ -17,6 +19,7 @@
 						<th>ID</th>
 						<th>Name</th>
 						<th>email</th>
+						<th>Mobile</th>
 						<th>Status</th>
 						<th>Source</th>
 						<th>Store</th>
@@ -30,9 +33,22 @@
 						<td>{{ $customer->id }}</td>
 						<td>{{ $customer->customer_name }}</td>
 						<td>{{ $customer->customer_email }}</td>
+						<td>{{ $customer->customer_mobile }}</td>
 						<td>{{ $customer->customer_status }}</td>
-						<td>{{ $source[$customer->customer_source_id] }}</td>
-						<td>{{ $store[$customer->customer_store_id] }}</td>
+						<td>
+						@foreach($sources as $s)
+							@if($s->id == $customer->customer_source_id)
+								{{ $s->cs_name }}
+							@endif
+						@endforeach
+						</td>
+						<td>
+						@foreach($stores as $s)
+							@if($s->id == $customer->customer_store_id)
+								{{ $s->store_name }}
+							@endif
+						@endforeach
+						</td>
 						<td>{{ $customer->customer_date_created }}</td>
 						<td>{{ $customer->customer_date_updated }}</td>
 					</tr>

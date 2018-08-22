@@ -24,8 +24,8 @@
 	<form class='form-horizontal' name='add' id='add' method='post' enctype='multipart/form-data'>
 	<div class="row">
 		<div class="form-group">
-			<label class="control-label col-xs-2">Store:</label>
-			<div class="col-xs-4">
+			<label class="control-label col-xs-12 col-sm-2 col-md-2 col-lg-2">Store:</label>
+			<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7">
 				<select class="form-control" id="store_id" name="store_id">
 					<option value="0">Global - All Stores</option>
 					@foreach($stores as $s)
@@ -39,24 +39,23 @@
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">Setting Name:</label>
-			<div class="col-xs-7">
+			<label class="control-label col-xs-12 col-sm-2 col-md-2 col-lg-2">Setting Name:</label>
+			<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7">
 				<input type="text" class="form-control" id='setting_name' name="setting_name">
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">Value:</label>
-			<div class="col-xs-7">
+			<label class="control-label col-xs-12 col-sm-2 col-md-2 col-lg-2">Value:</label>
+			<div class="col-xs-12 col-sm-7 col-md-7 col-lg-7">
 				<input type="text" class="form-control" id='setting_value' name="setting_value">
-		 	</div>
 		 	</div>
 		</div>
 	</div>
 
 	<div class="row">
 		<div class="form-group">
-			<label class="control-label col-xs-2"> </label>
-			<div class="col-xs-6">
+			<label class="control-label col-xs-12 col-sm-2 col-md-2 col-lg-2"> </label>
+			<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
 				<button id='btnsave'   type="button" class="btn btn-success">Add Setting</button>
 				<button id='btncancel' type="button" class="btn btn-warning">Cancel</button>
 		 	</div>

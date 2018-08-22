@@ -78,7 +78,7 @@
 </div>
 
 
-<script src='http://ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
+<script src='//ajax.aspnetcdn.com/ajax/jquery.validate/1.14.0/jquery.validate.min.js'></script>
 <script src='/bootstrap-switch.js'></script>
 
 <script>
