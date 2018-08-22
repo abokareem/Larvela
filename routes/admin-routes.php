@@ -58,12 +58,12 @@ Route::post('/admin/template/update/{id}', 'TemplateController@Update');
 Route::post('/admin/template/delete/{id}', 'TemplateController@Delete');
 #
 #
-Route::get('/admin/stores','StoreController@ShowStoresPage');
-Route::get('/admin/store/add','StoreController@ShowAddStorePage');
-Route::get('/admin/store/edit/{id}','StoreController@ShowEditStorePage');
-Route::get('/admin/store/addnew','StoreController@ShowAddStorePage');
-Route::post('/admin/store/save','StoreController@SaveNewStore');
-Route::post('/admin/store/update/{id}','StoreController@UpdateStore');
+Route::get('/admin/stores','AdminStoreController@ShowStoresPage');
+Route::get('/admin/store/add','AdminStoreController@ShowAddStorePage');
+Route::get('/admin/store/edit/{id}','AdminStoreController@ShowEditStorePage');
+Route::get('/admin/store/addnew','AdminStoreController@ShowAddStorePage');
+Route::post('/admin/store/save','AdminStoreController@SaveNewStore');
+Route::post('/admin/store/update/{id}','AdminStoreController@UpdateStore');
 #
 #
 Route::get('/admin/customers',['uses'=>'CustomerController@ShowCustomers','roles'=>'root']);
