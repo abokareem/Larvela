@@ -1,12 +1,31 @@
 <?php
 /**
  * \class	ProductController
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2016-08-18
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2016-08-18
+ * \version	1.0.0
  *
  *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
- * [CC]
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 namespace App\Http\Controllers;
 
@@ -84,9 +103,6 @@ use Logger;
 	 *
 	 * GET ROUTE: /admin/products
 	 *
-	 * @pre		none
-	 * @post	none
-	 *
 	 * @param	Request	$request
 	 * @return	mixed
 	 */
@@ -137,18 +153,6 @@ use Logger;
 			# {FIX_2018-02-25} Disabled code that gets all products for all categories for store.
 			# get all products in all categories for the selected store
 			#
-#			$store_categories = Category::where('category_store_id',$store_id)->get();
-#			$this->LogMsg("   There are [".count($store_categories)."] categories");
-#			foreach($store_categories as $sc)
-#			{
-#				$products_in_category = CategoryProduct::where('category_id', $sc->id )->get();
-#				$this->LogMsg("   Category [".$sc->id."]  Number of Products [".count($products_in_category)."]");
-#				foreach($products_in_category as $pic)
-#				{
-#					array_push($products, Product::find($pic->product_id) );
-#				}
-#			}
-			#
 			# {FIX_2018-02-25} Converted to first category to reduce number of products show
 			#
 			$first_category = Category::where('category_store_id',$store_id)
@@ -195,10 +199,7 @@ use Logger;
 		$store = app('store');
 		$stores = Store::all();
 		$product_types = ProductType::all();
-		return view('Admin.Products.selecttype',[
-			'product_types'=>$product_types,
-			'stores'=>$stores
-			]);
+		return view('Admin.Products.selecttype',[ 'product_types'=>$product_types, 'stores'=>$stores ]);
 	}
 
 
@@ -213,7 +214,7 @@ use Logger;
 	{
 		$this->LogFunction("RouteToPage()");
 		$product_type = ProductType::where('product_type',"Basic Product")->first();
-		$product_types = ProductType::all();
+		$product_types = ProductType::get();
 		foreach($product_types as $pt)
 		{
 			if($id == $pt->id)
@@ -227,37 +228,9 @@ use Logger;
 		$stores = Store::all();
 		$categories = Category::all();
 
-		switch($product_type->id)
-		{
-			case 2:
-				return view('Admin.Products.add_parent',[
-					'product_type'=>$product_type,
-					'stores'=>$stores,
-					'store'=>$store,
-					'categories'=>$categories ]);
-				break;
-			case 3:
-				return view('Admin.Products.add_virtual',[
-					'product_type'=>$product_type,
-					'stores'=>$stores,
-					'store'=>$store,
-					'categories'=>$categories ]);
-				break;
-			case 4:
-				return view('Admin.Products.add_unlimited_virtual',[
-					'product_type'=>$product_type,
-					'stores'=>$stores,
-					'store'=>$store,
-					'categories'=>$categories ]);
-				break;
-			default:
-				return view('Admin.Products.add_basic',[
-					'product_type'=>$product_type,
-					'stores'=>$stores,
-					'store'=>$store,
-					'categories'=>$categories ]);
-				break;
-		}
+		$ProductType = \App\Services\ProductTypeFactory::BuildRoute($product_type->id);
+		$route = "Admin.Products.".$ProductType;
+		return view($route,[ 'product_type'=>$product_type, 'stores'=>$stores, 'store'=>$store,'categories'=>$categories]);
 	}
 
 
@@ -290,7 +263,7 @@ use Logger;
 	 *
 	 * POST ROUTE: /admin/product/copy/{id}
 	 *
-	 * @param	integer	$id		Product to use as a tempalte to copy from.
+	 * @param	integer	$id		Product to use as a template to copy from.
 	 * @return	mixed
 	 */
 	public function CopyProductPage(Request $request, $id)
