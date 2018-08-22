@@ -24,7 +24,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 
 use App\Jobs\EmailUserJob;
-
+use App\Models\Customer;
 
 
 /**
