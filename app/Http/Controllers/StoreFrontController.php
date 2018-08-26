@@ -165,14 +165,6 @@ protected $store_settings;
 				return view('Install.install-1');
 			}
 		}
-#
-# CAPTURE ROUTE AND FORCE TO TEST CODE FOR THE TIME BEING
-#
-return view('Install.install-1');
-
-#		$parts = explode(":",$_ENV['APP_KEY']);
-#		$app_key = substr($parts[1],0,8);
-
 		$Image = new Image;
 		$Category = new Category;
 		$Product = new Product;
