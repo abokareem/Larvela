@@ -1,0 +1,133 @@
+/*
+ * http://www.rapidtables.com/web/color/pink-color.htm
+ */
+.pink { color: #FFC0CB; }
+.lightpink { color: #FFB6C1; }
+.hotpink { color: #FF69B4; }
+.deeppink { color: #FF1493; }
+.palevioletred { color: #DB7093; }
+.mediumvioletred { color: #C71585; }
+
+ul.unstyled, ol.unstyled { margin: 0; list-style: none outside none; }
+
+/* topbar */
+
+.topbar { font-family: 'Roboto'; color: white; font-size:14px;  margin: 20px;}
+.topbar h1 { font-size:32px; font-weight:300; }
+.topbar h2 { font-size:28px; font-weight:300; }
+.topbar h3 { font-size:22px; font-weight:300; }
+.topbar a { color: white; font-size:16px; margin-right:20px; }
+.topbar a:hover { color: #FF1493; font-size:16px; text-decoration: none; }
+.topbar-wrapper { background: url(/media/top_spacer.png) repeat-x scroll center top; left: 0; position: absolute; top: 0; width: 100%; }
+
+.store-name  { text-align:center; padding:40px; font-family: 'Pacifico', cursive;  }
+.store-name h1 { font-size:72px; font-weight:600; }
+.store-name h2 { font-size:48px; font-weight:600; }
+.store-name h3 { font-size:36px; font-weight:600; }
+
+.cart { position:relative; left:30px; top:100px; font-family:'Roboto'; font-size:18px; font-weight:100; }
+.cart-wrapper { background-color: blue; width:100%; }
+.cart a:hover { color: #FF1493; font-weight:200; text-decoration: none;}
+/*
+ * Cart page - displaed on add and remove or by cart link
+ */
+.cartpage-block { background-color:white; padding:15px; }
+
+.store_contact { font-family: 'Open Sans Condensed', sans-serif; }
+.store_contact  h1 { font-size: 30px; }
+.store_contact  h2 { font-size: 24px; }
+.store_contact  h3 { font-size: 18px; }
+/*
+ * product page buttons for sorting
+ */
+.sortbtn:{background-color: transparent; color: #4d92ff; transition: 0.4s;}
+.sortbtn:hover{background-color: #FF1493; color: #ffffff; transition: 0.4s;}
+
+/*
+ * product listing matrix
+ */
+.popup-title { text-align:center; font-family: 'Pacifico', cursive; font-size: 22px; color:#FF1493; }
+.popup-text { font-family:'Roboto'; font-size:16px; color:black; }
+.popup-name { font-family:'Pacifico',cursive; font-size:18px; color:#FF1493; }
+
+.category-description { margin-left:35px; line-height: 20px; font-family:'Pacifico',cursive; font-size:24px; color:#FF1493; }
+/*
+ * product listing matrix
+ */
+.products { background-color:white; width:100%;}
+.prod-matrix-h3 {font-size: 20px; margin: 5px 0 10px;}
+.prod-matrix-p {font-weight: 300; line-height: 20px; font-size: 14px; margin-bottom: 15px;}
+.prod-matrix-p-text {font-weight: 300; line-height: 20px; font-size: 14px; margin-bottom: 10px;}
+.prod-matrix-qty {font-weight:bold; color: green; font-size: 15px;}
+.prod-matrix-desc {}
+.prod-matrix-img { }
+.prod-matrix-price { margin-right:5px; line-height: 20px; font-size: 20px;font-weight: bold; color:blue; }
+.prod-matrix-title { font-weight: 300; line-height: 20px; font-size: 14px; }
+.prod-matrix-no-stock { font-size: 20px;font-weight: bold; color: green; margin-left:50px;}
+/*
+ * Product Page
+ */
+.prodpage-block { margin-bottom:45px; }
+.prodpage-images { padding:3px; margin-bottom: 5px; }
+.prodpage-related { border: 1px solid #ff0000; padding:25px; }
+
+/*
+ * QTY is outer box for order and notify
+ */
+.prodpage-qty-block {margin-top:0px; background-color:white;}
+.panel-default > .prodpage-panel-heading { background-image: none; background-color: #ff1493; color: #ffffff; font-size:18px; font-family:'Pacifico', cursive;}
+.product-qty { padding:15px; margin-bottom: 5px; }
+.prodpage-order { border: 1px solid #ff0ff0; padding:5px; font-size: 14px; margin-bottom: 5px;}
+.prodpage-add-to-cart { margin-top:8px;}
+.prodpage-qty-lastone { margin:8px; font-size:24px; font-family:'Pacifico', cursive; color:red;}
+.prodpage-in-stock    { margin:8px; font-size:24px; font-family:'Pacifico', cursive; color:green;}
+.prodpage-notinstock  { padding:15px;}
+.prodpage-panel-heading { background-color: blue;}
+/*
+ * Text blocks - title, short and long descriptions
+ */
+.prodpage-title-block { padding:15px; margin-left: 20px; margin-bottom:5px;  background-color:white; }
+.prodpage-title { color:#FF1493; font-size:14px; font-family:'Helvetica Neue',sans-serif;}
+.prodpage-title p { color:black; font-size:28px; font-family:'Pacifico', cursive;}
+.prodpage-desc-short { color:#FF1493; font-size:14px; font-family:'Helvetica Neue',sans-serif;}
+.prodpage-desc-short p {color:black; font-size:15px; font-family:'Helvetica Neue',sans-serif; margin-bottom: 5px;}
+.prodpage-desc-title { color:#FF1493; padding:5px;font-size:13px; font-family:'Helvetica Neue',sans-serif;}
+.prodpage-desc-title p { font-size:14px; font-family:'Pacifico', cursive;}
+.prodpage-desc-text { padding:5px; color:#FF1493; font-size:14px; font-family:'Helvetica Neue',sans-serif;}
+.prodpage-desc-text p { color:black; font-size:15px; font-family:'Helvetica Neue',sans-serif;}
+
+
+
+
+.box-shadow--2dp {
+box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12)
+}
+
+.box-shadow--3dp {
+box-shadow: 0 3px 4px 0 rgba(0, 0, 0, .14), 0 3px 3px -2px rgba(0, 0, 0, .2), 0 1px 8px 0 rgba(0, 0, 0, .12)
+}
+
+.box-shadow--4dp {
+box-shadow: 0 4px 5px 0 rgba(0, 0, 0, .14), 0 1px 10px 0 rgba(0, 0, 0, .12), 0 2px 4px -1px rgba(0, 0, 0, .2)
+}
+
+.box-shadow--6dp {
+box-shadow: 0 6px 10px 0 rgba(0, 0, 0, .14), 0 1px 18px 0 rgba(0, 0, 0, .12), 0 3px 5px -1px rgba(0, 0, 0, .2)
+}
+.box-shadow--8dp {
+	box-shadow: 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12), 0 5px 5px -3px rgba(0, 0, 0, .2)
+}
+
+.box-shadow--16dp
+{
+	box-shadow: 0 16px 24px 2px rgba(0, 0, 0, .14), 0 6px 30px 5px rgba(0, 0, 0, .12), 0 8px 10px -5px rgba(0, 0, 0, .2)
+}
+
+/*
+ * Footer on store front page
+ */
+.footer-menu {display:inline-block; padding-top:30px; padding-right:10px; padding-bottom:2px; padding-left:10px; }
+.footer-menu  a { font-size:14px; line-height:20px; padding-left:20px; color:#313131; }
+
+.navbar .nav > li { float:none; display:inline-block; vertical-align: top; }
+
