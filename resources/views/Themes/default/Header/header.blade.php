@@ -6,7 +6,7 @@
 	<div class="container">
 <!-- START:StoreName -->
 		<div class="row">
-			<div class="store-name text-center"><h2 id='store-logo-home'>{{ StoreHelper::StoreData()->store_name }}</h2></div>
+			<div class="store-name text-center"><h2 id='store-logo-home'>{{ $store->store_name }}</h2></div>
 		</div>
 	</div>
 <!-- END:StoreName -->

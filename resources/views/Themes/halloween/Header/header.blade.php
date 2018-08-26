@@ -7,7 +7,7 @@
 <!-- START:StoreName -->
 	<div class="row" style="padding-top:70px;" align="center">
 		<img src="/halloween-flying-witch-1.jpg" style="padding:5px;height:100px; width:100px;">
-		<span class="store-name text-center" id='store-logo-home' style="font-size:48px;">{{ StoreHelper::StoreData()->store_name }}</span>
+		<span class="store-name text-center" id='store-logo-home' style="font-size:48px;">{{ $store->store_name }}</span>
 		<img src="/halloween-flying-witch-1.jpg" style="padding:5px;height:100px; width:100px;">
 	</div>
 	<div class="row" align="center">

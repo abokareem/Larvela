@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Welcome to {{ StoreHelper::StoreData()->store_name }}!</title>
+<title>Welcome to {{ $store->store_name }}!</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="description" content="Buy Rockabilly, Retro PinUp, Vintage Inspired, Alternative and 50s Style Clothing in Sizes from 10 to 18 online at {{ StoreHelper::StoreData()->store_name}}" />
+<meta name="description" content="Buy Rockabilly, Retro PinUp, Vintage Inspired, Alternative and 50s Style Clothing in Sizes from 10 to 18 online at {{ $store->store_name}}" />
 <meta name="robots" content="index">
 <meta name="robots" content="follow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -60,6 +60,6 @@ $('[data-toggle="popover"]').popover();
 <!-- Framework Version: {{ app()::VERSION }} -->
 <!-- Theme Name: {{ $THEME_NAME }} -->
 <!-- Theme Home: {{ $THEME_HOME }} -->
-<!-- Store Code: {{ StoreHelper::StoreData()->store_env_code }} -->
+<!-- Store Code: {{ $store->store_env_code }} -->
 </body>
 </html>

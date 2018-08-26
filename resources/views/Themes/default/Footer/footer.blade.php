@@ -32,12 +32,12 @@
 		</div>
 		<div class="col-md-3 column">
 			<h3>CONTACT INFO</h3>
-			{{ StoreHelper::StoreData()->store_address }}<br>
-			{{ StoreHelper::StoreData()->store_address2 }}<br>
-			<strong>Mobile: </strong>{{ StoreHelper::StoreData()->store_contact }}<br>
-			<strong>Hours:</strong> <i>( {{ StoreHelper::StoreData()->store_hours }} )</i><br>
+			{{ $store->store_address }}<br>
+			{{ $store->store_address2 }}<br>
+			<strong>Mobile: </strong>{{ $store->store_contact }}<br>
+			<strong>Hours:</strong> <i>( {{ $store->store_hours }} )</i><br>
 			<strong>E-Mail: </strong><span class="reverse">
-			{!!	strrev( StoreHelper::StoreData()->store_sales_email ) !!}
+			{!!	strrev( $store->store_sales_email ) !!}
 			</span>
 		</div>
 		<div class="col-md-3 column">

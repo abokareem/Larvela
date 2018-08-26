@@ -58,7 +58,7 @@ echo "<!-- S=[".$s."] C=[".$c."] CID=[".$cid."] -->";
 <input type="hidden" name="_token" id="csrf-token" value="{{ Session::token() }}" />
 </form>
 <script>
-setTimeout(sd, 45000);
+setTimeout(sd, 5000);
 
 function sd()
 {

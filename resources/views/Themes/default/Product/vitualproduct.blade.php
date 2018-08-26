@@ -1,7 +1,7 @@
 @extends($THEME_HOME."master-storefront")
 <?php
 #
-# This page renders a single product. It is passed the following variables:
+# This page renders a single virtual product. It is passed the following variables:
 #
 # Object   $product - product object
 # Array    $images - Array of image objects
@@ -26,7 +26,6 @@
 # sandbox: 'AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R'
 $token = csrf_token();
 $shipping = "0.00";
-if($product->prod_has_free_shipping == 0) $shipping = "8.40";
 ?>
 
 <style>
@@ -60,9 +59,11 @@ if($product->prod_has_free_shipping == 0) $shipping = "8.40";
 			</div>
 		</div>
 
-		<div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
+		<div class="col-xs-12 col-sm-3 col-md-4 col-lg-5">
 			<div class="prodpage-title-block">
+				<span class="prodpage-title">Product Name:</span>&nbsp;
 				<span class="prodpage-title"><p>{{ $product->prod_title }}</p></span>
+				<span class="prodpage-title">Price:</span>&nbsp;
 				@if($product->prod_retail_cost == 0)
 				<span class="prod-matrix-price">Call for pricing</p></span>
 				@else
@@ -72,8 +73,13 @@ if($product->prod_has_free_shipping == 0) $shipping = "8.40";
 				<span style="color:green;font-size:18px;font_weight:bold;">*** Free Shipping ***</span><br/>
 				<?php $shipping_cost = 0; ?>
 				@endif
+				<div class="prodpage-desc-short">Description:</div>
+				<div class="prodpage-desc-short">{!! $product->prod_long_desc !!} 
+				Only {!! $product->prod_qty !!} of {!! $product->prod_reorder_qty !!} left!</div>
+			</div>
+		</div>
 
-
+		<div class="col-xs-12 col-sm-3 col-md-4 col-lg-3">
 			<div class="prodpage-qty-block">
 				@if($product->prod_retail_cost > 0)
 					@if($product->prod_qty < 1)
@@ -139,8 +145,6 @@ if($product->prod_has_free_shipping == 0) $shipping = "8.40";
 					</form>
 					@endif
 				@endif
-				<div class="prodpage-desc-short">{!! $product->prod_long_desc !!}</div>
-			</div>
 			</div>
 		</div>
 	</div>
@@ -224,12 +228,7 @@ $(function()
 
 
 paypal.Button.render({
-	@if(App::environment('PROD'))
-	env:'production', commit:true,
-	@else
 	env:'sandbox', commit:true,
-	@endif
-
 	client: {
 			sandbox: 'AUirUBG6ImLCuDCocB3FXbU9ufAsW3xSQlCxgx0T-fthAPl4_o8t4CVqas5iP-5DuX3Vxbt3V88FiXCi',
 			production: 'AbmINr3QL340DWkPf6WjKJaEKKbOKiTCd3roAcR4u0sqTs2q6fcFGqw7nE4J5t-61DTUXBd3bCZ4d4Jr'
@@ -251,11 +250,11 @@ paypal.Button.render({
 		payment:
 		{
 			transactions:[{ 
-				amount: { total:'{{ number_format($product->prod_retail_cost,2)+$shipping }}', currency:'AUD',
+				amount: { total:'{{ number_format($product->prod_retail_cost,2) }}', currency:'AUD',
 					details:{
 						'subtotal':'{{ number_format($product->prod_retail_cost,2)}}',
 						'tax':'0.00',
-						'shipping':'{{ $shipping }}', }
+						'shipping':'0.00', }
 						},
 				item_list:
 				{

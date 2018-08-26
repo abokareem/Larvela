@@ -5,7 +5,7 @@
 </style>
 <div class="container">
 	<div class="row clearfix">
-		<div class="col-md-3 column">
+		<div class="col-xs-12 col-md-3 column">
 			<h3>ONLINE SHOP</h3>
 			<a href="/">Home</a><br/>
 			@foreach($categories as $c)
@@ -14,7 +14,7 @@
 				@endif
 			@endforeach			
 		</div>
-		<div class="col-md-3 column">
+		<div class="col-xs-12 col-md-3 column">
 			<h3>FOLLOW US</h3>
 			<a href="{{ config('app.twitter.url','#') }}">
 				<span class="fa-stack fa-lg">
@@ -30,17 +30,17 @@
 				</span> Google+
 			</a><br/>
 		</div>
-		<div class="col-md-3 column">
+		<div class="col-xs-12 col-md-3 column">
 			<h3>CONTACT INFO</h3>
-			{{ StoreHelper::StoreData()->store_address }}<br>
-			{{ StoreHelper::StoreData()->store_address2 }}<br>
-			<strong>Mobile: </strong>{{ StoreHelper::StoreData()->store_contact }}<br>
-			<strong>Hours:</strong> <i>( {{ StoreHelper::StoreData()->store_hours }} )</i><br>
+			{{ $store->store_address }}<br>
+			{{ $store->store_address2 }}<br>
+			<strong>Mobile: </strong>{{ $store->store_contact }}<br>
+			<strong>Hours:</strong> <i>( {{ $store->store_hours }} )</i><br>
 			<strong>E-Mail: </strong><span class="reverse">
-			{!!	strrev( StoreHelper::StoreData()->store_sales_email ) !!}
+			{!!	strrev( $store->store_sales_email ) !!}
 			</span>
 		</div>
-		<div class="col-md-3 column">
+		<div class="col-xs-12 col-md-3 column">
 			<h3>MAILING LIST</h3>
 			<form action="/subscribe" method="post">
 				<div class="input-prepend">
