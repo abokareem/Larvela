@@ -1,14 +1,41 @@
 @extends('Install.install-template')
+@section('header-step')
+<div class="row">
+	<section>
+		<div class="wizard">
+			<div class="wizard-inner">
+				<div class="connecting-line"></div>
+				<ul class="nav nav-tabs" role="tablis">
+					<li role="presentation" class="active">
+						<a href="#step1" data-toggle="tab" aria-controls="step1" role="tab" title="Step 1">
+							<span class="round-tab"> <i class="glyphicon glyphicon-user"></i> </span>
+						</a>
+					</li>
+					<li role="presentation" class="disabled">
+						<a href="#step2" data-toggle="tab" aria-controls="step2" role="tab" title="Step 2">
+							<span class="round-tab"> <i class="glyphicon glyphicon-home"></i> </span>
+						</a>
+					</li>
+					<li role="presentation" class="disabled">
+						<a href="#step3" data-toggle="tab" aria-controls="step3" role="tab" title="Step 3">
+							<span class="round-tab"> <i class="glyphicon glyphicon-list"></i> </span>
+						</a>
+					</li>
+					<li role="presentation" class="disabled">
+						<a href="#complete" data-toggle="tab" aria-controls="complete" role="tab" title="Complete">
+							<span class="round-tab"> <i class="glyphicon glyphicon-ok"></i> </span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+</div>
+@endsection 
 @section('content')
 <div class="container">
 	<form class='form-horizontal' name='install' id='install' method='post' enctype='multipart/form-data' style="padding:20px;">
 		<div class="row">
-			<div class="form-group">
-				<label class="control-label col-xs-2"> </label>
-				<div class="col-xs-12 col-sm-8 progress">
-						<div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
-				</div>
-			</div>
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">App Key:</label>
 				<div class="col-xs-12 col-sm-3">
@@ -39,7 +66,7 @@
 					</div>
 				</div>
 			</div>
-        </div>
+</div>
 		<div class="row">
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2"> </label>
@@ -67,7 +94,7 @@ $('#install').validate(
 {
 	rules:
 	{
-	    app_key: { required: true, minlength:8 },
+	app_key: { required: true, minlength:8 },
 		admin_name: { required: true, minlength: 3 },
 		admin_email: { required: true, minlength: 5 },
 		admin_pwd: { required: true, minlength: 8 }
