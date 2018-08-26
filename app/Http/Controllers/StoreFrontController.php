@@ -3,14 +3,33 @@
  * \class	StoreFrontController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
+ * \version	1.0.0
  *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
- * [CC]
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 namespace App\Http\Controllers;
 
-#use Request;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Routing\Route;
 use App\Http\Requests;
 
@@ -18,6 +37,7 @@ use Auth;
 use Input;
 use Cookie;
 use Session;
+use Config;
 
 use App\Models\Advert;
 use App\Models\Attribute;
@@ -38,10 +58,9 @@ use App\Models\Store;
 use App\Models\StoreSetting;
 use App\Models\Notification;
 use App\Models\SubscriptionRequest;
-
+use App\Models\Users;
 
 use App\Helpers\StoreHelper;
-
 
 use App\Jobs\OrderPlaced;
 use App\Jobs\OrderDispatched;
@@ -53,9 +72,6 @@ use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
 
 use App\Traits\Logger;
-
-
-use Amqp;
 
 
 /**
@@ -106,13 +122,14 @@ protected $store_settings;
 			}
 		}
 		$this->setFileName("store");
+		$this->setClassName("StoreFrontController");
 		$this->LogStart();
-		$this->LogMsg("CLASS:StoreFrontController");
 		if($cid=Cookie::get('cid','0') > 0)
 		{
 			Session::set('cid', $cid);
 		}
 	}
+
 
 
 	/**
@@ -122,7 +139,6 @@ protected $store_settings;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS:StoreFrontController");
 		$this->LogEnd();
 
 	}
@@ -138,6 +154,24 @@ protected $store_settings;
 	public function ShowStoreFront($MAXPRODUCTS = 9)
 	{
 		$this->LogFunction("ShowStoreFront()");
+		#
+		# Check if the first user (admin) is present, if not run the install, need app key in install to proceed.
+		#
+		if(Schema::hasTable('users'))
+		{
+			$admin = Users::first();
+			if(is_null($admin))
+			{
+				return view('Install.install-1');
+			}
+		}
+#
+# CAPTURE ROUTE AND FORCE TO TEST CODE FOR THE TIME BEING
+#
+return view('Install.install-1');
+
+#		$parts = explode(":",$_ENV['APP_KEY']);
+#		$app_key = substr($parts[1],0,8);
 
 		$Image = new Image;
 		$Category = new Category;
@@ -286,22 +320,33 @@ protected $store_settings;
 				}
 			} while (sizeof($selected) != sizeof($product_id_list));
 
+			$attributes = Attribute::get();
+			$attribute_values = AttributeValue::get();
+
+			/*
+			 * REFACTOR required, these should not be in this controller
+			 */
 			$size_attribute = Attribute::where('attribute_name','Size')->first();
 			$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
-
 			$colour_attribute = Attribute::where('attribute_name','Colour')->first();
 			$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
+			/*
+			 * END
+			 */
 
 			$theme_path = \Config::get('THEME_HOME')."storefront";
 			$this->LogMsg("Render View storefront from [".$theme_path."]");
 
 			return view($theme_path,[
-				'settings'=>$settings,
-				'sizes'=>$sizes,
-				'colours'=>$colours,
-				'categories'=>$categories,
 				'adverts'=>$this->getAdverts(),
-				'products'=>$products ]);
+				'categories'=>$categories,
+				'settings'=>$settings,
+				'products'=>$products,
+				'attributes'=>$attributes,
+				'attribute_values'=>$attribute_values,
+				'sizes'=>$sizes,
+				'colours'=>$colours
+				]);
 		}
 		else
 		{
@@ -506,7 +551,6 @@ protected $store_settings;
 				{
 					$this->LogMsg("Image [".$i->image_id."]");
 					$row = Image::where('id',$i->image_id)->first();
-#					$this->LogMsg("Image: ".print_r($row,true));
 					array_push($images,$row);
 					array_push($thumbnails,$row);
 				}
@@ -605,7 +649,7 @@ protected $store_settings;
 		##Amqp::publish('category_view', "{'category_id':'".$category_data->id."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
 
 		$current_store = app('store');
-		$this->LogMsg("Current Store: ".print_r( $current_store, true) );
+		$this->LogMsg("Current Store: [".$store->store_name."]" );
 		/*
 		 * Categories relevant to this shop
 		 */	
@@ -669,7 +713,6 @@ protected $store_settings;
 					$image_row = Image::where('id',$image_id)->first();
 					$row->image = "/".$image_row->image_folder_name."/".$image_row->image_file_name;
 				}
-				$this->LogMsg("Row data: ".print_r($row,true));
 				array_push($products,$row);
 			}
 			$theme_path = \Config::get('THEME_CATEGORY').'storecategorypage';
