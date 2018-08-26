@@ -165,6 +165,11 @@ protected $store_settings;
 				return view('Install.install-1');
 			}
 		}
+
+return view('Install.install-1');
+
+
+
 		$Image = new Image;
 		$Category = new Category;
 		$Product = new Product;

@@ -50,7 +50,7 @@ use App\Traits\Logger;
 /**
  * \brief MVC Controller for handling basic store functions.
  */
-class StoreController extends Controller
+class AdminStoreController extends Controller
 {
 use Logger;
 

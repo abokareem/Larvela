@@ -3,9 +3,29 @@
  * \class	CartController
  * \date	2016-09-05
  * \author	Sid Young <sid@off-grid-engineering.com>
+ * \version 1.0.0
  *
  *
- * [CC]
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 namespace App\Http\Controllers;
 
@@ -16,6 +36,11 @@ use Redirect;
 use Input;
 use Auth;
 use Session;
+
+use App\Services\CartLocking;
+use App\Events\Larvela\AddToCartMessage;
+use App\Events\Larvela\ShowCartMessage;
+
 
 use App\Models\Cart;
 use App\Models\CartData;
@@ -46,6 +71,8 @@ use App\Traits\Logger;
 class CartController extends Controller
 {
 use Logger;
+
+private $user;
 
 	/**
 	 * Constuct a new cart and make sure we are authenticated before using it.
@@ -94,6 +121,7 @@ use Logger;
 	{
 		$this->LogFunction("ShowCart()");
 
+		$store = app('store');
 		#
 		# The logged in user
 		#
@@ -121,7 +149,7 @@ use Logger;
 			$cart->save();
 			$this->LogMsg("Cart UID [ $cart->user_id ]");
 			$cart = Cart::where('user_id',Auth::user()->id)->first();
-			$this->LogMsg("Cart  ".print_r($cart, true));
+			#$this->LogMsg("Cart  ".print_r($cart, true));
 
 			$cart_data = new CartData;
 			$cart_data->cd_cart_id = $cart->id;
@@ -219,10 +247,11 @@ use Logger;
 		$cart_data->cd_sub_total = $total;
 		$cart_data->save();
 
+		$m = new ShowCartMessage($store,$user,$cart,$cart_data);
+		$m->dispatch();
 		$this->LogMsg("Done processing cart - now render view");
 
 		$theme_path = \Config::get('THEME_CART')."1-cart";
-		$store = app('store');
 		return view($theme_path,[
 			'store'=>$store,
 			'cart'=>$cart,
@@ -238,45 +267,12 @@ use Logger;
 	}
 
 
-	/**
-	 * Customer has sat on the cart confirm page for too long and the page has timedout
-	 * Display a formatted error page inticating the page timed out waiting for the user to
-	 * complete the action.
-	 *
-	 * Note: A background task will unlock the loked products the user has attempted to purchase.
-	 *
-	 *
-	 * @return	mixed
-	 */
-	public function CartTimeoutError()
-	{
-		$this->LogFunction("CartTimeoutError()");
-
-		$Customer = new Customer;
-
-		$user = Users::find(Auth::user()->id);
-		$customer = Customer::where('customer_email', $user->email)->first();
-		$address = CustomerAddress::where('customer_cid', $customer->id)->first();
-		$cart = Cart::where('user_id',Auth::user()->id)->first();
-		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
-
-		$theme_path = \Config::get('THEME_ERRORS')."cart-timeout";
-		$store = app('store');
-		return view($theme_path,[
-			'store'=>$store,
-			'cart'=>$cart,
-			'cart_data'=>$cart_data,
-			'user'=>$user,
-			'customer'=>$customer,
-			'address'=>$address]);
-	}
-
-
-
-
 
 	/**
 	 * Calculate the total weight of our cart items and the shipping options.
+	 *
+	 * @todo - Change shipping logic to possibly use Chain Of Responsilility pattern 
+	 * to ask each shipping module for the shipping options, cost and displayable description and a form id value to pass back.
 	 *
 	 *
 	 * cart ->SHIPPING -> confirm/payment -> purchased
@@ -291,8 +287,6 @@ use Logger;
 	{
 		$this->LogFunction("ShowShipping()");
 
-		$Customer = new Customer;
-		$CustomerAddress = new CustomerAddress;
 		$Users = new Users;
 
 		$Product = new Product;
@@ -310,8 +304,8 @@ use Logger;
 		$customer = Customer::where('customer_email',$user->email)->first();
 		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
 
-		$this->LogMsg("Customer Data ".print_r($customer,true));
-		$this->LogMsg("Address Data ".print_r($address,true));
+		#$this->LogMsg("Customer Data ".print_r($customer,true));
+		#$this->LogMsg("Address Data ".print_r($address,true));
 
 		#
 		# Cart, cart items and cart data
@@ -320,8 +314,8 @@ use Logger;
 		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
 		$items = $cart->cartItems;
 
-		$this->LogMsg("Cart Contents ".print_r($cart, true));
-		$this->LogMsg("Cart ITEMS: ".print_r($items, true) );
+		#$this->LogMsg("Cart Contents ".print_r($cart, true));
+		#$this->LogMsg("Cart ITEMS: ".print_r($items, true) );
 		$quantities = array();
 		$qtymap = array();
 		$this->LogMsg("Iterate through cart - look for duplicate products");
@@ -340,7 +334,7 @@ use Logger;
 				array_push( $quantities, $item->product_id);
 			}
 		}
-		$this->LogMsg("QTY Mappings ".print_r($qtymap,true));
+		#$this->LogMsg("QTY Mappings ".print_r($qtymap,true));
 		#
 		# on exit from above qtymap[] has our unique product id's and the quantity of each.
 		#
@@ -439,7 +433,6 @@ use Logger;
 		#       options.
 		#
 		$this->LogMsg("Postage items:");
-		##$post_packs = $Product->getByCombineCode("AUPOST");
 		$post_packs = Product::where('prod_combine_code',"AUPOST")->orderBy("prod_weight")->get();
 
 		$postal_options = array();
@@ -500,6 +493,42 @@ use Logger;
 				]);
 		}
 	}
+
+
+
+	/**
+	 * Customer has sat on the cart confirm page for too long and the page has timedout
+	 * Display a formatted error page inticating the page timed out waiting for the user to
+	 * complete the action.
+	 *
+	 * Note: A background task will unlock the loked products the user has attempted to purchase.
+	 *
+	 *
+	 * @return	mixed
+	 */
+	public function CartTimeoutError()
+	{
+		$this->LogFunction("CartTimeoutError()");
+
+		$Customer = new Customer;
+
+		$user = Users::find(Auth::user()->id);
+		$customer = Customer::where('customer_email', $user->email)->first();
+		$address = CustomerAddress::where('customer_cid', $customer->id)->first();
+		$cart = Cart::where('user_id',Auth::user()->id)->first();
+		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
+
+		$theme_path = \Config::get('THEME_ERRORS')."cart-timeout";
+		$store = app('store');
+		return view($theme_path,[
+			'store'=>$store,
+			'cart'=>$cart,
+			'cart_data'=>$cart_data,
+			'user'=>$user,
+			'customer'=>$customer,
+			'address'=>$address]);
+	}
+
 
 
 
@@ -570,6 +599,10 @@ use Logger;
 		$route = "";
 
 		$this->LogMsg("Work out Payment Method - Route");
+
+		#
+		#  @todo Redesign to use route factory or call payment gateways to get the route for each gateway
+		#
 		switch($payment_method)
 		{
 			case "0":
@@ -624,7 +657,10 @@ use Logger;
 			return view($theme_path,[ 'store'=>$store, 'products'=>$products_out_of_stock,'user'=>$user]);
 		}
 		$this->LogMsg("Call LockProducts for cart ID [".$cart->id."]");
-		$this->LockProducts($cart->id);
+		
+		$cartlocking = new CartLocking;
+		$cartlocking->LockProducts($cart->id);
+
 		$this->LogMsg("exit OK");
 
 		return view($theme_path,[
@@ -644,48 +680,6 @@ use Logger;
 			]);
 	}
 
-
-
-
-	/**
-	 * Called to put back into stock all the locked products for a specific cart.
-	 *
-	 * @param	integer	$cart_id
-	 * @return	void
-	 */
-	public function ReverseProductLocks($cart_id)
-	{
-		$this->LogFunction("ReverseProductLocks( $cart_id )");
-		
-		$Product = new Product;
-		$product_locks = ProductLock::where('product_lock_cid',$cart_id)->get();
-
-		foreach($product_locks as $locked)
-		{
-			$this->LogMsg("Checking product_locks row ID [".$locked->id."]");
-			$this->LogMsg("Product ID [".$locked->product_lock_pid."]");
-			$product = Product::where('id',$locked->product_lock_pid)->first();
-			$this->LogMsg("Checking Product Type for ID [".$product->id."]");
-			if(($product->prod_type == 1)||($product->prod_type == 3))
-			{
-				$locked_qty = $locked->product_lock_qty;
-				$stock_qty = $product->prod_qty;
-				$this->LogMsg("Product QTY [".$stock_qty."] add back [".$locked_qty."]");
-				\DB::beginTransaction();
-				$this->LogMsg("Updating Product [".$product->id."]");
-				$product->prod_qty = $stock_qty + $locked_qty;
-				$product->save();
-			}
-			else
-			{
-				$this->LogMsg("Virtual Product - not stock levels to adjust");
-			}
-			$this->LogMsg("Removing Lock [".$locked->id."]");
-			$locked->delete();
-			\DB::commit();
-		}
-		$this->LogMsg("Reverse done Complete.");
-	}
 
 
 
@@ -719,40 +713,6 @@ use Logger;
 
 
 	/**
-	 * Called to update the time stamp on the product locks to keep the product from being re-sold.
-	 * return the number of rows found.
-	 *
-	 * @param	integer	$cart_id
-	 * @return	integer
-	 */
-	public function UpdateProductLocks($cart_id)
-	{
-		$this->LogFunction("UpdateProductLocks( $cart_id )");
-		
-		
-		$now = time();
-		$this->LogMsg("Unix time is [".$now."]");
-		$rows = ProductLock::where('product_lock_cid',$cart_id)->get();
-		if(sizeof($rows) > 0)
-		{
-			$this->LogMsg("There are [".sizeof($rows)."] row items for Cart [".$cart_id."]");
-			foreach($rows as $row)
-			{
-				$this->LogMsg("Uptime time for product lock row [".$row->id."]");
-				$o = ProductLock::find($row->id);
-				$o->product_lock_utime = $now;
-				$rv = $o->save();
-			}
-			return sizeof($rows);
-		}
-		$this->LogMsg("No product locks to update!");
-		return	0;
-	}
-
-
-
-
-	/**
 	 * Add an item to the cart and redirect to the show cart page to 
 	 * show the present items (if any).
 	 * If qty is set in URL then add the item multiple times so cart reflect correctly.
@@ -764,6 +724,7 @@ use Logger;
 	public function addItem(Request $request, $id)
 	{
 		$this->LogFunction("addItem()");
+		$store = app('store');
 		$query = Request::input();
 		$qty = 1;
 		foreach($query as $key=>$val)
@@ -790,13 +751,15 @@ use Logger;
 				return redirect('/cart');
 			}
 		}
+		$product = Product::find($id);
 		$this->LogMsg("Save single product to cart.");
 		$cartItem  = new CartItem;
 		$cartItem->product_id = $id;
 		$cartItem->cart_id = $cart->id;
 		$cartItem->qty = $qty;
 		$cartItem->save();
-
+		$m = new AddToCartMessage($store,Auth::user(),$cart,$product);
+		$m->dispatch();
 		return redirect('/cart');
 	}
 
@@ -824,87 +787,6 @@ use Logger;
 		}
 		return redirect('/cart');
 	}
-
-
-
-
-
-	/**
-	 * Given the cart ID, create the entries in the product_locks table to lock the products in the cart. 
-	 * Decrement the store inventory by the amount so it reflects the correct values.
-	 * If the customer has gone back in, reverse the product locks
-	 * (put them back into stock and then do it all over again).
-	 *
-	 *
-	 * @param	integer	$cart_id
-	 * @return	mixed
-	 */
-	public function LockProducts($cart_id)
-	{
-		$this->LogFunction("LockProducts()");
-
-		#
-		# If the user comes back through the cart process then previous locks wil be present.
-		# Update the timestamp to stop a simulateous CRON task from doing anything stupid.
-		#
-		$this->UpdateProductLocks($cart_id);
-		$this->ReverseProductLocks($cart_id);
-
-		$Product = new Product;
-
-		$cartitems = CartItem::where('cart_id',$cart_id)->get();
-		$this->LogMsg("There are [".sizeof($cartitems)."] rows in cart items");
-		$product_list = array();
-		#
-		# for each item, get the product, we need the qty info later.
-		#
-		$this->LogMsg("Loop through cart items.");
-		foreach($cartitems as $item)
-		{
-			$this->LogMsg("Fetching product [".$item->product_id."] with QTY of [".$item->qty."]");
-			array_push($product_list, Product::where('id',$item->product_id)->first());
-		}
-		#
-		# get existing rows for this cart
-		#
-		$this->LogMsg("Get any existing product locks.");
-		$product_lock_rows = ProductLock::where('product_lock_cid',$cart_id)->get();
-		$this->LogMsg("There are [".sizeof($product_lock_rows)."] rows locked");
-		#
-		# for each product, check for a row, if not there (newly added, insert it)
-		# if its present, check
-		$this->LogMsg("Iterate through products in cart.");
-
-		foreach($cartitems as $item)
-		{
-			$o = new ProductLock();
-			$o->product_lock_pid = $item->product_id;
-			$o->product_lock_cid = $cart_id;
-			$o->product_lock_qty = $item->qty;
-			$o->product_lock_utime = time();
-			$rv = $o->save();
-			$this->LogMsg("Insert a new product lock for [".$item->product_id."] with a QTY of [".$item->qty."]");
-#
-# @todo check prod_type if basic or virtual (limited) then deduct from stock
-# 
-			$product = Product::find($item->product_id);
-			$this->LogMsg("Product type [".$product->prod_type."]");
-			if(($product->prod_type == 1)||($product->prod_type == 3))
-			{
-				$stock_qty = $product->prod_qty - $item->qty;
-				$this->LogMsg("Product QTY was [".$product->prod_qty."] reduced to [".$stock_qty."]");
-				$this->LogMsg("Updating Product [".$product->id."]");
-				$product->prod_qty = $stock_qty;
-				$product->save();
-			}
-			else
-			{
-				$this->LogMsg("Virtual Product - not stock to decrement");
-			}
-		}
-		return;
-	}
-
 
 
 
