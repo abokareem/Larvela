@@ -246,6 +246,8 @@ protected $store_settings;
 		 */
 		$selected = array();
 
+		$attributes = Attribute::get();
+		$attribute_values = AttributeValue::get();
 		/*
 		 * Return "products" to view.
 		 */
@@ -316,8 +318,6 @@ protected $store_settings;
 				}
 			} while (sizeof($selected) != sizeof($product_id_list));
 
-			$attributes = Attribute::get();
-			$attribute_values = AttributeValue::get();
 
 			/*
 			 * REFACTOR required, colour and size should not be assigned here
@@ -350,15 +350,21 @@ protected $store_settings;
 		{
 			$size_attribute = Attribute::where('attribute_name','Size')->first();
 			$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
+			$colour_attribute = Attribute::where('attribute_name','Colour')->first();
+			$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
 			$this->LogMsg("Render View Frontend.storefront - No Products assigned to shop");
 			$theme_path = \Config::get('THEME_HOME')."storefront";
 			return view($theme_path,[
 				'store'=>$store,
-				'settings'=>$settings,
-				'sizes'=>$sizes,
-				'categories'=>$categories,
 				'adverts'=>$this->getAdverts(),
-				'products'=>array()]);
+				'categories'=>$categories,
+				'settings'=>$settings,
+				'products'=>array(),
+				'attributes'=>$attributes,
+				'attribute_values'=>$attribute_values,
+				'sizes'=>$sizes,
+				'colours'=>$colours
+				]);
 		}
 	}	
 
