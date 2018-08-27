@@ -74,6 +74,8 @@ class Installer extends Controller
 			$o->email = $form['admin_email'];
 			$o->password = bcrypt($form['admin_pwd']);
 			$o->role_id = 1;
+			$o->created_at = date("Y-m-d H:i:s");
+			$o->updated_at = date("Y-m-d H:i:s");
 			$o->save();
 			$tzdata = explode("/",date_default_timezone_get());
 			return view("Install.install-2",['key_hash'=>$hash,'admin_user'=>$o,'countries'=>$countries,'tzdata'=>$tzdata[0]]);
