@@ -42,7 +42,7 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Default Currency:</label>
 				<div class="col-xs-12 col-sm-2">
-					<select class="form-control" id="currency" name="currency">
+					<select class="form-control" id="store_currency" name="store_currency">
 					@foreach($currency as $c)
 						<option value="{{$c}}">{{$c}}</option>
 					@endforeach
