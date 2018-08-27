@@ -16,6 +16,12 @@
 				</div>
 			</div>
 			<div class="form-group">
+				<label class="control-label col-xs-12 col-sm-2">Store URL::</label>
+				<div class="col-xs-12 col-sm-4">
+					<input type="text" class="form-control" id='store_url' name="store_url" value=""><br>
+				</div>
+			</div>
+			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Store Hours:</label>
 				<div class="col-xs-12 col-sm-4">
 					<input type="text" class="form-control" id='store_hours' name="store_hours" value="M-F 9-5"><br>
