@@ -55,14 +55,8 @@ class StoreHelper
 	public static function CategoryMenu()
 	{
 		$Category = new Category;
-		
-		$Store = new Store;
-		if(($store_code=getenv("STORE_CODE"))!=false)
-		{
-			$store = Store::where('store_env_code', $store_code )->first();
-			$Category->BuildStoreData($store->id);
-			return $Category->getHTML();
-		}
+		$store = app('store');
+		$Category->BuildStoreData($store->id);
 		return $Category->getHTML();
 	}
 
