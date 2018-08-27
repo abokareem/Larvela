@@ -34,7 +34,7 @@
 @endsection 
 @section('content')
 <div class="container">
-	<form class='form-horizontal' name='install' id='install' method='post' enctype='multipart/form-data' style="padding:20px;">
+	<form class='form-horizontal' name='install' id='install' method='post' style="padding:20px;">
 		<div class="row">
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Store Name:</label>
@@ -45,25 +45,37 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Store URL::</label>
 				<div class="col-xs-12 col-sm-4">
-					<input type="text" class="form-control" id='store_url' name="store_url" value=""><br>
+					<input type="text" class="form-control" id='store_url' name="store_url" value="">
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Store Hours:</label>
 				<div class="col-xs-12 col-sm-4">
-					<input type="text" class="form-control" id='store_hours' name="store_hours" value="M-F 9-5"><br>
+					<input type="text" class="form-control" id='store_hours' name="store_hours" value="M-F 9-5">
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Store Sales Email:</label>
 				<div class="col-xs-12 col-sm-5">
-					<input type="text" class="form-control" id='store_sales_email' name="store_sales_email" value=""><br>
+					<input type="text" class="form-control" id='store_sales_email' name="store_sales_email" value="">
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Contact Number:</label>
 				<div class="col-xs-12 col-sm-4">
-					<input type="text" class="form-control" id='store_contact' name="store_contact" value=""><br>
+					<input type="text" class="form-control" id='store_contact' name="store_contact" value="">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-12 col-sm-2">Address:</label>
+				<div class="col-xs-12 col-sm-8">
+					<input type="text" class="form-control" id='store_address' name="store_address" value="">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-12 col-sm-2">Address 2:</label>
+				<div class="col-xs-12 col-sm-8">
+					<input type="text" class="form-control" id='store_address2' name="store_address2" value="">
 				</div>
 			</div>
 			<div class="form-group">
