@@ -15,6 +15,7 @@ use Config;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Country;
 use App\Models\Store;
 
 /**
@@ -35,6 +36,33 @@ class AppServiceProvider extends ServiceProvider
 		\Blade::extend(function($value) { return preg_replace('/\@define(.+)/', '<?php ${1}; ?>', $value); });
 
 		$store = null;
+		#
+		# Check and load the countries table on startup for the installation process
+		#
+		if(Schema::hasTable('countries'))
+		{
+			if(Country::count()==0)
+			{
+				$datafile = base_path()."/countries.data";
+				if(file_exists($datafile))
+				{
+					$countries = file($datafile);
+					foreach($countries as $c)
+					{
+						$parts = explode("=",$c);
+						$o = new Country();
+						$iso_code = strtoupper(trim($parts[0]));
+						$country_name = ucwords(trim($parts[1]));
+						$o->iso_code = $iso_code;
+						$o->country_name = $country_name;
+						$o->save();
+					}
+				}
+			}
+		}
+
+
+
 		if(Schema::hasTable('stores'))
         {
 			$Store = new Store;
@@ -63,7 +91,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-		foreach(glob(app_path().'/PaymentGateways/*_Payment.php') as $filename)
+		foreach(glob(app_path().'/Events/Larvela/Dispatch_By_*.php') as $filename)
+		{
+			require_once($filename);
+		}
+		foreach(glob(app_path().'/Services/Payments/*_Payment.php') as $filename)
+		{
+			require_once($filename);
+		}
+		foreach(glob(app_path().'/Services/Shipping/*_Shipping.php') as $filename)
 		{
 			require_once($filename);
 		}
