@@ -1,4 +1,37 @@
 @extends('Install.install-template')
+@section('header-step')
+<div class="row">
+	<section>
+		<div class="wizard">
+			<div class="wizard-inner">
+				<div class="connecting-line"></div>
+				<ul class="nav nav-tabs" role="tablis">
+					<li role="presentation" class="disabled">
+						<a href="#step1" data-toggle="tab" aria-controls="step1" role="tab" title="Admin Details">
+							<span class="round-tab"> <i class="glyphicon glyphicon-user"></i> </span>
+						</a>
+					</li>
+					<li role="presentation" class="disabled">
+						<a href="#step2" data-toggle="tab" aria-controls="step2" role="tab" title="Store Details">
+							<span class="round-tab"> <i class="glyphicon glyphicon-home"></i> </span>
+						</a>
+					</li>
+					<li role="presentation" class="active">
+						<a href="#step3" data-toggle="tab" aria-controls="step3" role="tab" title="Store Contact Details">
+							<span class="round-tab"> <i class="glyphicon glyphicon-list"></i> </span>
+						</a>
+					</li>
+					<li role="presentation" class="disabled">
+						<a href="#complete" data-toggle="tab" aria-controls="complete" role="tab" title="Complete">
+							<span class="round-tab"> <i class="glyphicon glyphicon-ok"></i> </span>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+</div>
+@endsection 
 @section('content')
 <div class="container">
 	<form class='form-horizontal' name='install' id='install' method='post' enctype='multipart/form-data' style="padding:20px;">
