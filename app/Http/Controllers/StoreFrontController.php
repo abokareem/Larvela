@@ -3,7 +3,7 @@
  * \class	StoreFrontController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.0
+ * \version	1.0.1
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -59,6 +59,7 @@ use App\Models\StoreSetting;
 use App\Models\Notification;
 use App\Models\SubscriptionRequest;
 use App\Models\Users;
+use App\Models\CategoryImage;
 
 use App\Helpers\StoreHelper;
 
@@ -159,16 +160,14 @@ protected $store_settings;
 		#
 		if(Schema::hasTable('users'))
 		{
-			$admin = Users::first();
-			if(is_null($admin))
+			$this->LogMsg("Users table is present");
+			if(Users::count()==0)
 			{
 				return view('Install.install-1');
 			}
 		}
 
-return view('Install.install-1');
-
-
+		$store = app('store');
 
 		$Image = new Image;
 		$Category = new Category;
@@ -321,7 +320,8 @@ return view('Install.install-1');
 			$attribute_values = AttributeValue::get();
 
 			/*
-			 * REFACTOR required, these should not be in this controller
+			 * REFACTOR required, colour and size should not be assigned here
+			 * pass in the attributes and values and let the theme work out what it needs.
 			 */
 			$size_attribute = Attribute::where('attribute_name','Size')->first();
 			$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
@@ -335,6 +335,7 @@ return view('Install.install-1');
 			$this->LogMsg("Render View storefront from [".$theme_path."]");
 
 			return view($theme_path,[
+				'store'=>$store,
 				'adverts'=>$this->getAdverts(),
 				'categories'=>$categories,
 				'settings'=>$settings,
@@ -352,6 +353,7 @@ return view('Install.install-1');
 			$this->LogMsg("Render View Frontend.storefront - No Products assigned to shop");
 			$theme_path = \Config::get('THEME_HOME')."storefront";
 			return view($theme_path,[
+				'store'=>$store,
 				'settings'=>$settings,
 				'sizes'=>$sizes,
 				'categories'=>$categories,
@@ -623,6 +625,9 @@ return view('Install.install-1');
 #		$Category = new Category;
 #		$Image = new Image;
 #		$CategoryProduct  = new CategoryProduct;
+		$CategoryImage = new CategoryImage;
+		$images = $CategoryImage->images();
+		dd($images);
 
 		$category_data = Category::find($id);
 		#
