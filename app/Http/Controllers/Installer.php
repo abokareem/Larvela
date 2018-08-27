@@ -199,8 +199,10 @@ class Installer extends Controller
 		{
 			$s = Store::find($form['id']);
 			$currency = array('USD','AUD','GBP','EURO','NZD','YEN');
+			$countries = Country::get();
+			$tzdata = explode("/",date_default_timezone_get());
 			return view("Install.install-2",[
-				'key_hash'=>$hash,'store'=>$s,'currency'=>$currency
+				'key_hash'=>$hash,'store'=>$s,'currency'=>$currency,'countries'=>$countries,'tzdata'=>$tzdata[0]
 				]);
 		}
 		return view("Install.install-1");
