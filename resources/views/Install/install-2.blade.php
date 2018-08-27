@@ -37,12 +37,6 @@
 	<form class='form-horizontal' name='install' id='install' method='post' enctype='multipart/form-data' style="padding:20px;">
 		<div class="row">
 			<div class="form-group">
-				<label class="control-label col-xs-12 col-sm-2"> </label>
-				<div class="col-xs-12 col-sm-8 progress">
-						<div class="progress-bar" role="progressbar" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">50%</div>
-				</div>
-			</div>
-			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Store Name:</label>
 				<div class="col-xs-12 col-sm-3">
 					<input type="text" class="form-control" id='store_name' name="store_name" value="Demo Store">
