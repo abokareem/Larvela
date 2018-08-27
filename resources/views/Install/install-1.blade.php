@@ -39,7 +39,7 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">App Key:</label>
 				<div class="col-xs-12 col-sm-3">
-					<input type="text" class="form-control" id='app_key' name="app_key" value=''><br>
+					<input type="text" class="form-control" id='app_key' name="app_key" value=''><i><span id="count">0</span></i><br>
 					Enter first 8 characters of APP_KEY from .env file after the <strong>"base64:"</strong>sub-string.
 				</div>
 			</div>
@@ -88,8 +88,7 @@ for( var i=0; i < 8; i++ )
 text += possible.charAt(Math.floor(Math.random() * possible.length));
 $("input[name=admin_pwd]").val( text );
 });
-<?php
-/*
+
 $('#install').validate( 
 {
 	rules:
@@ -100,8 +99,9 @@ $('#install').validate(
 		admin_pwd: { required: true, minlength: 8 }
 	}
 });
-*/
-?>
 $('#btnnext').click( function() { $('#install').attr('action','/install/save/1'); $('#install').submit(); });
+
+$("#app_key").on("input", function() { $("#count").text(this.value.length); });
+
 </script>
 @endsection
