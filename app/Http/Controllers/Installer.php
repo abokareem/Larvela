@@ -3,7 +3,7 @@
  * \class	Installer
  * \date	2018-08-14
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
