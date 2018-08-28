@@ -3,6 +3,7 @@
  * \class	SupportController
  * \date	2017-08-30
  * \author	Sid Young <sid@off-grid-engineering.com>
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -136,8 +137,9 @@ use Logger;
 	 */ 
 	public function about()
 	{
+		$store = app('store');
 		$theme_path = \Config::get('THEME_SUPPORT').'about';
-		return view($theme_path);
+		return view($theme_path,['store'=>$store]);
 	}
 
 
@@ -148,8 +150,9 @@ use Logger;
 	 */ 
 	public function tandc()
 	{
+		$store = app('store');
 		$theme_path = \Config::get('THEME_SUPPORT').'tandc';
-		return view($theme_path);
+		return view($theme_path,['store'=>$store]);
 	}
 
 
@@ -160,8 +163,9 @@ use Logger;
 	 */ 
 	public function support()
 	{
+		$store = app('store');
 		$theme_path = \Config::get('THEME_SUPPORT').'support';
-		return view($theme_path);
+		return view($theme_path,['store'=>$store]);
 	}
 
 
@@ -171,8 +175,9 @@ use Logger;
 	 */ 
 	public function privacy()
 	{
+		$store = app('store');
 		$theme_path = \Config::get('THEME_SUPPORT').'privacy';
-		return view($theme_path);
+		return view($theme_path,['store'=>$store]);
 	}
 
 
@@ -182,7 +187,8 @@ use Logger;
 	 */ 
 	public function contact()
 	{
+		$store = app('store');
 		$theme_path = \Config::get('THEME_SUPPORT').'contact';
-		return view($theme_path);
+		return view($theme_path,['store'=>$store]);
 	}
 }
