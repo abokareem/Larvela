@@ -93,6 +93,7 @@ use Logger;
 	public function user_defined_page($page_name)
 	{
 		$this->LogFunction("user_defined_page");
+		$store = app('store');
 
 		$theme_name = \Config::get('THEME_NAME');
 		$path = resource_path("views/Themes/".$theme_name."/Support");
@@ -105,7 +106,7 @@ use Logger;
 			{
 				$blade_path = \Config::get('THEME_SUPPORT').$page_name;
 				$this->LogMsg("Fetching blade [".$blade_path."]");
-				return view($blade_path);
+				return view($blade_path,['store'=>$store]);
 			}
 		}
 		else
@@ -121,13 +122,13 @@ use Logger;
 				{
 					$blade_path = "Themes.default.Support.".$page_name;
 					$this->LogMsg("Fetching blade [".$blade_path."]");
-					return view($blade_path);
+					return view($blade_path,['store'=>$store]);
 				}
 			}
 		}
 		$blade_path = \Config::get('THEME_ERRORS')."no-route";
 		$this->LogMsg("Using default blade [".$blade_path."]");
-		return view($blade_path);
+		return view($blade_path,['store'=>$store]);
 	}
 
 
