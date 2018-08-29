@@ -1,11 +1,31 @@
 <?php
 /**
  * \class	StoreController
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2016-09-15
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2016-09-15
+ * \version	1.0.1
  *
  *
- * [CC]
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 namespace App\Http\Controllers;
 
@@ -44,6 +64,7 @@ use Logger;
 	public function __construct()
 	{
 		$this->setFileName("store-admin");
+		$this->setClassName("StoreController");
 		$this->LogStart();
 	}
 	
@@ -83,11 +104,11 @@ use Logger;
 		$address->customer_state = "";
 		$address->customer_country = "AU";
 
+		$store = app('store');
 		$user = Auth::user();
 		if (Auth::check())
 		{
 			$source = CustSource::where('cs_name',"WEBSTORE")->first();
-			$store = app('store');
 			$customer = Customer::where('customer_email', $user->email)->first();
 
 			$this->LogMsg("Customer Data [".print_r($customer,true)."]");
@@ -159,105 +180,22 @@ use Logger;
 	 */
 	public function ShowSignUpForm()
 	{
+		$store = app('store');
 		$this->LogFunction("ShowSignUpForm()");
-		return view('auth.register');
+		return view('auth.register',['store'=>$store]);
 	}
 
 
 
 
-	/**
-	 * Get all stores and return a view listing them
-	 *
-	 * GET ROUTE: /admin/stores
-	 *
-	 * @return	mixed
-	 */
-	public function ShowStoresPage()
-	{
-		$this->LogFunction("ShowStoresPage()");
-		$stores = Store::all();
-		return view('Admin.Stores.showstores',['stores'=>$stores]);
-	}
-
-
-
-	/**
-	 * Return a view for adding a new store.
-	 *
-	 * GET ROUTE: /admin/store/add
-	 * @return	mixed
-	 */
-	public function ShowAddStorePage()
-	{
-		$this->LogFunction("ShowAddStorePage()");
-		$stores = Store::all();
-		return view('Admin.Stores.addstore',['stores'=>$stores]);
-	}
-
-
-
-
-	/**
-	 * Return the edit page for editing existing store details.
-	 *
-	 * GET ROUTE: /admin/store/edit/{id}
-	 *
-	 * @return	mixed
-	 */
-	public function ShowEditStorePage($id)
-	{
-		$this->LogFunction("ShowEditStorePage()");
-		$store = Store::find($id);
-		return view('Admin.Stores.editstore',['store'=>$store]);
-	}
-
-
-
-
-	/**
-	 * Given the store ID, Process the posted data in the validation class and
-	 * update the stores table using the service layer.
-	 *
-	 * POST ROUTE: /admin/store/update/{id}
-	 *
-	 * @param	app/Http/Request/StoreRequest	$request
-	 * @param	integer	$id
-	 * @return	mixed
-	 */
-	public function UpdateStore(StoreRequest $request, $id)
-	{
-		$this->LogFunction("UpdateStore()");
-		$this->CreateThemeDir($request->store_env_code);
-		$request['id'] = $id;
-		StoreService::update($request);
-		return $this->ShowStoresPage();
-	}
-
-
-
-
-	/**
-	 *
-	 *
-	 * POST ROUTE: /admin/store/save
-	 *
-	 * @param	app/Http/Request/StoreRequest	$request
-	 * @return	mixed
-	 */
-	public function SaveNewStore(StoreRequest $request)
-	{
-		$this->LogFunction("SaveNewStore()");
-		$this->CreateThemeDir($request->store_env_code);
-		$this->LogMsg("Save New Store");
-		StoreService::insert($request);
-		return $this->ShowStoresPage();
-	}
 
 
 
 	/**
 	 * Create Theme Directory given the store code, return false on failure.
+	 *
+	 * Possible obsolete now
+	 *
 	 *
 	 * @param	string	$store_code
 	 * @return	boolean
