@@ -39,7 +39,7 @@ public $timestamps = false;
  * Items that are mass assignable
  * @var array $fillable
  */
-protected $fillable = array('category_title','category_description','category_url','category_parent_id','category_status','category_visible','category_store_id');
+protected $fillable = array('id','category_title','category_description','category_url','category_parent_id','category_status','category_visible','category_store_id');
 
 
 /**
@@ -321,5 +321,16 @@ protected $data = array();
 		}
 		$html .="</select>";
 		return $html;
+	}
+
+
+	/**
+	 * Returns all relevant images as a Collection of Image objects
+	 *
+	 * @return  mixed
+	 */
+	public function images()
+	{
+		return $this->belongsToMany('App\Models\Image','category_image','category_id','image_id');
 	}
 }
