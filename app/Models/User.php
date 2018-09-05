@@ -32,71 +32,61 @@ protected $fillable = ['name','email','password','role_id'];
 protected $hidden = [ 'password', 'remember_token', ];
 
 
-
-	/**
-	 * Map Role to User, each user has 1 role.
-	 *
-	 * @return	mixed
-	 */
-	public function role()
-	{
-		return $this->hasOne('App\Models\Role', 'id', 'role_id');
-	}
+protected $have_roles;
 
 
 	/**
-	 * Map Role to User, each user has 1 role.
+	 * Called from Middleware and passed in an array of suitable roles.
 	 *
+	 * Check if the user is an admin/root user, return true
+	 * Otherwise check if user has the role assigned.
 	 *
 	 * @param	array	$roles
 	 * @return	boolean
 	 */
 	public function hasRole($roles)
 	{
-		$this->have_role = $this->getUserRole();
-		
-		// Check if the user is a root account
-		if($this->have_role->name == 'root')
+		if($this->role_id == 1) return true;
+
+		$assigned_roles = $this->roles;
+		foreach($assigned_roles as $ar)
 		{
-			return true;
-		}
-		if(is_array($roles))
-		{
-			foreach($roles as $need_role)
+			$assigned_role = strtolower($ar->role_name);
+			if(is_array($roles))
 			{
-				if($this->checkIfUserHasRole($need_role))
+				foreach($roles as $role_needed)
+				{
+					if(strtolower($role_needed) == $assigned_role)
+					{
+						return true;
+					}
+				}
+			}
+			else
+			{
+				if(($this->have_role->role_name == 'ADMIN')||
+					($this->have_role->role_name == 'root'))
+				{
+					return true;
+				}
+				if($assigned_role == strtolower($roles))
 				{
 					return true;
 				}
 			}
 		}
-		else
-		{
-			return $this->checkIfUserHasRole($roles);
-		}
 		return false;
 	}
 
 
-	/**
-	 *
-	 *
-	 * @return	array
-	 */
-	private function getUserRole()
-	{
-		return $this->role()->getResults();
-	}
-
-
 
 	/**
+	 * User can have lots of roles
 	 *
-	 *
-	 * @return	boolean
+	 * @return	mixed
 	 */
-	private function checkIfUserHasRole($need_role)
+	public function roles()
 	{
-		return (strtolower($need_role)==strtolower($this->have_role->name)) ? true : false;
+		return $this->belongsToMany('App\Models\Role', 'user_role','user_id','role_id');
 	}
 }
