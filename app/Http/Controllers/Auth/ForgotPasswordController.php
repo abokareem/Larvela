@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * \class	ForgotPasswordController
+ * \version	1.0.0
+ *
+ */
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -29,4 +33,17 @@ class ForgotPasswordController extends Controller
     {
         $this->middleware('guest');
     }
+
+
+	/**
+	 * Display the form to request a password reset link.
+	 *
+	 * @return \Illuminate\Http\Response
+	 */
+	public function showLinkRequestForm()
+	{
+		$store = app('store');
+		return view('auth.passwords.email',['store'=>$store]);
+	}
+
 }
