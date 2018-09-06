@@ -128,8 +128,14 @@ Typically you would create a "dev", "uat" and "prod" environment so you can deve
 To install into a directory called "dev"
 ```
 git clone https://github.com/offgridengineering/Larvela.git dev
+cd dev
+<edit .env file with YOUR database settings>
 composer install
+chown -R apache:apache ../dev
+php artisan migrate
+php artisan db:seed
 ```
+Once you complete the installation, navigate to your website, if its setup correctly then the larvela Installation Configuration Page should load.
 
 ## Configuration
 
