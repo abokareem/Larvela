@@ -24,7 +24,7 @@ Limited email support is available until a Production release is available. If y
 
 Larvela has been designed from the ground up to scale to huge system capacities if needed, that includes multi-server front ends, multi-server backends using Queuing and a host of features that the Laravel framework provides to achieve this.
 
-It is recommended that the Redis cache is installed and configured for the Session Support and Queue capabilites in all deployments. While Memcached is also available, it does not provide a Message Queue/ Job Queue capability while is used extensively in Larvela. You are free to implement a third party Queuing solution but this may not be supportable over time. 
+It is recommended that the Redis cache is installed and configured for the Session Support and Queue capabilites in all deployments. While Memcached is also available, it does not provide a Message Queue/ Job Queue capability which is used extensively in Larvela. You are free to implement a third party Queuing solution but this may not be supportable over time. 
 
 Larvela has been implemented from the ground up to support multi work queues and session caching using Redis so this is the basic recomendation for all implementations.
 
@@ -37,10 +37,10 @@ Larvela uses the Laravel Blootstrap v3 in the Blade templating. The Blade templa
 ## Multi-Store / Multi-Site
 
 Larvela supports an unlimted number of stores on the same host. This requires an environment variable be presented by the web server (usually set in your site specific web-host configuration file). Each store can be Themed independantly, this allows you to build language specific versions of your site or any type of variant you desire.
-
+```
  SetEnv STORE_CODE EUSTORE
  SetEnv STORE_ENV PROD
-
+```
 More info can be found in the knowledgebase article: <a href="https://larvela.org/kb?2017103101">Vhost Variable for Multiple Store Support</a>
 
 # Product Types
@@ -112,17 +112,32 @@ The Knowledgebase is slowly being updated, you can view it by visiting https://l
 
 ## Installation
 
- ** Still being constructed **
+*Being Finalized **
 
-Please review the Laravel 5.3 Installation Guide, once v5.3 installed, ensure the composer.json file is configured as per the repo file. 
+The install process has become increadibly simple!
 
-Also the directories from the repo can be copied into place until an installation program is finalized.
+Using <b>git clone</b>, you an download a copy of the current release into a directory created for you, edit the .env file, run <b>composer install</b>, set file ownership, generate an APP KEY, run the migration, then the seed and fire up the site!
+
+Once fired up the auot installer runs and collects some details about you and the store, configures itself and your in business.
+
+The install process is documented here: <a href="https://larvela.org/kb?2017-0002">https://larvela.org/kb?2017-0002</a>. Its being actively updated as the release date approaches and any additional requirements will be posted in the <a href="https://larvela.org/kb">Knowledgebase</>
+
+### Installation for Development, User Acceptance Testing and Production
+
+Typically you would create a "dev", "uat" and "prod" environment so you can develp, test and release to production...
+To install into a directory called "dev"
+```
+git clone https://github.com/offgridengineering/Larvela.git dev
+composer install
+```
 
 ## Configuration
 
+ TODO - Outline auto installer actions....
+
 ### Composer additions
 
- Still to do.
+ TODO - Still to do, outline how to add extra packages.
 
 ### app.php configuration:
 
