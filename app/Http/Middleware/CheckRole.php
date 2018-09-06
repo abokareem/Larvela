@@ -1,16 +1,25 @@
-<?php namespace App\Http\Middleware;
+<?php
+/**
+ * \class	CheckRole
+ *
+ *
+ *
+ *
+ */
+namespace App\Http\Middleware;
 
 /**
  * \class CheckRole
  */
-// First copy this file into your middleware directoy
 
 use Closure;
 
 /**
- * \brief Third party Role checker middleware class
+ * \brief Role checker middleware class. Used in the route to limit access to authorised users who have this role.
  */
-class CheckRole{
+class CheckRole
+{
+
 
 	/**
 	 * Handle an incoming request.
@@ -22,8 +31,7 @@ class CheckRole{
 	public function handle($request, Closure $next)
 	{
 		// Get the required roles from the route
-		$roles = $this->getRequiredRoleForRoute($request->route());
-
+		$roles = $this->getRequiredRole($request->route());
 		// Check if a role is required for the route, and
 		// if so, ensure that the user has that role.
 		if($request->user()->hasRole($roles) || !$roles)
@@ -46,7 +54,7 @@ class CheckRole{
 	 * @param	Request	$route
 	 * @return	mixed	array or null
 	 */
-	private function getRequiredRoleForRoute($route)
+	private function getRequiredRole($route)
 	{
 		$actions = $route->getAction();
 		return isset($actions['roles']) ? $actions['roles'] : null;
