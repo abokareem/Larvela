@@ -3,10 +3,30 @@
  * \class	 Store
  * \author	 Sid Young <sid@off-grid-engineering.com>
  * \date	 2016-08-23
+ * \version	1.0.0
  *
  *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
- * [CC]
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *
  */
 namespace App\Models;
 
@@ -27,11 +47,15 @@ class Store extends Model
 protected $table = "stores";
 
 
+/**
+ * The table does not use timestamps.
+ * @var boolean $timestamps
+ */
 public $timestamps = false;
+
 
 /**
  * The items that are mass assignable
- *
  * @var array $fillable
  */
 protected $fillable = array(
@@ -51,7 +75,9 @@ protected $fillable = array(
 		'store_address',
 		'store_address2',
 		'store_contact',
-		'store_bg_image'
+		'store_bg_image',
+		'store_country',
+		'store_country_code'
 		);
 
 protected $data = array();
@@ -59,106 +85,17 @@ protected $data = array();
 
 	function __construct()
 	{
-#		$this->BuildData();
 	}
 
 
 
-
-
-
-	/**
-	 * Get a store using the environment code. This code should be defined in the apache vhost file so the correct store is selected.
-	 *
-	 * @param	string	$code	Store code to select by.
-	 * @return	mixed	Collection of rows of stores ordered by store name.
-	 */
-	private function getByCode($code)
-	{
-		return \DB::table('stores')->where(['store_env_code'=>$code])->first();
-	}
-
-
-
-
-
-
-	private  function getData() { return $this->data; }
-
-
-
-	/**
-	 * Build initial array from the Database
-	 * at object creation time.
-	 */
-	protected function BuildData()
-	{
-		$rows = \DB::table('stores')->where(['store_status'=>'A'])->orderBy('id')->get();
-
-		foreach($rows as $row)
-		{
-			$d = array(
-				'id'=>$row->id,
-				'name'=>$row->store_name,
-				'parent'=>$row->store_parent_id
-				);
-			array_push($this->data, $d);
-		}
-	}
-
-
-	/**
-	 * Recursive Tree Builder of a list of stores.
-	 *
-	 * usage: $tree = BuildTree($this->getData());
-	 * or
-	 *        Display(BuildTree($this->getData()));
-	 */
-	private function BuildTree(array $elements, $parentId = 0)
-	{
-		$branch = array();
-		foreach ($elements as $element)
-		{
-			if ($element['parent'] == $parentId)
-			{
-				$children = $this->BuildTree($elements, $element['id']);
-				if($children)
-				{
-					$element['children'] = $children;
-				}
-				$branch[] = $element;
-			}
-		}
-		return $branch;
-	}
-	
-	
-
-	private function Display($array)
-	{
-		echo "<ul class='ul-store'>\n";
-		foreach($array as $key => $value)	# key is numeric index  value is array
-		{
-			$name = $value['name'];
-			echo "<li class='li-store'>".$name."</li>\n";
-			if(array_key_exists('children', $value))
-			{
-				echo "<ul>\n";
-				foreach($value['children'] as $cv)
-				{
-					echo "<li class='li-sub-store'>".$name." - ".$cv['name']."</li>";
-				}
-				echo "</ul>\n";
-			}
-		}
-		echo "</ul>\n";
-	}
-
-
-	
 	/**
 	 * Given a text string containing code, and a Store object containg row data
 	 * return a text string with the codes translated into data and return.
+	 *
+	 *
+	 * @deprecated Has been phased out, using Mailable interface.
+	 *
 	 *
 	 * @param	string	$text
 	 * @param	mixed	$store
