@@ -41,10 +41,12 @@ use Config;
 
 use App\User;
 
+use App\Models\Advert;
 use App\Models\Attribute;
 use App\Models\AttributeProduct;
 use App\Models\AttributeValue;
 use App\Models\Category;
+use App\Models\CategoryProduct;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\ProdImageMap;
@@ -228,6 +230,27 @@ use Logger;
 
 
 
+
+	/**
+	 * Find the product in the array of product rows.
+	 *
+	 * @param	array	$products 	The array of retrieved products from the DB
+	 * @param	integer	$id	The ID to find 
+	 * @return	mixed
+	 */
+	protected function FindProduct($products, $id)
+	{
+		$product = array_filter($products, function($p) use ($id) { if($p['id'] == $id) { return $p;} });
+		return reset($product);
+
+		#foreach($products as $p)
+		#{
+		#if($p->id == $id) return $p;
+		#}
+		#return null;
+	}
+
+
 	/**
 	 * Construct a media image storage path from the ID given and return string
 	 *
@@ -247,4 +270,56 @@ use Logger;
 		$this->LogMsg("Path is [ $path ] ");
 		return $path;
 	}
+
+
+
+	/**
+	 * Return an array of formatted category objects, only the parent items.
+	 *
+	 * @return	array
+	 */
+	protected function GetStoreCategories($store_id = 0)
+	{
+		$this->LogFunction("GetStoreCategories(".$store_id.")");
+		$category_data = Category::where('category_store_id',$store_id)->get();
+		return $category_data;
+	}
+
+
+
+
+	/**
+	 * Return the string represention of the category HTML unordered list
+	 *
+	 * @return	string
+	 */
+	protected function GetStoreCategoriesHTML()
+	{
+		$this->LogFunction("GetStoreCategoriesHTML()");
+
+		$Category = new Category;
+		return $Category->getHTML();
+	}
+
+
+
+	/**
+	 *============================================================
+	 *
+	 *                        DEVELOPMENT
+	 *
+	 *============================================================
+	 *
+	 * Return a collection of rows that are current adverts from the adverts table.
+	 *
+	 * @return	mixed
+	 */
+	protected function GetAdverts()
+	{
+		$this->LogFunction("GetAdverts()");
+		return Advert::where('advert_status','A')->get();
+	}
+
+
+
 }
