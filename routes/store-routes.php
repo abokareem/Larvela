@@ -59,9 +59,12 @@ Route::post('/cart/getcartdata','StoreFrontController@GetCartData');
 # Routes for Pages
 #
 Route::get('/','StoreFrontController@ShowStoreFront');
-Route::get('/category/{id}','StoreFrontController@ShowStoreCategory');
-Route::get('/product/{id}','StoreFrontController@ShowProductPage');
 Route::get('/attribute/{id}','StoreFrontController@ShopByAttribute');
+#
+# 2018-09-12 refactored this route from StoreFrontController.
+#
+Route::get('/product/{id}','ProductPageController@ShowProductPage');
+Route::get('/category/{id}','CategoryPageController@ShowStoreCategory');
 
 #
 # CMS/SEO pages
