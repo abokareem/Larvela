@@ -18,6 +18,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 use App\Models\Customer;
+use App\Models\Store;
 
 use App\Jobs\EmailUserJob;
 use App\Traits\TemplateTrait;
@@ -41,33 +42,15 @@ protected $store;
 
 /**
  * The email address to send the Subscription Confirmation to.
- * @var string $to
+ * @var string $email
  */
-protected $to;
-
-protected $from;
+protected $email;
 
 /**
- * The subject line for this email
- * @var string $subject
+ * The order object
+ * @var mixed $order
  */
-protected $subject;
-
-
-/**
- * The filename and path for email template to use.
- * Note: Template may also be made of SEOHelper calls.
- * @var string template_file_name
- */
-protected $template_file_name;
-
-
-/**
- * Tempalte to use
- * @var string $ACTION
- */
-private $ACTION="ORDER_DISPATCH_PENDING";
-
+protected $order;
 
 
     /**
@@ -82,22 +65,8 @@ private $ACTION="ORDER_DISPATCH_PENDING";
     public function __construct($store, $email, $order)
     {
 		$this->store = $store;
+		$this->email = $email;
 		$this->order = $order;
-
-		$this->to    = $email;
-		$this->from  = $store->store_sales_email;
-
-		#
-		# Add order number to the SUbject and details from the order in the handle() method
-		#
-		$this->subject = "Order Dispatch Pending - Order ID ".$order->id;
-
-		$this->template_file_name = $this->getTemplate($this->ACTION);
-		echo "Template: ". $this->template_file_name. "</br>";
-		if(strlen($this->template_file_name)==0)
-		{
-			$this->template_file_name = strtolower($this->ACTION).".email";
-		}
     }
 
 
@@ -106,40 +75,14 @@ private $ACTION="ORDER_DISPATCH_PENDING";
      * Fetch the template, parse with the store helper and
 	 * then send using Job Dispatch.
 	 *
-	 * {FIX_2017-11-05} - OrderDispatchPending.php - removed call to StrReplace
-	 *
      * @return void
      */
     public function handle()
     {
-		$Customer = new Customer;
-		$Store = new Store;
-		$path = base_path();
-		$file = $path."/templates/".$this->store->store_env_code."/".$this->template_file_name;
-
-		$text = "<h1>WARNING</h1><p>Order Dispatch Pending email NOT sent to: ".$this->to."</p><br/><br/>Check Template file! - <b>".$file."</b>";
-		if(file_exists($file))
-		{
-			$body = file_get_contents($file);
-
-			$store_name_lower = strtoupper($this->store->store_name);
-			$store_name = str_replace(" ","_", $store_name_lower);
-			$header_tag = $store_name."_EMAIL_HEADER";
-			$footer_tag = $store_name."_EMAIL_FOOTER";
-
-			$header = SEOHelper::getText($header_tag);
-			$footer = SEOHelper::getText($footer_tag);
-
-			$t1 = $header.$body.$footer;
-			$text = $Store->translate($t1, $this->store);
-
-			$cmd = new EmailUserJob($this->to, $this->from, $this->subject, $text);
-			dispatch($cmd);
-		}
-
+		$subject = "[LARVELA] Order Dispatch Pending email sent to [".$this->to."]a;
+		$text = "Notice Order Dispatch Pending email sent to [".$this->email."]";
+		$from = $this->store->store_sales_email;
 		$admin_user = Customer::find(1);
-		$admin_email = $admin_user->customer_email;
-		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Order Dispatch Pending email sent to [".$this->to."]", $text);
-		dispatch($cmd);
+		dispatch(new EmailUserJob($admin_user->customer_email, $from, $subject, $text);
     }
 }
