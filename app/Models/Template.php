@@ -4,7 +4,7 @@
  * @author	Sid Young <sid@off-grid-engineering.com>
  * @date	2016-09-15
  *
- *
+ * @deprecated Template class has now been deprecated due to implementation of Mailables.
  *
  * [CC]
  */
@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 
 
 /**
- * \brief Template file fetching methods - Not yet fully implemented.
+ * \brief Template file fetching methods - now obsoleted and due for removal.
  */
 class Template
 {

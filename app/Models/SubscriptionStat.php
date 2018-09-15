@@ -3,6 +3,7 @@
  * \class	SubscriptionStat
  * \date	2018-03-11
  * \author	Sid Young <sid@off-grid-engineering.com>
+ * \version	1.0.0
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -25,7 +26,6 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- *
  */
 namespace App\Models;
 
@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * \brief MVC Eloquent model for the "subscription_stats" table.
+ * Every time a subscription is processed a record is written
  */
 class SubscriptionStat extends Model
 {

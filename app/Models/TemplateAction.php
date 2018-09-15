@@ -4,9 +4,13 @@
  * @author	Sid Young <sid@off-grid-engineering.com>
  * @date	2016-08-18
  *
- *
+ * @deprecated TemplateAction class now deprecated due to use of Mailables.
  *
  * [CC]
+ *
+ *
+ * \addtogroup PENDING_REMOVAL
+ * TemplateAction - Needs to be removed from admin, classes, migrations and DB
  */
 namespace App\Models;
 

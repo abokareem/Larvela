@@ -36,7 +36,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * \brief Basic model for the role mapping table.
  *
- * Used to map the user to a role.
+ * Used to map the user to one or more role(s).
  */
 class Role extends Model
 {

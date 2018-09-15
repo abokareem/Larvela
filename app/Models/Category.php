@@ -252,7 +252,7 @@ protected $data = array();
 	 * @param	array	$array	Array of category
 	 * @return void
 	 */
-	public function Display($array)
+	protected function Display($array)
 	{
 		echo "<ul id='menu-bar'>\n";
 		foreach($array as $key => $value)	# key is numeric index  value is array

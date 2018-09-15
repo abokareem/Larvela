@@ -1,9 +1,9 @@
 <?php
 /**
- * @class	ProductLock
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2017-08-24
- * @version	1.0.1
+ * \class	ProductLock
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2017-08-24
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -61,8 +61,8 @@ protected $fillable = ['product_lock_pid','product_lock_cid','product_lock_qty',
 	 *
 	 * @return  mixed
 	 */
-	public function product()
+	public function products()
 	{
-		return $this->belongsTo('App\Models\Products');
+		return $this->belongsTo('App\Models\Product');
 	}
 }
