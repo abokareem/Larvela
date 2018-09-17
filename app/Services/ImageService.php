@@ -1,65 +1,122 @@
 <?php
-/**
- * \class ImageService
- */
 namespace App\Services;
-
-use App\Http\Requests\ImageRequest;
 
 use App\Models\Image;
 
 
-/**
- * \brief Service layer for the Image Model
- */
 class ImageService
 {
-
-	public static function insert(ImageRequest $request)
+	function __construct()
 	{
-		$rv = 0;
-		$o = new Image;
-		$o->image_file_name = $request['image_file_name'];
-        $o->image_folder_name = $request['image_folder_name'];
-        $o->image_size = $request['image_size'];
-        $o->image_height = $request['image_height'];
-        $o->image_width = $request['image_width'];
-        $o->image_order = $request['image_order'];
-        $o->image_parent_id = $request['image_parent_id'];
 
-		if(($rv=$o->save()) > 0)
+	}
+
+
+	/**
+	 * Given either an array of product or just a single product
+	 * compile an array of all images.
+	 *
+	 * @param	mixed	$product
+	 * @return	array
+	 */
+	public static function getParentImages($products)
+	{
+		if(is_array($products))
 		{
-			\Session::flash('flash_message','Image Saved!');
+			$images = array();
+			foreach($products as $product)
+			{
+				$images = array_merge($images, self::getImages($product));
+			}
+			return $images;
 		}
 		else
 		{
-			\Session::flash('flash_error','Image Save Failed!');
+			return self::getImages($products);
 		}
-		return $rv;
 	}
 
 
 
-	public static function update(ImageRequest $request)
+	/**
+	 * Given the product, get all images.
+	 * - parent images and thumbnails.
+	 *
+	 * @param	App\Models\Product	$product
+	 * @return	array
+	 */
+	public static function getImages($product)
 	{
-		$rv = 0;
-		$o = Image::find($request['id']);
-		$o->image_file_name = $request['image_file_name'];
-        $o->image_folder_name = $request['image_folder_name'];
-        $o->image_size = $request['image_size'];
-        $o->image_height = $request['image_height'];
-        $o->image_width = $request['image_width'];
-        $o->image_order = $request['image_order'];
-        $o->image_parent_id = $request['image_parent_id'];
-
-		if(($rv=$o->save()) > 0)
+		$images = array();
+		$mapping = $product->images;
+		if(sizeof($mapping)>0)
 		{
-			\Session::flash('flash_message','Image updated!');
+			foreach($mapping as $m)
+			{
+				array_push($images,$m);
+				$pp_images = Image::where('image_parent_id',$m->id)->get();
+				foreach($pp_images as $pi)
+				{
+					array_push($images,$pi);
+				}
+			}
 		}
-		else
-		{
-			\Session::flash('flash_error','Image update Failed!');
-		}
-		return $rv;
+		return $images;
 	}
+
+
+
+	public static function getThumbnails($product)
+	{
+		$thumbnails = array();
+		$mapping = $product->images;
+		if(sizeof($mapping)>0)
+		{
+			foreach($mapping as $m)
+			{
+				$images = Image::where('image_parent_id',$m->id)->get();
+				array_push($thumbnails, $images);
+			}
+		}
+		return $thumbnails;
+	}
+
+
+
+	public static function getMainImage($product)
+	{
+		$main_image_folder_name = $this->getStoragePath($product->id);
+		$main_image_file_name = $id."-1.jpeg";
+		if(sizeof($images)==1)
+		{
+			$main_image_file_name = $images[0]->image_file_name;
+		}
+		return array('name'=>$main_image_file_name, 'folder'=>$main_image_folder_name);
+	}
+
+
+
+
+
+	/**
+	 * Construct a media image storage path from the ID given and return string
+	 *
+	 * @param   string  $str_id String holding the ID value as a number
+	 * @return  string
+	 */
+	protected function getStoragePath($str_id)
+	{
+#		$this->LogFunction("getStoragePath()");
+		$id = "$str_id";
+		$path="/media";
+		for($i=0;$i<strlen($id);$i++)
+		{
+			$path.="/".$id[$i];
+#			$this->LogMsg($path);
+		}
+#		$this->LogMsg("Path is [ $path ] ");
+		return $path;
+	}
+
+
 }

@@ -1,9 +1,10 @@
 <?php
 /**
- * \class	ProductPageFactory
- * \date	2018-09-17
+ * \class	PackProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2018-09-17
  * \version	1.0.0
+ *
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -26,46 +27,61 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ *
  */
 namespace App\Services;
 
-use App\Exceptions\Handler;
-use App\Models\ProductType;
+use App\Models\Product;
+
+
+use App\Traits\Logger;
+
 
 
 /**
- * \brief Return a suitable Object from the factory to send our data to.
+ * \brief Pack Product Service for handling Controller requests for this type of Product.
+ * - Created via the ProductPageFactory service.
+ * - Pack instanciatation tested OK.
  */
-class ProductPageFactory 
+class PackProductService implements IProduct
 {
+use Logger;
+
+
+/**
+ * The Product object
+ * @var mixed $product
+ */
+protected $product;
+
+
+
+	function __construct($product)
+	{
+		$this->setFileName("store");
+		$this->setClassName("PackProductService");
+
+		$this->product = $product;
+	}
+
+
 
 	/**
-	 * Instanciate a new Product Object used in the ProductPageController.
+	 * Return the name of the page for display of this type of product.
+	 * View will be "Themes/<theme_name>/Product.basic.blade.php"
 	 *
-	 * @param	App\Models\Product	$product
-	 * @return	mixed
+	 * @return	string
 	 */
-	public static function build($product)
+	public function getPageRoute()
 	{
-		$type = ProductType::find($product->prod_type);
-		if(!is_null($type))
-		{
-			$parts = explode(" ",$type->product_type);
-			$object_name = trim(ucwords($parts[0]))."ProductService";
-			$class_name = "App\\Services\\".$object_name;
-			require_once $object_name.'.php';
-			if(class_exists($class_name))
-			{
-				return new $class_name($product);
-			}
-			else
-			{
-				throw new \Exception("Product class not found.");
-			}
-		}
-		else
-		{
-			throw new \Exception("Invalid type given.");
-		}
+		return "packproduct";
+	}
+
+
+	# @todo devise the variables needed for a page display of a basic product.
+	#
+	public function getPageVariables()
+	{
+		return array();
 	}
 }
