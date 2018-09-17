@@ -3,7 +3,7 @@
  * \class	DispatcherFactory
  * \date	2018-08-19
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -30,6 +30,8 @@
 namespace App\Events\Larvela;
 
 
+use App\Excpetions\Handler;
+
 
 /**
  * \brief Return a suitable Object from the factory to send our data to.
@@ -53,7 +55,7 @@ class DispatcherFactory
 		}
 		else
 		{
-			throw new Exception("Invalid type given.");
+			throw new \Exception("Invalid type given.");
 		}
 	}
 }
