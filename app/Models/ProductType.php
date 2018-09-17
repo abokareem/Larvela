@@ -3,7 +3,7 @@
  * \class	ProductType
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2017-01-05
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -35,6 +35,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * \brief MVC Model to provide all CRUD functionality for the "product_types" table.
+ *
+ * {INFO_2018-09-18} - ProductType.php Added new column to seeds, migration and DB
  */
 class ProductType extends Model
 {
@@ -58,7 +60,7 @@ public $timestamps = false;
  * Columns that are mass asignable
  * @var array $fillable
  */
-protected $fillable = ['product_type'];
+protected $fillable = ['product_type','product_type_token'];
 
 
 }
