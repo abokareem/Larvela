@@ -16,6 +16,7 @@ class CreateProductTypesTable extends Migration
 		{
 			$table->increments('id');
 			$table->string('product_type')->unique();
+			$table->string('product_type_token')->unique();
 		});
 
     }
