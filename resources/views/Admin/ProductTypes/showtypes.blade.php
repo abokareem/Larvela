@@ -14,6 +14,7 @@
 			<thead>
 				<tr>
 				<th>ID</th>
+				<th>Token</th>
 				<th>Product Type</th>
 				<th>Actions</th>
 				</tr>
@@ -22,6 +23,7 @@
 			@foreach($product_types as $p)
 				<tr onclick='select({{ $p->id }})'  style="cursor: pointer">
 				<td>{{ $p->id }}</td>
+				<td>{{ $p->product_type_token }}</td>
 				<td>{{ $p->product_type }}</td>
 				<td><i class="fa fa-trash"></i> <a href="/admin/producttype/delete/{{ $p->id }}">Delete</a></td>
 				</tr>
