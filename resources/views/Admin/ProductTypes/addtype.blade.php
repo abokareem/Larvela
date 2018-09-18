@@ -25,8 +25,14 @@
 	<form class='form-horizontal' name='edit' id='edit' method='post' enctype='multipart/form-data'>
 	<div class="row">
 		<div class="form-group">
-			<label class="control-label col-xs-2">Name:</label>
-			<div class="col-xs-2">
+			<label class="control-label col-xs-12 col-md-2">Token:</label>
+			<div class="col-xs-12 col-md-2">
+				<input type="text" class="form-control" id='product_type_token' name="product_type_token" value=''>
+		 	</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-md-2">Name:</label>
+			<div class="col-xs-12 col-md-2">
 				<input type="text" class="form-control" id='product_type' name="product_type" value=''>
 		 	</div>
 		</div>
@@ -54,7 +60,8 @@ $('#edit').validate(
 {
 	rules:
 	{
-		product_type: { required: true, minlength: 3 }
+		product_type: { required: true, minlength: 4 },
+		product_type_token: { required: true, minlength: 4 }
 	}
 });
 
