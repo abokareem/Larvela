@@ -48,7 +48,7 @@ $('#edit').validate(
 {
 	rules:
 	{
-		product_type: { required: true, minlength: 4 }
+		product_type: { required: true, minlength: 4 },
 		product_type_token: { required: true, minlength: 4 }
 	}
 });
