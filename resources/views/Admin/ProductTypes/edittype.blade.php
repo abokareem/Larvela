@@ -17,6 +17,12 @@
 				<input type="text" class="form-control" id='product_type' name="product_type" value="{{ $product_type->product_type}}">
 		 	</div>
 		</div>
+		<div class="form-group">
+			<label class="control-label col-xs-2">Token:</label>
+			<div class="col-xs-2">
+				<input type="text" class="form-control" id='product_type_token' name="product_type_token" value="{{ $product_type->product_type_token}}">
+		 	</div>
+		</div>
 	</div>
 
 
@@ -42,7 +48,8 @@ $('#edit').validate(
 {
 	rules:
 	{
-		product_type: { required: true, minlength: 3 }
+		product_type: { required: true, minlength: 4 }
+		product_type_token: { required: true, minlength: 4 }
 	}
 });
 
