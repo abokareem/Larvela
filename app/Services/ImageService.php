@@ -106,8 +106,14 @@ class ImageService
 		{
 			foreach($mapping as $m)
 			{
-				$images = Image::where('image_parent_id',$m->id)->get();
-				array_push($thumbnails, $images);
+				$images = Image::where('image_parent_id',$m->id)->where('image_height',68)->get();
+				if(!is_null($images))
+				{
+					foreach($images as $img)
+					{
+						array_push($thumbnails, $img);
+					}
+				}
 			}
 		}
 		return $thumbnails;
