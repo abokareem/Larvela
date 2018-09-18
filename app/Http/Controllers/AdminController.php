@@ -3,7 +3,7 @@
  * \class	AdminController
  * \date	2016-07-01
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -41,7 +41,8 @@ use Session;
 use App\Models\Customer;
 use App\Models\Order;
 
-use App\Models\Users;
+use App\User;
+
 use App\Models\Services\TemplateService;
 use App\Http\Requests\TemplateNewRequest;
 use App\Http\Requests\TemplateUpdateRequest;
@@ -117,7 +118,7 @@ use Logger;
 	 */
 	public function ShowDashboard()
 	{
-		$Users = new Users;
+		$User = new User;
 		$Customer = new Customer;
 		$Order = new Order;
 
@@ -188,7 +189,7 @@ use Logger;
 				$colour_index++;
 				if($colour_index > 6) $colour_index=0; 
 			}
-			$currentuser = Users::where('email',Auth::user()->email)->first();
+			$currentuser = User::where('email',Auth::user()->email)->first();
 			if($currentuser->id==1)
 			{
 				return view('Admin.Dashboard.dashboard',[
