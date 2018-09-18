@@ -1,12 +1,31 @@
 <?php
 /**
  * \class	ProductTypeController
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2018-01-13
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2018-01-13
+ * \version 1.0.1
  *
  *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
- * [CC]
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 namespace App\Http\Controllers;
 
@@ -58,8 +77,8 @@ use Logger;
 	public function __construct()
 	{
 		$this->setFileName("store-admin");
+		$this->setClassName("ProductTypeController");
 		$this->LogStart();
-		$this->LogMsg("CLASS:ProductTypeController");
 	}
 	
 	/**
@@ -69,7 +88,6 @@ use Logger;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS:ProductTypeController");
 		$this->LogEnd();
 	}
 
@@ -86,7 +104,8 @@ use Logger;
 	 */
 	public function Show()
 	{
-		$pt = ProductType::all();
+		$this->LogFunction("Show()");
+		$pt = ProductType::get();
 		return view('Admin.ProductTypes.showtypes',['product_types'=>$pt]);
 	}
 
@@ -99,6 +118,7 @@ use Logger;
 	 */
 	public function Add()
 	{
+		$this->LogFunction("Add()");
 		return view('Admin.ProductTypes.addtype');
 	}
 
@@ -111,8 +131,10 @@ use Logger;
 	 */
 	public function Save(Request $request)
 	{
+		$this->LogFunction("Save()");
 		$o = new ProductType;
 		$o->product_type = $request['product_type'];
+		$o->product_type_token = $request['product_type_token'];
 		if(($rv=$o->save()) > 0)
 		{
 			$this->LogMsg("Product Type [".$o->product_type."] saved!");
@@ -135,6 +157,7 @@ use Logger;
 	 */
 	public function Edit($id)
 	{
+		$this->LogFunction("Edit()");
 		$pt = ProductType::find($id);
 		return view('Admin.ProductTypes.edittype',['product_type'=>$pt]);
 	}
@@ -158,6 +181,7 @@ use Logger;
 				$this->LogMsg("Update Product Type [".$request['product_type']."]");
 				$o = ProductType::find($id);
 				$o->product_type = $request['product_type'];
+				$o->product_type_token = $request['product_type_token'];
 				if(($rv=$o->save()) > 0)
 				{
 					$this->LogMsg("Updated!");
@@ -186,6 +210,7 @@ use Logger;
 	 */
 	public function Delete($id)
 	{
+		$this->LogFunction("Delete()");
 		ProductType::find($id)->delete();
 		return $this->Show();
 	}
