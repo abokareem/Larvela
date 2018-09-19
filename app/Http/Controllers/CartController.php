@@ -3,7 +3,7 @@
  * \class	CartController
  * \date	2016-09-05
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.0
+ * \version 1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -51,10 +51,10 @@ use App\Models\ProdImageMap;
 use App\Models\ProductLock;
 use App\Models\CustomerAddress;
 use App\Models\Image;
-use App\Models\Users;
+use App\Models\StoreSetting;
 
 
-
+use App\User;
 use App\Traits\Logger;
 
 
@@ -83,8 +83,8 @@ private $user;
 	{
 		$this->middleware('auth');
 		$this->setFileName("store");
+		$this->setClassName("CartController");
 		$this->LogStart();
-		$this->LogMsg("CLASS::CartController");
 	}
 
 
@@ -95,7 +95,6 @@ private $user;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS::CartController");
 		$this->LogEnd();
 	}
 
@@ -122,10 +121,11 @@ private $user;
 		$this->LogFunction("ShowCart()");
 
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		#
 		# The logged in user
 		#
-		$user = Users::find(Auth::user()->id);
+		$user = User::find(Auth::user()->id);
 		#
 		# The users customer data
 		#
@@ -254,6 +254,7 @@ private $user;
 		$theme_path = \Config::get('THEME_CART')."1-cart";
 		return view($theme_path,[
 			'store'=>$store,
+			'settings'=>$settings,
 			'cart'=>$cart,
 			'cart_data'=>$cart_data,
 			'user'=>$user,
@@ -287,7 +288,7 @@ private $user;
 	{
 		$this->LogFunction("ShowShipping()");
 
-		$Users = new Users;
+		$User = new User;
 
 		$Product = new Product;
 		$Image = new Image;
@@ -297,7 +298,7 @@ private $user;
 		#
 		# The logged in user
 		#
-		$user = Users::find(Auth::user()->id);
+		$user = User::find(Auth::user()->id);
 		#
 		# The users customer data
 		#
@@ -512,7 +513,7 @@ private $user;
 
 		$Customer = new Customer;
 
-		$user = Users::find(Auth::user()->id);
+		$user = User::find(Auth::user()->id);
 		$customer = Customer::where('customer_email', $user->email)->first();
 		$address = CustomerAddress::where('customer_cid', $customer->id)->first();
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
@@ -554,7 +555,7 @@ private $user;
 		$this->LogFunction("Confirm()");
 		$Product = new Product;
 		$Customer = new Customer;
-		$Users = new Users;
+		$User = new User;
 		$CustomerAddress = new CustomerAddress;
 
 		$THEME_CART = \Config::get('THEME_CART');
@@ -574,7 +575,7 @@ private $user;
 		
 		$customer = Customer::find($customer_id);
 		$address = CustomerAddress::where('customer_cid',$customer->id)->first();
-		$user = Users::where('email', $customer->customer_email)->first();
+		$user = User::where('email', $customer->customer_email)->first();
 		#
 		# Cart, cart items and cart data
 		#
@@ -881,6 +882,4 @@ private $user;
 		}
 		return Redirect::to("/cart");
 	}
-
-
 }
