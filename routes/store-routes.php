@@ -53,8 +53,11 @@ Route::get('/home','StoreFrontController@ShowStoreFront');
 Route::post('/home','StoreFrontController@ShowStoreFront');
 
 Route::post('/capture','StoreFrontController@CaptureForm');
-Route::post('/notify/outofstock','StoreFrontController@OutOfStockNotify');
 Route::post('/cart/getcartdata','StoreFrontController@GetCartData');
+#
+# 2018-09-18 Added new route
+#
+Route::post('/notify/outofstock','NotificationController@OutOfStockNotify');
 #
 # Routes for Pages
 #
@@ -81,10 +84,12 @@ Route::get('/contact','SupportController@contact');
 Route::get('/cart', 'CartController@ShowCart');
 Route::get('/cart/incqty/{cid}/{iid}','CartController@incCartQty');
 Route::get('/cart/decqty/{cid}/{iid}','CartController@decCartQty');
-Route::get('/cart/shipping','CartController@ShowShipping');
-Route::get('/cart/checkout','CartController@Checkout');
 Route::get('/signup', 'StoreController@ShowSignUpForm');
 #
+# 2018-09-19 Split from CartController
+#
+Route::get('/cart/shipping','CheckoutController@ShowShipping');
+Route::get('/cart/checkout','CheckoutController@Checkout');
 #
 #
 Route::post('/ajax/updatelocks/{id}','CartController@UpdateLocks');
