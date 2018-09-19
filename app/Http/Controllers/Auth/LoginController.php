@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
+use App\Models\StoreSetting;
+
 class LoginController extends Controller
 {
     /*
@@ -41,6 +43,7 @@ class LoginController extends Controller
 	public function showLoginForm()
 	{
 	    $store = app('store');
-		return view('auth.login',['store'=>$store]);
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		return view('auth.login',['store'=>$store,'settings'=>$settings]);
 	}
 }

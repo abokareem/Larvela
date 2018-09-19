@@ -3,7 +3,7 @@
  * \class	SupportController
  * \date	2017-08-30
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -37,7 +37,7 @@
  */
 namespace App\Http\Controllers;
 
-
+use App\Models\StoreSetting;
 use App\Traits\Logger;
 
 
@@ -94,7 +94,7 @@ use Logger;
 	{
 		$this->LogFunction("user_defined_page");
 		$store = app('store');
-
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$theme_name = \Config::get('THEME_NAME');
 		$path = resource_path("views/Themes/".$theme_name."/Support");
 		if(file_exists($path) && is_dir($path))
@@ -106,7 +106,7 @@ use Logger;
 			{
 				$blade_path = \Config::get('THEME_SUPPORT').$page_name;
 				$this->LogMsg("Fetching blade [".$blade_path."]");
-				return view($blade_path,['store'=>$store]);
+				return view($blade_path,['store'=>$store,'settings'=>$settings]);
 			}
 		}
 		else
@@ -122,13 +122,13 @@ use Logger;
 				{
 					$blade_path = "Themes.default.Support.".$page_name;
 					$this->LogMsg("Fetching blade [".$blade_path."]");
-					return view($blade_path,['store'=>$store]);
+					return view($blade_path,['store'=>$store,'settings'=>$settings]);
 				}
 			}
 		}
 		$blade_path = \Config::get('THEME_ERRORS')."no-route";
 		$this->LogMsg("Using default blade [".$blade_path."]");
-		return view($blade_path,['store'=>$store]);
+		return view($blade_path,['store'=>$store,'settings'=>$settings]);
 	}
 
 
@@ -139,8 +139,9 @@ use Logger;
 	public function about()
 	{
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$theme_path = \Config::get('THEME_SUPPORT').'about';
-		return view($theme_path,['store'=>$store]);
+		return view($theme_path,['store'=>$store,'settings'=>$settings]);
 	}
 
 
@@ -152,8 +153,9 @@ use Logger;
 	public function tandc()
 	{
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$theme_path = \Config::get('THEME_SUPPORT').'tandc';
-		return view($theme_path,['store'=>$store]);
+		return view($theme_path,['store'=>$store,'settings'=>$settings]);
 	}
 
 
@@ -165,8 +167,9 @@ use Logger;
 	public function support()
 	{
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$theme_path = \Config::get('THEME_SUPPORT').'support';
-		return view($theme_path,['store'=>$store]);
+		return view($theme_path,['store'=>$store,'settings'=>$settings]);
 	}
 
 
@@ -177,8 +180,9 @@ use Logger;
 	public function privacy()
 	{
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$theme_path = \Config::get('THEME_SUPPORT').'privacy';
-		return view($theme_path,['store'=>$store]);
+		return view($theme_path,['store'=>$store,'settings'=>$settings]);
 	}
 
 
@@ -189,7 +193,8 @@ use Logger;
 	public function contact()
 	{
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$theme_path = \Config::get('THEME_SUPPORT').'contact';
-		return view($theme_path,['store'=>$store]);
+		return view($theme_path,['store'=>$store,'settings'=>$settings]);
 	}
 }
