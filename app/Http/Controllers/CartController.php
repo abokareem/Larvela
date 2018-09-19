@@ -3,7 +3,7 @@
  * \class	CartController
  * \date	2016-09-05
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.1
+ * \version 1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -122,13 +122,7 @@ private $user;
 
 		$store = app('store');
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-		#
-		# The logged in user
-		#
 		$user = User::find(Auth::user()->id);
-		#
-		# The users customer data
-		#
 		$address = null;
 		$customer = Customer::where('customer_email',$user->email)->first();
 		if(!is_null($customer))
@@ -160,10 +154,7 @@ private $user;
 		# for any carts that dont have a matching cart_data row.
 		#
 		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
-		#
-		# uses Eloquent hasMany relationship to get cart_items with cart_id set to cart->id
-		#
-		$items = $cart->cartItems;
+		$items = $cart->items;
 
 		/*
 		 * map repeated products so qty value is correct.
@@ -294,6 +285,7 @@ private $user;
 		$Image = new Image;
 
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$free_shipping = 0;
 		#
 		# The logged in user
@@ -313,7 +305,7 @@ private $user;
 		#
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
 		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
-		$items = $cart->cartItems;
+		$items = $cart->items;
 
 		#$this->LogMsg("Cart Contents ".print_r($cart, true));
 		#$this->LogMsg("Cart ITEMS: ".print_r($items, true) );
@@ -469,6 +461,7 @@ private $user;
 			$this->LogMsg("View will be [".$theme_path."]");
 			return view($theme_path,[
 				'store'=>$store,
+				'settings'=>$settings,
 				'cart'=>$cart,
 				'cart_data'=>$cart_data,
 				'items'=>$items,
@@ -484,6 +477,7 @@ private $user;
 			$this->LogMsg("View will be [".$theme_path."]");
 			return view($theme_path,[
 				'store'=>$store,
+				'settings'=>$settings,
 				'cart'=>$cart,
 				'cart_data'=>$cart_data,
 				'items'=>$items,
@@ -511,7 +505,8 @@ private $user;
 	{
 		$this->LogFunction("CartTimeoutError()");
 
-		$Customer = new Customer;
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 
 		$user = User::find(Auth::user()->id);
 		$customer = Customer::where('customer_email', $user->email)->first();
@@ -520,9 +515,9 @@ private $user;
 		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
 
 		$theme_path = \Config::get('THEME_ERRORS')."cart-timeout";
-		$store = app('store');
 		return view($theme_path,[
 			'store'=>$store,
+			'settings'=>$settings,
 			'cart'=>$cart,
 			'cart_data'=>$cart_data,
 			'user'=>$user,
@@ -562,6 +557,7 @@ private $user;
 		$THEME_ERRORS = \Config::get('THEME_ERRORS');
 
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$this->LogMsg("Get Form Data.");
 		$form = \Input::all();
 
@@ -581,7 +577,7 @@ private $user;
 		#
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
 		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
-		$items = $cart->cartItems;
+		$items = $cart->items;
 		#
 		# Build an array of products so we can pass descriptions to the required payment method if needed.
 		#
@@ -666,6 +662,7 @@ private $user;
 
 		return view($theme_path,[
 			'store'=>$store,
+			'setttings'=>$settings,
 			'cart'=>$cart,
 			'cart_data'=>$cart_data,
 			'items'=>$items,
@@ -739,7 +736,7 @@ private $user;
 			$cart->user_id=Auth::user()->id;
 			$cart->save();
 		}
-		$items = $cart->cartItems;	# uses Eloquent hasMany relationship to get cart_items with cart_id set to cart->id
+		$items = $cart->items;	# uses Eloquent hasMany relationship to get cart_items with cart_id set to cart->id
 		$this->LogMsg("Qty to save is [".$qty."]");
 
 		foreach($items as $item)
@@ -778,7 +775,7 @@ private $user;
 		$this->LogFunction("removeItem()");
 
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
-		$items = $cart->cartItems;
+		$items = $cart->items;
 		foreach($items as $item)
 		{
 			if($id == $item->product_id)
@@ -806,7 +803,7 @@ private $user;
 		if($cid == $cart->id)
 		{
 			$this->LogMsg("cart id [".$cid."]");
-			$items = $cart->cartItems;
+			$items = $cart->items;
 			$this->LogMsg("cart has [".sizeof($items)."] items");
 			$cartqty=0;
 			foreach($items as $item)
@@ -856,7 +853,7 @@ private $user;
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
 		if($cid == $cart->id)
 		{
-			$items = $cart->cartItems;
+			$items = $cart->items;
 			foreach($items as $item)
 			{
 				if($iid == $item->id)
