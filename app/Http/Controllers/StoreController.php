@@ -3,7 +3,7 @@
  * \class	StoreController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-09-15
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,6 +42,7 @@ use App\Http\Requests\StoreRequest;
 use App\Services\StoreService;
 
 use App\Models\Store;
+use App\Models\StoreSetting;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 use App\Models\CustSource;
@@ -105,13 +106,14 @@ use Logger;
 		$address->customer_country = "AU";
 
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$user = Auth::user();
 		if (Auth::check())
 		{
 			$source = CustSource::where('cs_name',"WEBSTORE")->first();
 			$customer = Customer::where('customer_email', $user->email)->first();
 
-			$this->LogMsg("Customer Data [".print_r($customer,true)."]");
+	#		$this->LogMsg("Customer Data [".print_r($customer,true)."]");
 			if(sizeof($customer)==0)
 			{
 				$this->LogMsg("No Customer Data! - create a new customer");
@@ -124,7 +126,7 @@ use Logger;
 				$o->customer_store_id = $store->id;
 				$o->save();
 				$customer = Customer::where('customer_email', $user->email)->first();
-				$this->LogMsg("Customer Data [".print_r($customer,true)."]");
+		#		$this->LogMsg("Customer Data [".print_r($customer,true)."]");
 				$this->LogMsg("Insert a blank address");
 				#
 				# {FIX_2018-07-23} - Added customer address using Eloquent.
@@ -137,7 +139,7 @@ use Logger;
 				$ca->save();
 
 				$address = CustomerAddress::where('customer_cid',$customer->id)->first();
-				$this->LogMsg("Fetch Address Data [".print_r($address,true)."]");
+		#		$this->LogMsg("Fetch Address Data [".print_r($address,true)."]");
 
 			}
 			else
@@ -164,10 +166,12 @@ use Logger;
 
 			$theme_path = \Config::get('THEME_CART')."myaccount";
 			return view($theme_path,[
+				'store'=>$store,
+				'settings'=>$settings,
 				'user'=>$user,
 				'customer'=>$customer,
-				'address'=>$address,
-				'store'=>$store]);
+				'address'=>$address
+				]);
 		}
 		return view('auth.login');
 	}
@@ -184,53 +188,8 @@ use Logger;
 		$this->LogFunction("ShowSignUpForm()");
 		return view('auth.register',['store'=>$store]);
 	}
-
-
-
-
-
-
-
-	/**
-	 * Create Theme Directory given the store code, return false on failure.
-	 *
-	 * Possible obsolete now
-	 *
-	 *
-	 * @param	string	$store_code
-	 * @return	boolean
-	 */
-	protected function CreateThemeDir($store_code)
-	{
-		return true;
-
-		#
-		# 2017-08-29 - DISABLED, THEMES NOW IMPLEMENTED
-		#
-		$paths_to_create = array();
-		$path = resource_path('views')."/Themes/".$store_code;
-		array_push($paths_to_create, $path);
-		$path = resource_path('views')."/Themes/".$store_code."/Monthly";
-		array_push($paths_to_create, $path);
-		$path = resource_path('views')."/Themes/".$store_code."/Monthly/01";
-		array_push($paths_to_create, $path);
-		$path = resource_path('views')."/Themes/".$store_code."/Monthly/12";
-		array_push($paths_to_create, $path);
-
-		foreach($paths_to_create as $path)
-		{
-			$this->LogMsg("Path [".$path."]");
-			if(!file_exists($path))
-			{
-				$this->LogMsg("Create Path!");
-				try { mkdir($path,0775,true); }
-				catch(Exception $e)
-				{
-					$this->LogError("Failed to create Path [".$finalpath."]");
-					return false;
-				}
-			}
-		}
-		return true;
-	}
 }
+
+
+
+
