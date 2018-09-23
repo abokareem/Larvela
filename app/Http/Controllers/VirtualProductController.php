@@ -1,12 +1,31 @@
 <?php
 /**
  * \class	VirtualProductController
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2018-04-03
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2018-04-03
+ * \version	1.0.1
  *
  *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
- * [CC]
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 namespace App\Http\Controllers;
 
@@ -18,6 +37,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Support\Facades\Mail;
 
 
 use App\Helpers\StoreHelper;
@@ -68,8 +88,8 @@ use ProductImageHandling;
 	public function __construct()
 	{
 		$this->setFileName("store-admin");
+		$this->setClassName("BasicProductController");
 		$this->LogStart();
-		$this->LogMsg("CLASS:BasicProductController");
 	}
 	
 	/**
@@ -79,216 +99,52 @@ use ProductImageHandling;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS:BasicProductController");
 		$this->LogEnd();
 	}
 
 
 
-
-
 	/**
-	 * Return an administration view listing the selected products.
-	 *
-	 * GET ROUTE: /admin/products
-	 *
-	 * @pre		none
-	 * @post	none
-	 *
-	 * @param	Request	$request
-	 * @return	mixed
-	 */
-	public function ShowProductsPage(Request $request)
-	{
-		$this->LogFunction("ShowProductsPage()");
-
-		#
-		# {FIX_2017-10-26} ShowProductsPage() - Converted to app('store')
-		#
-		$store = app('store');
-		$stores = Store::all();
-		$categories = Category::all();
-		$store_id = $store->id;
-		$category_id = 0;
-		$this->LogMsg("Default store ID [".$store->id."]");
-		$query = $request->input();
-		foreach($query as $n=>$v)
-		{
-			if(is_string($n)== true)
-			{
-				if(is_string($v)== true)
-				{
-					$this->LogMsg("Checking query N= $n while V= $v");
-					if($n=="s") $store_id = $v;
-					if($n=="c") $category_id = $v;
-				}
-			}
-		}
-		$this->LogMsg("Required store ID [".$store_id."]");
-		$this->LogMsg("Required Category ID [".$category_id."]");
-
-		$products = array();
-		#
-		# Get all products in the matching category
-		#
-		if(($store_id > 0)&&($category_id>0))
-		{
-			$this->LogMsg("Processing for Store/Category [".$store_id."/".$category_id."]");
-			$products_in_category = CategoryProduct::where('category_id', $category_id )->get();
-			foreach($products_in_category as $pic)
-			{
-				array_push($products, Product::find($pic->product_id) );
-			}
-		}
-		elseif($store_id > 0)
-		{
-			$this->LogMsg("Processing for Store Only [".$store_id."/".$category_id."]");
-			#
-			# {FIX_2018-02-25} Disabled code that gets all products for all categories for store.
-			# get all products in all categories for the selected store
-			#
-#			$store_categories = Category::where('category_store_id',$store_id)->get();
-#			$this->LogMsg("   There are [".count($store_categories)."] categories");
-#			foreach($store_categories as $sc)
-#			{
-#				$products_in_category = CategoryProduct::where('category_id', $sc->id )->get();
-#				$this->LogMsg("   Category [".$sc->id."]  Number of Products [".count($products_in_category)."]");
-#				foreach($products_in_category as $pic)
-#				{
-#					array_push($products, Product::find($pic->product_id) );
-#				}
-#			}
-			#
-			# {FIX_2018-02-25} Converted to first category to reduce number of products show
-			#
-			$first_category = Category::where('category_store_id',$store_id)
-				->where('category_status',"A")
-				->first();
-			$products_in_category = CategoryProduct::where('category_id', $first_category->id )->get();
-			foreach($products_in_category as $pic)
-			{
-				array_push($products, Product::find($pic->product_id) );
-			}
-		}
-		else
-		{
-			$this->LogMsg("Processing for All Products [".$store_id."/".$category_id."]");
-			#
-			# Just get ALL products
-			#
-			$products = Product::where('prod_status',"A")->get();
-		}
-		return view('Admin.Products.products',[
-			'store_id'=>$store_id,
-			'category_id'=>$category_id,
-			'store'=>$store,
-			'stores'=>$stores,
-			'categories'=>$categories,
-			'products'=>$products
-			]);
-	}
-
-
-
-	/**
-	 * Present a new page which allows SKU entry, then post back.
-	 *
-	 * {FIX_2017-10-24} Refactored product fetch using eloquent call in ShowCopyProductPage()
-	 *
-	 * GET ROUTE: /admin/product/copy/{id}
-	 *
-	 * @param	integer	$id		Product to copy
-	 * @return	mixed
-	 */
-	public function ShowCopyProductPage($id)
-	{
-		$this->LogFunction("ShowCopyProductPage()");
-		$product = Product::find($id);
-		return view('Admin.Products.copy',['product'=>$product]);
-	}
-
-
-
-	/**
-	 * Using the new SKU, read the existing product using the ID, insert a new product with the new SKU.
-	 * Dont copy the images.
-	 * Dont match the categories.
-	 *
-	 * POST ROUTE: /admin/product/copy/{id}
-	 *
-	 * @param	integer	$id		Product to use as a tempalte to copy from.
-	 * @return	mixed
-	 */
-	public function CopyProductPage(Request $request, $id)
-	{
-		$this->LogFunction("CopyProductPage()");
-		$this->LogMsg("Source Product ID [".$id."]");
-
-		$base_product = Product::find($id);
-		$duplicate_count  = Product::where('prod_sku',$request['prod_sku'])->count();
-		if($duplicate_count == 0)
-		{
-			$base_product['prod_sku'] = $request['prod_sku'];
-			$prod_categories = CategoryProduct::where('product_id',$id)->get();
-			foreach($prod_categories as $pc)
-			{
-				$this->LogMsg("Product is assigned to category [".$pc->category_id."]");
-			}
-
-			$data = $base_product->toArray();
-			$this->LogMsg("New Product".print_r($data, true));
-			$new_pid = ProductService::insertArray($data);
-			$this->LogMsg("Product [".$id."] copied, new Product ID [".$new_pid."]");
-			$saved_categories = array();
-			$this->LogMsg("Checking for duplicates?");
-			foreach($prod_categories as $pc)
-			{
-				if(!in_array($pc->category_id, $saved_categories))
-				{
-					$this->LogMsg("Insert Cat [".$pc->category_id."]   Prod [".$new_pid."]");
-					$o = new CategoryProduct;
-					$o->category_id = $pc->category_id;
-					$o->product_id  = $new_pid;
-					$o->save();
-					array_push($saved_categories, $pc->category_id);
-				}
-				else
-				{
-					$this->LogMsg("Duplicate category found [".$pc->category_id."]");
-				}
-			}
-		}
-		else
-		{
-			\Session::flash('flash_error','ERROR - Product SKU alreay in Database!');
-		}
-		return Redirect::to("/admin/products");
-	}
-
-
-
-
-
-	/**
-	 * Given the ID of a product remove it totally from the server.
+	 * Given the ID of a Virtual Product remove it totally from the server.
 	 * use a form because only admin can get the form and the ID
 	 * must be encoded in the form and the call must be authenticated as an admin user.
 	 *
 	 * @param	integer	$id		Product to delete
 	 * @return	mixed
 	 */
-	public function DeleteProduct(Request $request, $id )
+	public function Delete(Request $request, $id )
 	{
-		$this->LogFunction("DeleteProduct(".$id.")");
+		$this->LogFunction("Delete()");
+		$this->LogMsg("Delete Virtual Product [".$id."]");
 
 		$form = Input::all();
 		if(array_key_exists('id',$form))
 		{
 			if($id == $form['id'])
 			{
+				$product = Product::find($id);
 				$this->LogMsg("Dispatch Job.");
 				$cmd = new DeleteProductJob($id);
 				$this->dispatch($cmd);
+				#
+				# Delete Virtual product files and downloadable content.
+				#
+				$type = ProductType::find($product->prod_type);
+				switch($type->product_type_token)
+				{
+					case "VUNLIMITED":
+					#
+					# @todo Add code to support removing any files.
+					#
+						$this->LogMsg("Cleanup files for UNLIMITED product.");
+						break;
+					case "VLIMITED":
+					#
+					# @todo Add code to support removing any files.
+					#
+						$this->LogMsg("Cleanup files for LIMITED product.");
+						break;
+				}
 			}
 			else
 			{
@@ -463,24 +319,6 @@ use ProductImageHandling;
 
 
 
-	/**
-	 * POST ROUTE: /admin/prodimage/update/{id}
-	 *
-	 * ToDo
-	 * @pre none
-	 * @post none
-	 * @param $id int row id of product
-	 * @return void
-	 */
-	public function SaveProdImages($id)
-	{
-		#
-		# @tod Add code to save the image etc
-		#
-		$this->LogFunction("SaveProdImages(".$id.")");
-	}
-
-
 
 	/**
 	 * Render a view edit page, first collect the existing data and
@@ -497,9 +335,9 @@ use ProductImageHandling;
 
 		$product = Product::find($id);
 		$store = app('store');
-		$stores = Store::all();
+		$stores = Store::where('store_status','A')->get();
 		$categories = Category::all();
-		$product_types = ProductType::all();
+		$product_types = ProductType::get();
 
 		$imagemap = ProdImageMap::where('product_id',$id)->get();
 		$prod_categories = CategoryProduct::where('product_id',$id)->get();
@@ -563,9 +401,9 @@ use ProductImageHandling;
 	 * @param $id int row id to be checked against before insert
 	 * @return mixed - view object
 	 */
-	public function UpdateProduct(ProductRequest $request, $id)
+	public function Update(ProductRequest $request, $id)
 	{
-		$this->LogFunction("UpdateProduct(".$id.")");
+		$this->LogFunction("Update(".$id.")");
 
 		CategoryProduct::where('product_id',$id)->delete();
 		$categories = $request->category;	/* array of category id's */
@@ -633,9 +471,11 @@ use ProductImageHandling;
 	 * @param $request mixed Validation request object
 	 * @return mixed - view object
 	 */
-	public function SaveNewProduct(ProductRequest $request)
+	public function Save(ProductRequest $request)
 	{
-		$this->LogFunction("SaveNewProduct()");
+		$this->LogFunction("Save()");
+
+dd($request);
 
 		$pid=0;
 		$categories = $request->categories;	/* array of category id's */
@@ -684,171 +524,8 @@ use ProductImageHandling;
 
 
 
-	/**
-	 * Create the path needed to store product images and return the full filesystem path to place file.
-	 *
-	 * @pre		none
-	 * @post	creates directory structure as needed
-	 *
-	 * @param	integer	$id - the product ID
-	 * @return	string 
-	 */
-	protected function getStoragePath( $id )
-	{
-		$this->LogFunction("getStoragePath(".$id.")");
-		$path="";
-		$length = strlen($id);
-		$id = "".$id."";
-		for($i=0 ; $i < $length ; $i++)
-		{
-			$path.="/".$id[$i];
-		}
-		$finalpath = public_path()."/media".$path;
-		if(is_dir($finalpath))
-		{
-			$this->LogMsg("PATH [".$finalpath."]");
-			return $finalpath;
-		}
-		else
-		{	
-			$this->LogMsg("Create Path [".$finalpath."]");
-			try { mkdir($finalpath,0775,true); }
-			catch(Exception $e)
-			{
-				$this->LogError("Failed to create Path [".$finalpath."]");
-			}
-		}
-		$this->LogMsg("PATH [".$finalpath."]");
-		return $finalpath;
-	}
-
-
-
-	/**
-	 * Create the subpath needed to store product images and return a partial filesystem path.
-	 *
-	 * @pre none
-	 * @post none
-	 *
-	 * @param	integer	$id - the product ID
-	 * @return	string
-	 */
-	protected function getStorageSubPath($id)
-	{
-		$this->LogFunction("getStorageSubPath(".$id.")");
-
-		$path="media";
-		$length = strlen($id);
-		$id = "".$id."";
-		for($i=0 ; $i < $length ; $i++)
-		{
-			$path.="/".$id[$i];
-		}
-		$this->LogMsg("PATH [".$path."]");
-		return $path;
-	}
-
-
-
-
-
-
-	/**
-	 * Display the product attributes
-	 *
-	 *
-	 * @return	mixed
-	 */
-	public function ShowAttributesPage()
-	{
-		$stores = Store::all();
-		$store_names = array();
-		$store_names[0]='All Stores';
-		$html = "<select class='form-control' id='store_id' name='store_id'>";
-		$html .= "<option value='0'>Global - All Stores</option>";
-		foreach($stores as $store)
-		{
-			$store_names[$store->id] = $store->store_name;
-			$html .= "<option value='".$store->id."'>".$store->store_name."</option>";
-		}
-		$html .="</select>";
-		$attributes = Attribute::all();
-
-		return view('Admin.Attributes.showattributes',[
-			'attributes'=>$attributes,
-			'stores'=>$store_names,
-			'store_select_list'=>$html
-			]);
-	}
-
-
-	/**
-	 *------------------------------------------------------------
-	 *
-	 *                        DEVELOPMENT
-	 *
-	 *------------------------------------------------------------
-	 *
-	 * Return parent product details
-	 *
-	 * GET ROUTE: /pp?PID=nnnnn
-	 *
-	 * @return	void
-	 */
-	public function BulkUpdate()
-	{
-		$this->LogFunction("BulkUpdate()");
-
-		$Product = new Product;
-		$products = Product::where('prod_sku','like',"PP-")->get();
-		return view("Admin.Products.bulkupdate",['products'=>$products]);
-	}
-
-
-
-
-	/**
-	 *------------------------------------------------------------
-	 *
-	 *                        DEVELOPMENT
-	 *
-	 *------------------------------------------------------------
-	 *
-	 * Return parent product details
-	 *
-	 * GET ROUTE: /pp?PID=nnnnn
-	 *
-	 * @return	void
-	 */
-	public function DebugParentProducts(Request $request)
-	{
-		$this->LogFunction("DebugParentProducts()");
-
-		$Product = new Product;
-		$query = $request->input();
-		$pid = 0;
-		foreach($query as $n=>$v)
-		{
-			if(is_string($n)== true)
-			{
-				if(is_string($v)== true)
-				{
-					if($n=="PID") $pid = $v;
-				}
-			}
-		}
-		if($pid>0)
-		{
-			$Product->getChildProducts($pid);
-		}
-		else
-			echo "ERROR - no product set";
-	}
-
-
-
-
-
-
-
 }
+
+
+
+

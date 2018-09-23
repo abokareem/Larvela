@@ -3,7 +3,7 @@
  * \class	ProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -40,6 +40,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 
 use App\Helpers\StoreHelper;
 use App\Services\ProductService;
+use App\Services\ProductFactory;
 
 
 use App\Jobs\DeleteImageJob;
@@ -81,8 +82,8 @@ use Logger;
 	public function __construct()
 	{
 		$this->setFileName("store-admin");
+		$this->setClassName("ProductController");
 		$this->LogStart();
-		$this->LogMsg("CLASS:ProductController");
 	}
 	
 	/**
@@ -92,7 +93,6 @@ use Logger;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS:ProductController");
 		$this->LogEnd();
 	}
 
@@ -204,7 +204,7 @@ use Logger;
 
 
 	/**
-	 *
+	 * When adding a new product, route to the correct Product Creation page.
 	 *
 	 * POST ROUTE: /admin/select/type/{id}
 	 *
@@ -311,4 +311,126 @@ use Logger;
 		}
 		return Redirect::to("/admin/products");
 	}
+
+
+
+	/**
+	 * new Save method, create prouct controller from factory.
+	 *
+	 *
+	 *
+	 * @return	void
+	 */
+	public function Save(ProductRequest $request)
+	{
+		$this->LogFunction("Save()");
+
+		$store = app('store');
+		$store_id = $store->id;
+		$category_id = 0;
+		$query = $request->input();
+		foreach($query as $n=>$v)
+		{
+			if(is_string($n)== true)
+			{
+				if(is_string($v)== true)
+				{
+					$this->LogMsg("Checking query N= $n while V= $v");
+					if($n=="s") $store_id = $v;
+					if($n=="c") $category_id = $v;
+				}
+			}
+		}
+		$this->LogMsg("Required store ID [".$store_id."]");
+		$this->LogMsg("Required Category ID [".$category_id."]");
+
+		$form = Input::all();
+		$type = $form['prod_type'];
+		$this->LogMsg("Build Product Factory");
+		$controller = ProductFactory::build($type);
+		$controller->Save($request);
+	}
+
+
+
+	/**
+	 * New Update method, create prouct controller from factory.
+	 *
+	 *
+	 * @param	App\Http\Requests\ProductRequest	$request
+	 * @param	integer	$id
+	 * @return	void
+	 */
+	public function Update(ProductRequest $request, $id)
+	{
+		$this->LogFunction("Update()");
+
+		$store = app('store');
+		$store_id = $store->id;
+		$category_id = 0;
+		$query = $request->input();
+		foreach($query as $n=>$v)
+		{
+			if(is_string($n)== true)
+			{
+				if(is_string($v)== true)
+				{
+					$this->LogMsg("Checking query N= $n while V= $v");
+					if($n=="s") $store_id = $v;
+					if($n=="c") $category_id = $v;
+				}
+			}
+		}
+		$this->LogMsg("Required store ID [".$store_id."]");
+		$this->LogMsg("Required Category ID [".$category_id."]");
+
+		$form = Input::all();
+		$type = $form['prod_type'];
+		$this->LogMsg("Build Product Factory");
+		$controller = ProductFactory::build($type);
+		$controller->Update($request, $id);
+		return $this->ShowProductsPage($request);
+	}
+
+
+
+
+	/**
+	 * New Delete method, delete product using factory.
+	 *
+	 * @param	App\Http\Requests\ProductRequest	$request
+	 * @param	integer	$id
+	 * @return	void
+	 */
+	public function Delete(ProductRequest $request, $id)
+	{
+		$this->LogFunction("Delete()");
+
+		$store = app('store');
+		$store_id = $store->id;
+		$category_id = 0;
+		$query = $request->input();
+		foreach($query as $n=>$v)
+		{
+			if(is_string($n)== true)
+			{
+				if(is_string($v)== true)
+				{
+					$this->LogMsg("Checking query N= $n while V= $v");
+					if($n=="s") $store_id = $v;
+					if($n=="c") $category_id = $v;
+				}
+			}
+		}
+		$this->LogMsg("Required store ID [".$store_id."]");
+		$this->LogMsg("Required Category ID [".$category_id."]");
+
+		$form = Input::all();
+		$type = $form['prod_type'];
+		$this->LogMsg("Build Product Factory");
+		$controller = ProductFactory::build($type);
+		$controller->Delete($request, $id);
+		return $this->ShowProductsPage($request);
+	}
+
 }

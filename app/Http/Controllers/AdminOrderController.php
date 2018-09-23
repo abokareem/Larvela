@@ -35,6 +35,7 @@ use Redirect;
 use Input;
 use Auth;
 use Session;
+use Illuminate\Support\Facades\Mail;
 
 use PDF;
 
@@ -69,7 +70,7 @@ use App\Models\CartItem;
 use App\Models\CartData;
 use App\Models\OrderItem;
 
-use App\Models\Users;
+use App\Models\User;
 use App\Models\CustomerAddress;
 
 

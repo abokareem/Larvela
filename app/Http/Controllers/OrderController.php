@@ -3,14 +3,35 @@
  * \class	OrderController
  * \author	Sid Young <sid@off-grif-engineering.com>
  * \date	2017-01-10
+ * \version	1.0.1
  *
- * 2017-10-07 Added PDF support for shop invoices.
- * 2017-10-13 Added PDF support for packing slips.
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
  *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @tod - Need to move payment related code to factories and move admin order code
+ * to elsewhere.
  */
 namespace App\Http\Controllers;
 
+
+use Illuminate\Support\Facades\Mail;
 use Request;
 use App\Http\Requests;
 use Redirect;
@@ -51,7 +72,7 @@ use App\Models\CartItem;
 use App\Models\CartData;
 use App\Models\OrderItem;
 
-use App\Models\Users;
+use App\Models\User;
 use App\Models\CustomerAddress;
 
 
@@ -62,7 +83,9 @@ use App\Traits\Logger;
  * \brief Order controller handles instant, cart and delayed order creation.
  * Also has admin order page code.
  * 
- * 2017-09-21 Added order source, options include PAGE,CART, API, MANUAL etc
+ * {INFO_2017-09-21} - OrderController - Added order source, options include PAGE,CART, API, MANUAL etc
+ * {INFO_2017-10-07} - OrderController - Added PDF support for shop invoices.
+ * {INFO_2017-10-13} - OrderController - Added PDF support for packing slips.
  * 
  * 
  */
@@ -79,8 +102,8 @@ use Logger;
 	public function __construct()
 	{
 		$this->setFileName("orders");
+		$this->setClassName("CLASS:OrderController");
 		$this->LogStart();
-		$this->LogMsg("CLASS:OrderController");
 	}
 
 
@@ -91,7 +114,6 @@ use Logger;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS:OrderController");
 		$this->LogEnd();
 	}
 
@@ -124,6 +146,8 @@ use Logger;
 
 		$customer_id = 0;
 		$order_id = 0;
+		$part1 = "";
+		$part2 = "";
 		if(Request::ajax())
 		{
 			$data = null;
@@ -270,6 +294,8 @@ use Logger;
 		$source = CustSource::where('cs_name', "WEBSTORE")->first();
 		$customer_id = 0;
 		$order_id = 0;
+		$part2 = "";
+		$part1 = "";
 		if(Request::ajax())
 		{
 			$data = null;
@@ -388,19 +414,19 @@ use Logger;
 		$this->LogFunction("DelayedPurchase()");
 
 		$store = app('store');
-		$user = Users::find(Auth::user()->id);
+		$user = User::find(Auth::user()->id);
 		$customer = Customer::where('customer_email', $user->email)->first();
 		$this->LogMsg("Using existing customer: [".print_r($customer,true)."]");
 
 		$payment_ref = "unknown";
 
 		$cart = Cart::find($id);
-		$count = CartData::where('cd_cart_id',$cart->id)->count();
-		if($count == 0)
 		$cart_data = new CartData();
-		else
-		$cart_data = CartData::where('cd_cart_id',$cart->id)->first();
-
+		$count = CartData::where('cd_cart_id',$cart->id)->count();
+		if($count > 0)
+		{
+			$cart_data = CartData::where('cd_cart_id',$cart->id)->first();
+		}
 		$order = new Order;
 		$order->order_cart_id = $id;
 		$order->order_ref = $payment_ref;
@@ -512,8 +538,7 @@ use Logger;
 		$orders = array();
 		foreach($current_orders as $o)
 		{
-			$customer = Customer::where('id',$o->order_cid)->first();
-
+			$customer = Customer::find($o->order_cid);
 			$order_items = OrderItem::where('order_item_oid',$o->id)->get();
 			$order_value = 0;
 			if(is_null($o->order_value))
@@ -543,7 +568,6 @@ use Logger;
 			$order->order_time = $o->order_time;
 			array_push($orders, $order);
 		}
-
 
 		$cancelled = Order::where('order_status','C')
 			->whereBetween('order_date', array($last_month, $today))
@@ -621,7 +645,7 @@ use Logger;
 		$this->LogFunction("BackOrderAnItem()");
 		$this->LogMsg("Item ID [".$id."]");
 
-		$order_item = OrderItem::where('id',$id)->first();
+		$order_item = OrderItem::find($id);
 		$qty_purchased = $order_item->order_item_qty_purchased;
 		$qty_supplied = $order_item->order_item_qty_supplied;
 		$order_item->order_item_qty_backordered = $qty_purchased-$qty_supplied;
@@ -631,98 +655,6 @@ use Logger;
 
 
 
-
-	/**
-	 *============================================================
-	 *
-	 *                       TESTING
-	 *
-	 *============================================================
-	 *
-	 * Selected order has been marked by admin user as dispatched.
-	 * - Update the DB record for the items supplied and backorder
-	 * - Verify items supplied and mark as dispatched
-	 * - if all supplied, mark order as dispatched and dispatch jobs
-	 *
-	 * POST ROUTE: /admin/order/dispatch/{order_id}
-	 *
-	 * @param	integer	$id	The order id
-	 * @return	mixed
-	 */
-	public function OrderDispatched($id)
-	{
-		$this->LogFunction("OrderDispatched()");
-		$this->LogMsg("Order ID [".$id."]");
-
-		$form = Input::all();
-		foreach($form as $k=>$v)
-		{
-			$supplied_qty = 0;
-			$backorder_qty = 0;
-			if($k=="_token") continue;
-			$parts = explode("-",$k);
-			if(sizeof($parts) == 2)
-			{
-				$order_item = OrderItem::where('id',$parts[1])->first();
-				switch($parts[0])
-				{
-					case "su":
-						$order_item->order_item_qty_supplied = $v;
-						$order_item->save();
-						break;
-					case "bo":
-						$order_item->order_item_qty_backorder = $v;
-						$order_item->save();
-						break;
-				}
-			}
-		}
-
-		$store = app('store');
-		$order = Order::where('id',$id)->first();
-		$customer = Customer::where('id',$order->order_cid)->first();
-		$order_items = OrderItem::where('order_item_oid',$order->id)->get();
-		$item_count = sizeof($order_items);
-		#
-		# Check each order item, if supplied == ordered then mark as dispatch
-		#
-		$items_dispatched = 0;
-		$this->LogMsg("Order has ".$item_count." item(s).");
-		foreach($order_items as $oi)
-		{
-			$this->LogMsg("Checking item [".$oi->id."]");
-			if($oi->order_item_qty_purchased == $oi->order_item_qty_supplied)
-			{
-				$this->LogMsg("Setting item [".$oi->id."] to status D");
-				$oi->order_item_dispatch_status = "D";
-				$items_dispatched++;
-				$oi->save();
-			}
-			else
-			{
-				$this->LogMsg("Skipping item [".$oi->id."] supplied(".$oi->order_item_qty_supplied.") != ordered(".$oi->order_item_qty_purchased.").");
-			}
-			$this->LogMsg("Processed ".$items_dispatched." of ".$item_count." items.");
-		}
-		if($items_dispatched == $item_count)
-		{
-			$this->LogMsg("Marking order [".$order->id."] as DISPATCHED.");
-			$order->order_dispatch_status = "D";
-			$order->order_status = "C";
-			$order->order_dispatch_date = date("Y-m-d");
-			$order->order_dispatch_time = date("H:i:s");
-			$order->save();
-			dispatch(new OrderCompleted($store, $customer->customer_email, $order));
-			Mail::to($customer->customer_email)->send(new OrderCompletedEmail($store, $customer->customer_email, $order));
-		}
-		$this->LogMsg("Dispatch Job -> OrderDispatched()");
-		dispatch(new OrderDispatched($store, $customer->customer_email, $order));
-
-		$this->LogMsg("Send email using OrderDispatchedEmail");
-		Mail::to($customer->customer_email)->send(new OrderDispatchedEmail($store, $customer->customer_email, $order));
-
-		return $this->ShowCurrentOrders();
-	}
 
 
 
@@ -745,16 +677,16 @@ use Logger;
 
 		$store = app('store');
 		$shipping_product = null;
-		$order = Order::where('id',$id)->first();
+		$order = Order::find($id);
 		if(!is_null($order->order_shipping_method))
 		{
 			if( $order->order_shipping_method >0 )
 			{
-				$shipping_product = Product::where('id', $order->order_shipping_method)->first();
+				$shipping_product = Product::find($order->order_shipping_method);
 			}
 		}
 		$order_items = OrderItem::where('order_item_oid',$id)->get();
-		$customer = Customer::where('id',$order->order_cid)->first();
+		$customer = Customer::find($order->order_cid);
 		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
 		$pdf = \PDF::loadView('Admin.Orders.pdf-packingslip',[
 			'order'=>$order,
@@ -790,7 +722,7 @@ use Logger;
 		$this->LogMsg("Order ID [".$id."]");
 
 		$shipping_product = null;
-		$order = Order::where('id',$id)->first();
+		$order = Order::find($id);
 		if(!is_null($order->order_shipping_method))
 		{
 			if( $order->order_shipping_method >0 )
@@ -800,7 +732,7 @@ use Logger;
 		}
 		$order_items = OrderItem::where('order_item_oid',$id)->get();
 
-		$customer = Customer::where('id',$order->order_cid)->first();
+		$customer = Customer::find($order->order_cid);
 		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
 		$pdf = \PDF::loadView('Admin.Orders.pdf-showorder',[
 			'order'=>$order,
@@ -953,7 +885,7 @@ use Logger;
 			$this->LogMsg("There are [".$item_count."] row items for Cart [".$cart_id."]");
 			foreach($product_locks as $p)
 			{
-				$product = Product::where('id', $p->product_lock_pid)->first();
+				$product = Product::find($p->product_lock_pid);
 				if($product->prod_qty == 0)
 				{
 					$this->LogMsg("Out of stock product [".$p->product_lock_pid."]");
@@ -978,143 +910,5 @@ use Logger;
 		}
 		$this->LogMsg("Product Lock table entries are gone!");
 		return 0;
-	}
-
-
-
-/*
-MariaDB [rdstore]> desc orders;
-+-----------------------+------------------+------+-----+------------+----------------+
-| Field                 | Type             | Null | Key | Default    | Extra          |
-+-----------------------+------------------+------+-----+------------+----------------+
-| id                    | int(10) unsigned | NO   | PRI | NULL       | auto_increment |
-| order_ref             | varchar(128)     | YES  |     | NULL       |                |
-| order_src             | varchar(8)       | YES  |     | NULL       |                |
-| order_cart_id         | int(10) unsigned | NO   | MUL | NULL       |                |
-| order_cid             | int(10) unsigned | NO   | MUL | NULL       |                |
-| order_status          | char(2)          | NO   |     | W          |                |
-| order_shipping_method | varchar(32)      | YES  |     | NULL       |                |
-| order_shipping_value  | decimal(13,2)    | YES  |     | NULL       |                |
-| order_value           | decimal(13,2)    | YES  |     | NULL       |                |
-| order_payment_status  | char(1)          | NO   |     | W          |                |
-| order_dispatch_status | char(1)          | NO   |     | W          |                |
-| order_date            | date             | NO   |     | 0000-00-00 |                |
-| order_time            | time             | NO   |     | 00:00:00   |                |
-+-----------------------+------------------+------+-----+------------+----------------+
-13 rows in set (0.00 sec)
-*/
-
-	/**
-	 * Mark the order as paid
-	 *
-	 * GET ROUTE: /admin/order/update/paid/{id}
-	 *
-	 * @param	integer	$id		Order ID
-	 * @return	void
-	 */
-	public function MarkOrderPaid($id)
-	{
-		$this->LogFunction("MarkOrderPaid()");
-		$this->LogMsg("Order ID [".$id."]");
-
-		$order = Order::where('id',$id)->first();
-		$order->order_payment_status = 'P';
-		$order->save();
-		$customer = Customer::where('id',$order->order_cid)->first();
-		$store =app('store');
-		$this->LogMsg("Dispatching Job -> OrderPaid");
-		$cmd = new OrderPaid($store, $customer->customer_email, $order);
-		dispatch($cmd);
-		return $this->ShowCurrentOrders();
-	}
-
-
-
-	/**
-	 * Mark the order as Unpaid in casae of a bounce
-	 *
-	 * GET ROUTE: /admin/order/update/unpaid/{id}
-	 *
-	 * @param	integer	$id		Order ID
-	 * @return	void
-	 */
-	public function MarkOrderUnPaid($id)
-	{
-		$this->LogFunction("MarkOrderUnPaid()");
-		$this->LogMsg("Order ID [".$id."]");
-
-		$order = Order::where('id',$id)->first();
-		$order->order_payment_status = 'W';
-		$order->save();
-		return $this->ShowCurrentOrders();
-	}
-
-
-
-	/**
-	 * Mark the order as "On Hold" to stop reversal CRON jobs
-	 *
-	 * GET ROUTE: /admin/order/update/onhold/{id}
-	 *
-	 * @param	integer	$id		Order ID
-	 * @return	void
-	 */
-	public function MarkOrderOnHold($id)
-	{
-		$this->LogFunction("MarkOrderOnHold()");
-		$this->LogMsg("Order ID [".$id."]");
-
-		$order = Order::where('id',$id)->first();
-		$order->order_status = 'H';
-		$order->save();
-
-		# @todo Dispatch a Job called OrderPlacedOnHold to allow more external processing
-		return $this->ShowCurrentOrders();
-	}
-
-
-
-	/**
-	 * Put the order bck to waiting
-	 *
-	 * GET ROUTE: /admin/order/update/waiting/{id}
-	 *
-	 * @param	integer	$id		Order ID
-	 * @return	void
-	 */
-	public function MarkOrderAsWaiting($id)
-	{
-		$this->LogFunction("MarkOrderAsWaiting()");
-		$this->LogMsg("Order ID [".$id."]");
-
-		$order = Order::where('id',$id)->first();
-		$order->order_status = 'W';
-		$order->save();
-		return $this->ShowCurrentOrders();
-	}
-
-
-
-	/**
-	 * Mark the order as cancelled
-	 *
-	 * GET ROUTE: /admin/order/update/cancel/{id}
-	 *
-	 * @param	integer	$id		Order ID
-	 * @return	void
-	 */
-	public function MarkOrderAsCancelled($id)
-	{
-		$this->LogFunction("MarkOrderAsCancelled()");
-		$this->LogMsg("Order ID [".$id."]");
-
-		$order = Order::where('id',$id)->first();
-		$order->order_status = 'C';
-		$order->save();
-		$customer = Customer::where('id',$order->order_cid)->first();
-		$store =app('store');
-		$cmd = new OrderCancelled($store, $customer->customer_email, $order);
-		dispatch($cmd);
-		return $this->ShowCurrentOrders();
 	}
 }

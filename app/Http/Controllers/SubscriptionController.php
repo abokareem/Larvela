@@ -21,6 +21,7 @@ use Hash;
 use Session;
 use App\Http\Requests;
 use App\Http\Requests\SubscribeRequest;
+use Illuminate\Support\Facades\Mail;
 
 
 use App\Jobs\ConfirmSubscription;
@@ -59,6 +60,8 @@ use Logger;
 	public function __construct()
 	{
 		$this->setFileName("store");
+		$this->setClassName("SubscriptionController");
+		$this->LogStart();
 	}
 
 
