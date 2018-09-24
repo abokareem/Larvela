@@ -8,7 +8,7 @@ use App\Models\Role;
 
 class RoleTableSeeder extends Seeder{
 
-public $table="role";
+public $table="roles";
 
     public function run()
     {
@@ -17,37 +17,18 @@ public $table="role";
             exit('I just stopped you getting fired. Love, Amo.');
         }
 
-        DB::table('role')->truncate();
+        DB::table('roles')->truncate();
 
-        Role::create([
-            'id'            => 1,
-            'name'          => 'Root',
-            'description'   => 'Use this account with extreme caution. When using this account it is possible to cause irreversible damage to the system.'
-        ]);
-
-        Role::create([
-            'id'            => 2,
-            'name'          => 'Administrator',
-            'description'   => 'Full access to create, edit, and update companies, and orders.'
-        ]);
-
-        Role::create([
-            'id'            => 3,
-            'name'          => 'Manager',
-            'description'   => 'Ability to create new companies and orders, or edit and update any existing ones.'
-        ]);
-
-        Role::create([
-            'id'            => 4,
-            'name'          => 'Company Manager',
-            'description'   => 'Able to manage the company that the user belongs to, including adding sites, creating new users and assigning licences.'
-        ]);
-
-        Role::create([
-            'id'            => 5,
-            'name'          => 'User',
-            'description'   => 'A standard user that can have a licence assigned to them. No administrative features.'
-        ]);
+        Role::create(['id'=>1,'role_name'=>'ADMIN','role_description'=>'System Administrator']);
+		Role::create(['id'=>2,'role_name'=>'CUSTOMER','role_description'=>'Store Customer.']);
+        Role::create(['id'=>3,'role_name'=>'USER','role_description'=>'user of backend system.']);
+        Role::create(['id'=>4,'role_name'=>'ORDERS','role_description'=>'Order processing']);
+        Role::create(['id'=>5,'role_name'=>'ACCOUNTS','role_description'=>'Account processing']);
+        Role::create(['id'=>6,'role_name'=>'DISPATCH','role_description'=>'Dispatch processing']);
+        Role::create(['id'=>7,'role_name'=>'SALES','role_description'=>'Sales Access']);
+        Role::create(['id'=>8,'role_name'=>'PRODUCTADMIN','role_description'=>'Product Administration']);
+        Role::create(['id'=>9,'role_name'=>'CATEGORYADMIN','role_description'=>'Category Administration']);
+        Role::create(['id'=>10,'role_name'=>'SALESADMIN','role_description'=>'Sales Administration']);
     }
 
 }
