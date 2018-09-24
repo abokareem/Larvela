@@ -3,7 +3,8 @@
  * \class	ProductPageController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-12
- * \version	1.0.0
+ * \version	1.0.7
+ *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -52,6 +53,8 @@ use App\Models\Image;
 use App\Models\Store;
 use App\Models\StoreSetting;
 
+use App\Services\ProductPageFactory;
+use App\Services\ImageService;
 
 use App\Traits\Logger;
 
@@ -75,7 +78,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("ProductPageController");
 		$this->LogStart();
 	}
@@ -112,82 +115,39 @@ use Logger;
 	public function ShowProductPage($id)
 	{
 		$this->LogFunction("ShowProductPage()");
+
+		#
+		# @todo Build related Product system later
+		#
+		$related_products = array();
+
 		if(is_numeric($id))
 		{
-			$Product = new Product;
-			$AttributeProduct = new AttributeProduct;
-
-			$store = app('store');
-			$settings = StoreSetting::all();
-
-			$related_products = array();
-			$images = array();
-			$thumbnails = array();
 			if($id > 0)
 			{
-				$product = Product::where('id',$id)->first();
-				$image_list = ProdImageMap::where('product_id',$product->id)->get();
-				$this->LogMsg("Fetch images for this product");
-				foreach($image_list as $i)
-				{
-					$this->LogMsg("Image [".$i->image_id."]");
-					$row = Image::find($i->image_id);
-					array_push($images,$row);
-					array_push($thumbnails,$row);
-				}
-				#
-				# TODO - need to call a method in Image Model to find the main image given the ID
-				#        then read the folder from the DB
-				#
+				$product = Product::find($id);
+				$page_object = ProductPageFactory::build($product);
+				$view = $page_object->getPageRoute();
+				$variables = $page_object->getPageVariables();
+
 				$main_image_folder_name = $this->getStoragePath($id);
 				$main_image_file_name = $id."-1.jpeg";
+				$images = $variables['images'];
 				if(sizeof($images)==1)
 				{
 					$main_image_file_name = $images[0]->image_file_name;
 				}
-				$this->LogMsg("Fetching Attributes for PID [".$product->id."]");
-				$attributes = Attribute::where('store_id',$store->id)->get()->toArray();
-				$product_attributes = AttributeProduct::where('product_id',$product->id)->get();
-				switch($product->prod_type)
-				{
-					case 5:
-						$view = 'packproduct';
-						break;
-					case 4:
-						$view = 'vitualproduct';
-						break;
-					case 3:
-						$view = 'limitedvitualproduct';
-						break;
-					case 2:
-						$view = 'parentproduct';
-						break;
-					case 1:
-					default:
-						$view = 'productpage';
-						break;
-				}
-				$categories = Category::where('category_store_id',0)->get();
+				$variables = array_merge(
+					$variables,
+					['main_image_folder_name'=>$main_image_folder_name]);
+				$variables = array_merge(
+					$variables,
+					['main_image_file_name'=>$main_image_file_name]);
+				$variables = array_merge($variables, ['related'=>$related_products]);
 
 				$theme_path = \Config::get('THEME_PRODUCT').$view;
-				return view( $theme_path,[
-					'store'=>$store,
-					'categories'=>$categories,
-					'product'=>$product,
-					'attributes'=>$attributes,
-					'prod_attributes'=>$product_attributes,
-					'images'=>$images,
-					'thumbnails'=>$thumbnails,
-					'main_image_folder_name'=>$main_image_folder_name,
-					'main_image_file_name'=>$main_image_file_name,
-					'settings'=>$settings,
-					'related'=>$related_products
-					]);
+				return view( $theme_path, $variables );
 			}
-			else
-			{
-			}
-
 		}
 	}
 
