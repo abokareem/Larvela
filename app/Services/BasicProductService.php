@@ -29,10 +29,13 @@
 namespace App\Services;
 
 use App\Models\Attribute;
+use App\Models\AttributeProduct;
+use App\Models\AttributeValue;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\StoreSetting;
-
+use App\Services\ImageService;
 use App\Traits\Logger;
 
 
@@ -84,12 +87,20 @@ protected $product;
 		$store = app('store');
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$attributes = Attribute::where('store_id',$store->id)->get();
+		$attribute_values = AttributeValue::orderBy('attr_id')->orderBy('attr_sort_index')->get();
 		$product_attributes = $this->product->attributes;
+		$categories = Category::where('category_store_id',$store->id)->get();
+		$images = ImageService::getParentImages($this->product);
+		$thumbnails = ImageService::getParentImages($this->product);
 		return array(
 			'store'=>$store,
 			'settings'=>$settings,
+			'categories'=>$categories,
 			'attributes'=>$attributes,
-			'product_attributes'=>$product_attributes
+			'attribute_values'=>$attribute_values,
+			'product_attributes'=>$product_attributes,
+			'images'=>$images,
+			'thumbnails'=>$thumbnails,
 			'product'=>$this->product
 		);
 	}
