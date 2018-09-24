@@ -3,8 +3,7 @@
  * \class	BasicProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- * \version	1.0.0
- *
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -26,13 +25,13 @@
  * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- *
  */
 namespace App\Services;
 
+use App\Models\Attribute;
 use App\Models\Product;
-
+use App\Models\Store;
+use App\Models\StoreSetting;
 
 use App\Traits\Logger;
 
@@ -58,7 +57,7 @@ protected $product;
 
 	function __construct($product)
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("BasicProductService");
 
 		$this->product = $product;
@@ -82,6 +81,16 @@ protected $product;
 	#
 	public function getPageVariables()
 	{
-		return array();
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		$attributes = Attribute::where('store_id',$store->id)->get();
+		$product_attributes = $this->product->attributes;
+		return array(
+			'store'=>$store,
+			'settings'=>$settings,
+			'attributes'=>$attributes,
+			'product_attributes'=>$product_attributes
+			'product'=>$this->product
+		);
 	}
 }
