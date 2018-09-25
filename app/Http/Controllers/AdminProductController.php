@@ -3,7 +3,7 @@
  * \class	AdminProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-22
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -37,16 +37,12 @@ use App\Http\Requests;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
 
-
-use App\Helpers\StoreHelper;
 use App\Services\ProductService;
-
 
 use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
-
 
 use App\Models\Attribute;
 use App\Models\Category;
@@ -58,9 +54,7 @@ use App\Models\ProductType;
 use App\Models\ProdImageMap;
 use App\Models\Store;
 
-
 use App\Traits\Logger;
-
 
 /**
  * \brief MVC Controller to Handle the Product Administration functions.
@@ -80,8 +74,8 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
-		$this->setClassName("store-admin");
+		$this->setFileName("larvela-admin");
+		$this->setClassName("AdminProductController");
 		$this->LogStart();
 	}
 	
@@ -310,4 +304,81 @@ use Logger;
 		}
 		return Redirect::to("/admin/products");
 	}
+
+
+
+	/**
+	 * Render a view edit page, first collect the existing data and
+	 * format it up for the view we are about to call.
+	 *
+	 * GET ROUTE: /admin/product/edit/{id}
+	 *
+	 * @param $id int row id to be checked against before insert
+	 * @return mixed - view object
+	 */
+	public function ShowEditProductPage($id)
+	{
+		$this->LogFunction("ShowEditProductPage(".$id.")");
+
+		$product = Product::find($id);
+		$store = app('store');
+		$stores = Store::all();
+		$categories = Category::all();
+		$product_types = ProductType::all();
+
+
+#
+# use factory to get edit page name/route and route accordingly.
+#
+
+
+		$imagemap = ProdImageMap::where('product_id',$id)->get();
+		$prod_categories = CategoryProduct::where('product_id',$id)->get();
+
+		$images = array();
+		foreach($imagemap as $mapping)
+		{
+			$this->LogMsg("Found image ID [".$mapping->image_id."]");
+			$img = Image::find($mapping->image_id);
+			$this->LogMsg("           Name[".$img->image_file_name."]");
+			array_push($images, $img);
+		}
+		$text = "There are ".sizeof($images)." images assembled.";
+		$this->LogMsg( $text );
+
+		return view('Admin.Products.editproduct',[
+			'product'=>$product,
+			'product_types'=>$product_types,
+			'images'=>$images,
+			'categories'=>$categories,
+			'store'=>$store,
+			'stores'=>$stores,
+			'catmappings'=>$prod_categories]);
+	}
+
+
+
+
+	/**
+	 * Call the view to present the "Add New" Product page
+	 *
+	 * GET ROUTE: /admin/product/addnew
+	 *
+	 * @return mixed - view object
+	 */
+	public function ShowAddProductPage()
+	{
+		$this->LogFunction("ShowEditProductPage()");
+
+		$categories = Category::where('category_status','A')->orderBy('category_title')->get();
+		$stores = Store::all();
+		$product_types = ProductType::all();
+
+		return view('Admin.Products.addproduct',[
+			'categories'=>$categories,
+			'product_types'=>$product_types,
+			'stores'=>$stores
+			]);
+	}
+
 }
