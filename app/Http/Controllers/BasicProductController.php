@@ -1,11 +1,31 @@
 <?php
 /**
  * \class	BasicProductController
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2016-08-18
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2016-08-18
+ * \version	1.0.1
  *
+ * 
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
- * [CC]
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  *
  * \addtogroup Store_Administration
  * BasicProductController - This controller provides admin functions for Basic Products.
@@ -22,17 +42,14 @@ use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Mail;
 
-
 use App\Helpers\StoreHelper;
 use App\Services\ProductService;
-
 
 use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
 use App\Mail\BackInStockEmail;
 use App\Jobs\ResizeImages;
-
 
 use App\Models\Store;
 use App\Models\Product;
@@ -44,7 +61,6 @@ use App\Models\CategoryProduct;
 use App\Models\Attribute;
 use App\Models\ProdImageMap;
 use App\Models\Notification;
-
 
 use App\Traits\Logger;
 use App\Traits\ProductImageHandling;
@@ -70,9 +86,9 @@ use ProductImageHandling;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
+		$this->setFileName("larvela-admin");
+		$this->setClassName("BasicProductController");
 		$this->LogStart();
-		$this->LogMsg("CLASS:BasicProductController");
 	}
 	
 	/**
@@ -82,7 +98,6 @@ use ProductImageHandling;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS:BasicProductController");
 		$this->LogEnd();
 	}
 
@@ -101,7 +116,7 @@ use ProductImageHandling;
 	 * @param	Request	$request
 	 * @return	mixed
 	 */
-	public function ShowProductsPage(Request $request)
+	private function ShowProductsPage(Request $request)
 	{
 		$this->LogFunction("ShowProductsPage()");
 
@@ -147,21 +162,6 @@ use ProductImageHandling;
 		{
 			$this->LogMsg("Processing for Store Only [".$store_id."/".$category_id."]");
 			#
-			# {FIX_2018-02-25} Disabled code that gets all products for all categories for store.
-			# get all products in all categories for the selected store
-			#
-#			$store_categories = Category::where('category_store_id',$store_id)->get();
-#			$this->LogMsg("   There are [".count($store_categories)."] categories");
-#			foreach($store_categories as $sc)
-#			{
-#				$products_in_category = CategoryProduct::where('category_id', $sc->id )->get();
-#				$this->LogMsg("   Category [".$sc->id."]  Number of Products [".count($products_in_category)."]");
-#				foreach($products_in_category as $pic)
-#				{
-#					array_push($products, Product::find($pic->product_id) );
-#				}
-#			}
-			#
 			# {FIX_2018-02-25} Converted to first category to reduce number of products show
 			#
 			$first_category = Category::where('category_store_id',$store_id)
@@ -203,7 +203,7 @@ use ProductImageHandling;
 	 * @param	integer	$id		Product to copy
 	 * @return	mixed
 	 */
-	public function ShowCopyProductPage($id)
+	private  function ShowCopyProductPage($id)
 	{
 		$this->LogFunction("ShowCopyProductPage()");
 		$product = Product::find($id);
@@ -222,7 +222,7 @@ use ProductImageHandling;
 	 * @param	integer	$id		Product to use as a tempalte to copy from.
 	 * @return	mixed
 	 */
-	public function CopyProductPage(Request $request, $id)
+	private function CopyProductPage(Request $request, $id)
 	{
 		$this->LogFunction("CopyProductPage()");
 		$this->LogMsg("Source Product ID [".$id."]");
@@ -264,45 +264,6 @@ use ProductImageHandling;
 		else
 		{
 			\Session::flash('flash_error','ERROR - Product SKU alreay in Database!');
-		}
-		return Redirect::to("/admin/products");
-	}
-
-
-
-
-
-	/**
-	 * Given the ID of a product remove it totally from the server.
-	 * use a form because only admin can get the form and the ID
-	 * must be encoded in the form and the call must be authenticated as an admin user.
-	 *
-	 * @param	integer	$id		Product to delete
-	 * @return	mixed
-	 */
-	public function DeleteProduct(Request $request, $id )
-	{
-		$this->LogFunction("DeleteProduct(".$id.")");
-
-		$form = Input::all();
-		if(array_key_exists('id',$form))
-		{
-			if($id == $form['id'])
-			{
-				$this->LogMsg("Dispatch Job.");
-				$cmd = new DeleteProductJob($id);
-				$this->dispatch($cmd);
-			}
-			else
-			{
-				$this->LogError("Mismatched product id.");
-				\Session::flash('flash_error',"ERROR - Product ID is invalid!");
-			}
-		}
-		else
-		{
-			$this->LogError("Invalid product id.");
-			\Session::flash('flash_error',"ERROR - Product ID is invalid!");
 		}
 		return Redirect::to("/admin/products");
 	}
@@ -494,7 +455,7 @@ use ProductImageHandling;
 	 * @param $id int row id to be checked against before insert
 	 * @return mixed - view object
 	 */
-	public function ShowEditProductPage($id)
+	private function ShowEditProductPage($id)
 	{
 		$this->LogFunction("ShowEditProductPage(".$id.")");
 
@@ -538,7 +499,7 @@ use ProductImageHandling;
 	 *
 	 * @return mixed - view object
 	 */
-	public function ShowAddProductPage()
+	private function ShowAddProductPage()
 	{
 		$this->LogFunction("ShowEditProductPage()");
 
@@ -566,7 +527,8 @@ use ProductImageHandling;
 	 * @param	integer	$id - Row id to be checked against before insert
 	 * @return	mixed
 	 */
-	public function UpdateProduct(ProductRequest $request, $id)
+	#public function UpdateProduct(ProductRequest $request, $id)
+	public function Update(ProductRequest $request, $id)
 	{
 		$this->LogFunction("UpdateProduct(".$id.")");
 
@@ -640,7 +602,8 @@ use ProductImageHandling;
 	 * @param	ProductRequest	$request mixed Validation request object
 	 * @return	mixed 
 	 */
-	public function SaveNewProduct(ProductRequest $request)
+	#public function SaveNewProduct(ProductRequest $request)
+	public function Save(ProductRequest $request)
 	{
 		$this->LogFunction("SaveNewProduct()");
 
@@ -734,8 +697,7 @@ use ProductImageHandling;
 	/**
 	 * Create the subpath needed to store product images and return a partial filesystem path.
 	 *
-	 * @pre none
-	 * @post none
+	 * @deprecated - use call in ImageService in future.
 	 *
 	 * @param	integer	$id - the product ID
 	 * @return	string
@@ -788,73 +750,43 @@ use ProductImageHandling;
 	}
 
 
-	/**
-	 *------------------------------------------------------------
-	 *
-	 *                        DEVELOPMENT
-	 *
-	 *------------------------------------------------------------
-	 *
-	 * Return parent product details
-	 *
-	 * GET ROUTE: /pp?PID=nnnnn
-	 *
-	 * @return	void
-	 */
-	public function BulkUpdate()
-	{
-		$this->LogFunction("BulkUpdate()");
-
-		$Product = new Product;
-		$products = Product::where('prod_sku','like',"PP-")->get();
-		return view("Admin.Products.bulkupdate",['products'=>$products]);
-	}
-
 
 
 
 	/**
-	 *------------------------------------------------------------
+	 * Given the ID of a product remove it totally from the server.
+	 * use a form because only admin can get the form and the ID
+	 * must be encoded in the form and the call must be authenticated as an admin user.
 	 *
-	 *                        DEVELOPMENT
+	 * CALLED FROM FACTORY
 	 *
-	 *------------------------------------------------------------
-	 *
-	 * Return parent product details
-	 *
-	 * GET ROUTE: /pp?PID=nnnnn
-	 *
-	 * @return	void
+	 * @param	integer	$id		Product to delete
+	 * @return	mixed
 	 */
-	public function DebugParentProducts(Request $request)
+	public function Delete(Request $request, $id )
 	{
-		$this->LogFunction("DebugParentProducts()");
+		$this->LogFunction("DeleteProduct(".$id.")");
 
-		$Product = new Product;
-		$query = $request->input();
-		$pid = 0;
-		foreach($query as $n=>$v)
+		$form = Input::all();
+		if(array_key_exists('id',$form))
 		{
-			if(is_string($n)== true)
+			if($id == $form['id'])
 			{
-				if(is_string($v)== true)
-				{
-					if($n=="PID") $pid = $v;
-				}
+				$this->LogMsg("Dispatch Job.");
+				$cmd = new DeleteProductJob($id);
+				$this->dispatch($cmd);
+			}
+			else
+			{
+				$this->LogError("Mismatched product id.");
+				\Session::flash('flash_error',"ERROR - Product ID is invalid!");
 			}
 		}
-		if($pid>0)
-		{
-			$Product->getChildProducts($pid);
-		}
 		else
-			echo "ERROR - no product set";
+		{
+			$this->LogError("Invalid product id.");
+			\Session::flash('flash_error',"ERROR - Product ID is invalid!");
+		}
+		return Redirect::to("/admin/products");
 	}
-
-
-
-
-
-
-
 }
