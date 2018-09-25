@@ -3,7 +3,7 @@
  * \class	ProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,12 +42,10 @@ use App\Helpers\StoreHelper;
 use App\Services\ProductService;
 use App\Services\ProductFactory;
 
-
 use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
-
 
 use App\Models\Attribute;
 use App\Models\Category;
@@ -58,7 +56,6 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\ProdImageMap;
 use App\Models\Store;
-
 
 use App\Traits\Logger;
 
@@ -81,7 +78,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
+		$this->setFileName("larvela-admin");
 		$this->setClassName("ProductController");
 		$this->LogStart();
 	}
@@ -106,7 +103,7 @@ use Logger;
 	 * @param	Request	$request
 	 * @return	mixed
 	 */
-	public function ShowProductsPage(Request $request)
+	private function ShowProductsPage(Request $request)
 	{
 		$this->LogFunction("ShowProductsPage()");
 
@@ -193,7 +190,7 @@ use Logger;
 	 *
 	 * @return mixed - view object
 	 */
-	public function SelectType()
+	private function SelectType()
 	{
 		$this->LogFunction("SelectType()");
 		$store = app('store');
@@ -210,7 +207,7 @@ use Logger;
 	 *
 	 * @return mixed 
 	 */
-	public function RouteToPage($id)
+	private function RouteToPage($id)
 	{
 		$this->LogFunction("RouteToPage()");
 		$product_type = ProductType::where('product_type',"Basic Product")->first();
@@ -246,7 +243,7 @@ use Logger;
 	 * @param	integer	$id		Product to copy
 	 * @return	mixed
 	 */
-	public function ShowCopyProductPage($id)
+	private function ShowCopyProductPage($id)
 	{
 		$this->LogFunction("ShowCopyProductPage()");
 		$product = Product::find($id);
@@ -266,7 +263,7 @@ use Logger;
 	 * @param	integer	$id		Product to use as a template to copy from.
 	 * @return	mixed
 	 */
-	public function CopyProductPage(Request $request, $id)
+	private function CopyProductPage(Request $request, $id)
 	{
 		$this->LogFunction("CopyProductPage()");
 		$this->LogMsg("Source Product ID [".$id."]");
@@ -349,6 +346,7 @@ use Logger;
 		$this->LogMsg("Build Product Factory");
 		$controller = ProductFactory::build($type);
 		$controller->Save($request);
+		return Redirect::to("/admin/products");
 	}
 
 
@@ -389,7 +387,7 @@ use Logger;
 		$this->LogMsg("Build Product Factory");
 		$controller = ProductFactory::build($type);
 		$controller->Update($request, $id);
-		return $this->ShowProductsPage($request);
+		return Redirect::to("/admin/products");
 	}
 
 
@@ -430,7 +428,7 @@ use Logger;
 		$this->LogMsg("Build Product Factory");
 		$controller = ProductFactory::build($type);
 		$controller->Delete($request, $id);
-		return $this->ShowProductsPage($request);
+		return Redirect::to("/admin/products");
 	}
 
 }
