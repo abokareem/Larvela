@@ -3,7 +3,7 @@
  * \class	VirtualProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- * \version	1.0.0
+ * \version	1.0.2
  *
  *
  *
@@ -31,8 +31,13 @@
  */
 namespace App\Services;
 
+use App\Models\Attribute;
+use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\StoreSetting;
+use App\Models\Category;
+use App\Services\ImageService;
 
 
 use App\Traits\Logger;
@@ -81,18 +86,60 @@ protected $product;
 	 */
 	public function getPageRoute()
 	{
-		$types = ProductType::where('product_type','like','Virtual%')->get();
-		foreach($types as $type)
+		$type = ProductType::find($this->product->prod_type);
+		switch($type->product_type_token)
 		{
+			case "VLIMITED":
+					return	"virtual_limited_product";
+				break;
+			case "VUNLIMITED":
+					return	"virtual_unlimited_product";
+					break;
 		}
-		return "packproduct";
+		return	"basicproduct";
 	}
 
 
-	# @todo devise the variables needed for a page display of a basic product.
-	#
+
+	/**
+	 * Return the name of the page used for editing this specific product type.
+	 * View will be "Admin/Product/edit_virtual.blade.php"
+	 *
+	 * @return	string
+	 */
+	public function getEditPageRoute()
+	{
+		return "edit_virtual";
+	}
+
+
+
+
+	/**
+	 * Return the common variables needed by the page display
+	 *
+	 * @return	array
+	 */
 	public function getPageVariables()
 	{
-		return array();
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		$attributes = Attribute::where('store_id',$store->id)->get();
+		$attribute_values = AttributeValue::orderBy('attr_id')->orderBy('attr_sort_index')->get();
+		$product_attributes = $this->product->attributes;
+		$categories = Category::where('category_store_id',$store->id)->get();
+		$images = ImageService::getParentImages($this->product);
+		$thumbnails = ImageService::getParentImages($this->product);
+		return array(
+			'store'=>$store,
+			'settings'=>$settings,
+			'categories'=>$categories,
+			'attributes'=>$attributes,
+			'attribute_values'=>$attribute_values,
+			'product_attributes'=>$product_attributes,
+			'images'=>$images,
+			'thumbnails'=>$thumbnails,
+			'product'=>$this->product
+		);
 	}
 }
