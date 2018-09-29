@@ -3,7 +3,7 @@
  * \class	CartController
  * \date	2016-09-05
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.2
+ * \version 1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -38,6 +38,7 @@ use Auth;
 use Session;
 
 use App\Services\CartLocking;
+use App\Services\ImageService;
 use App\Events\Larvela\AddToCartMessage;
 use App\Events\Larvela\ShowCartMessage;
 
@@ -82,7 +83,7 @@ private $user;
 	public function __construct()
 	{
 		$this->middleware('auth');
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("CartController");
 		$this->LogStart();
 	}
@@ -193,8 +194,9 @@ private $user;
 			 */
 			$this->LogMsg("[".$item->product_id."] not in product_id_list array --- ADD!");
 			array_push($product_id_list,$item->product_id);
-			$thumbnail = null;
 			$product = Product::find($item->product_id);
+
+			$thumbnails = ImageService::getThumbnails($product);
 
 			$this->LogMsg("Item qty value is [".$item->qty."]");
 			$product['qty'] = $item->qty;
@@ -203,28 +205,28 @@ private $user;
 			$sub_total = $product->prod_retail_cost * $qtymap[$item->product_id];
 			
 			$product['sub_total'] = $sub_total;
-			$base_images = ProdImageMap::where('product_id',$item->product_id)->get();
-			foreach($base_images as $bi)
+#			$base_images = ProdImageMap::where('product_id',$item->product_id)->get();
+#			foreach($base_images as $bi)
+#			{
+#				$bimage = Image::find($bi->image_id);
+#				if($bimage->image_order == 0)
+#				{
+#					$thumbnails = $bimage->thumbnails()->get();
+#					foreach($thumbnails as $t)
+#					{
+#						if($t->image_order==1)
+#						{
+#							$thumbnail = $t;
+#							break;
+#						}
+#					}
+#				}
+#			}
+			if(is_array($thumbnails))
 			{
-				$bimage = Image::find($bi->image_id);
-				if($bimage->image_order == 0)
-				{
-					$thumbnails = $bimage->thumbnails()->get();
-					foreach($thumbnails as $t)
-					{
-						if($t->image_order==1)
-						{
-							$thumbnail = $t;
-							break;
-						}
-					}
-				}
+				$product['thumbnail'] = $thumbnails[0]->image_folder_name."/".$thumbnails[0]->image_file_name;
 			}
-			if(is_object($thumbnail))
-			{
-				$product['thumbnail'] = $thumbnail->image_folder_name."/".$thumbnail->image_file_name;
-			}
-			else
+			if(sizeof($thumbnails)==0)
 			{
 				$product['thumbnail'] = "media/product-image-missing.jpeg";
 			}
@@ -252,6 +254,7 @@ private $user;
 			'customer'=>$customer,
 			'address'=>$address,
 			'products'=>$products,
+			'thumbnails'=>$thumbnails,
 			'items'=>$items,
 			'total'=>$total,
 			'tax'=>0,
@@ -297,15 +300,20 @@ private $user;
 		$customer = Customer::where('customer_email',$user->email)->first();
 		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
 
-		#$this->LogMsg("Customer Data ".print_r($customer,true));
-		#$this->LogMsg("Address Data ".print_r($address,true));
-
 		#
 		# Cart, cart items and cart data
 		#
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
 		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
 		$items = $cart->items;
+		$products = array();
+		foreach($items as $item)
+		{
+			array_push($products, Product::find($item->product_id));
+		}
+		$product_with_free_shipping = array_filter($products,function($p) { return ($p->prod_has_free_shipping ==1) ? true:false; });
+		if(sizeof($product_with_free_shipping) == sizeof($products)) $free_shipping = 1;
+		$total_weight = array_reduce($products,function($weight,$p) { $weight += $p->prod_weight; echo "$weight <br>"; return $weight; }, $weight = 0);
 
 		#$this->LogMsg("Cart Contents ".print_r($cart, true));
 		#$this->LogMsg("Cart ITEMS: ".print_r($items, true) );

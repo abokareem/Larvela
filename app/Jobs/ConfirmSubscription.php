@@ -49,7 +49,6 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 use App\Jobs\EmailUserJob;
 
-
 use App\Models\Store;
 use App\Models\Customer;
 use App\Models\SubscriptionRequest;

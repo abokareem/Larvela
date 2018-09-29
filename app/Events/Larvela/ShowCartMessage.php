@@ -3,7 +3,8 @@
  * \class	ShowCartMessage
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-12
- * \version 1.0.1
+ * \version 1.0.2
+ *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -79,7 +80,7 @@ protected $user;
 	 */
 	public function __construct($store,$user,$cart,$cart_data)
 	{
-		$this->setFileName('store');
+		$this->setFileName('larvela');
 		$this->setClassName('ShowCartMessage');
 		$this->store = $store;
 		$this->user = $user;

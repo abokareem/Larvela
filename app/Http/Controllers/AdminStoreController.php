@@ -63,7 +63,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
+		$this->setFileName("larvela-admin");
 		$this->setClassName("AdminStoreController");
 		$this->LogStart();
 	}

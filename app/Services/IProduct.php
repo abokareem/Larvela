@@ -33,5 +33,6 @@ namespace App\Services;
 interface IProduct
 {
 	function getPageRoute();
+	function getEditPageRoute();
 	function getPageVariables();
 }

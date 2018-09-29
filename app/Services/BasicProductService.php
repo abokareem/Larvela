@@ -67,7 +67,6 @@ protected $product;
 	}
 
 
-
 	/**
 	 * Return the name of the page for display of this type of product.
 	 * View will be "Themes/<theme_name>/Product.basic.blade.php"
@@ -80,8 +79,25 @@ protected $product;
 	}
 
 
-	# @todo devise the variables needed for a page display of a basic product.
-	#
+
+	/**
+	 * Return the name of the page used for editing this specific product type.
+	 * View will be "Admin/Product/edit_basic.blade.php"
+	 *
+	 * @return	string
+	 */
+	public function getEditPageRoute()
+	{
+		return "edit_basic";
+	}
+
+
+
+	/**
+	 * Return the common variables needed by the page display
+	 *
+	 * @return	array
+	 */
 	public function getPageVariables()
 	{
 		$store = app('store');

@@ -41,7 +41,6 @@ use App\Services\CartLocking;
 use App\Events\Larvela\AddToCartMessage;
 use App\Events\Larvela\ShowCartMessage;
 
-
 use App\Models\Cart;
 use App\Models\CartData;
 use App\Models\CartItem;
@@ -52,7 +51,6 @@ use App\Models\ProductLock;
 use App\Models\CustomerAddress;
 use App\Models\Image;
 use App\Models\StoreSetting;
-
 
 use App\User;
 use App\Traits\Logger;
@@ -75,7 +73,7 @@ private $user;
 	public function __construct()
 	{
 		$this->middleware('auth');
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("CheckoutController");
 		$this->LogStart();
 	}

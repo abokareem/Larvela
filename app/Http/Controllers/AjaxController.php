@@ -32,9 +32,9 @@ use Logger;
      */
     public function __construct()
     {
-        $this->setFileName('store-ajax');
+        $this->setFileName('larvela-ajax');
+		$this->setClassName("AjaxController");
 		$this->LogStart();
-		$this->LogMsg("CLASS:AjaxController");
     }
 
 
@@ -47,7 +47,6 @@ use Logger;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS:AjaxController");
 		$this->LogEnd();
 	}
 

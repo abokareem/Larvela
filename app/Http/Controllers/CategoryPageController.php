@@ -3,7 +3,8 @@
  * \class	CategoryPageController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-12
- * \version	1.0.0
+ * \version	1.0.1
+ *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -77,7 +78,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("CategoryPageController");
 		$this->LogStart();
 	}
@@ -117,6 +118,7 @@ use Logger;
 		# {FIX_2018-04-03} If invalid category then trap here
 		#
 		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		if(is_null($category))
 		{
 			$theme_path = \Config::get('THEME_ERRORS')."category-not-found";
@@ -201,14 +203,16 @@ use Logger;
 				}
 				array_push($products,$row);
 			}
+			$categories = Category::where('category_store_id',$store->id)->get();
 			$theme_path = \Config::get('THEME_CATEGORY').'storecategorypage';
 			return view($theme_path,[
 				'store'=>$current_store,
+				'settings'=>$settings,
 				'attributes'=>$attributes,
 				'sizes'=>$sizes,
 				'colours'=>$colours,
 				'category'=>$category,
-				'categories'=>$this->GetStoreCategories($current_store->id),
+				'categories'=>$categories,
 				'adverts'=>$this->GetAdverts(),
 				'products'=>$products
 				]);

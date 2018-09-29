@@ -60,7 +60,8 @@ use App\Traits\Logger;
 
 
 /**
- * \brief Manages generating the Product Page view, allows for differnet product types such as basic, parent and virtual
+ * \brief Manages generating the Product Page view,
+ * allows for different product types such as basic, parent and virtual
  * In a system with no Administration sub-system, this Controller is required. 
  *
  * {INFO_2018-09-12} "ProductPageController.php" - Created from StoreFrontController code.

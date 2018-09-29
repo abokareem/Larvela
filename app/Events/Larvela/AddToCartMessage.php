@@ -3,7 +3,7 @@
  * \class	AddToCartMessage
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-12
- * \version 1.0.1
+ * \version 1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -78,7 +78,7 @@ protected $product;
 	 */
 	public function __construct($store,$user,$cart,$product)
 	{
-		$this->setFileName('store');
+		$this->setFileName('larvela');
 		$this->setClassName('AddToCartMessage');
 		$this->store = $store;
 		$this->user = $user;

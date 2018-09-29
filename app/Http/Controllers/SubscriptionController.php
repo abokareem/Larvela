@@ -1,10 +1,30 @@
 <?php
 /**
  * \class	SubscriptionController
- * @author	Sid Young <sid@off-grid-engineering.com>
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \version	1.0.1
  *
  *
- * [CC]
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  *
  * \addtogroup Subscription
  * SubscriptionController - Process the subscribe and unsubscribe business logic.
@@ -23,18 +43,12 @@ use App\Http\Requests;
 use App\Http\Requests\SubscribeRequest;
 use Illuminate\Support\Facades\Mail;
 
-
 use App\Jobs\ConfirmSubscription;
 use App\Jobs\SubscriptionConfirmed;
 use App\Jobs\ReSendSubRequest;
 
-
 use App\Mail\ConfirmSubscriptionEmail;
 use App\Mail\SubscriptionConfirmedEmail;
-
-
-use App\Helpers\StoreHelper;
-
 
 use App\Models\Store;
 use App\Models\Customer;
@@ -59,7 +73,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("SubscriptionController");
 		$this->LogStart();
 	}
@@ -209,6 +223,7 @@ use Logger;
 	 */	
 	public function AddNewSubscription( SubscribeRequest $request )
 	{
+		$store = app('store');
 		$this->LogFunction("AddNewSubscription()");
 		$captcha = $request['g-recaptcha-response'];
 		if(strlen($captcha)>0)
@@ -230,7 +245,7 @@ use Logger;
 			$email = $request['email'];
 			$this->LogMsg("Capture present - processing eMail [".$email."]");
 			$this->LogMsg("Dispatch ConfirmSubscription Job");
-			$cmd = new ConfirmSubscription(StoreHelper::StoreData(), $email);
+			$cmd = new ConfirmSubscription($store, $email);
 			$this->dispatch( $cmd );
 			$request->session()->put('capture', 'done');
 		}

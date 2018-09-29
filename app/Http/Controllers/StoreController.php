@@ -3,7 +3,7 @@
  * \class	StoreController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-09-15
- * \version	1.0.2
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -64,7 +64,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
+		$this->setFileName("larvela");
 		$this->setClassName("StoreController");
 		$this->LogStart();
 	}

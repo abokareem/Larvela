@@ -3,7 +3,8 @@
  * \class	StoreFrontController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.1
+ * \version	1.0.5
+ *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -39,6 +40,8 @@ use Cookie;
 use Session;
 use Config;
 
+use App\User;
+
 use App\Models\Advert;
 use App\Models\Attribute;
 use App\Models\AttributeProduct;
@@ -46,31 +49,15 @@ use App\Models\AttributeValue;
 use App\Models\Category;
 use App\Models\CategoryProduct;
 use App\Models\Cart;
-use App\Models\CartItem;
 use App\Models\Customer;
 use App\Models\CustSource;
 use App\Models\Product;
 use App\Models\ProductType;
-use App\Models\ProdImageMap;
 use App\Models\Image;
-use App\Models\ImageProduct;
 use App\Models\Store;
 use App\Models\StoreSetting;
-use App\Models\Notification;
-use App\Models\SubscriptionRequest;
-use App\Models\Users;
-use App\Models\CategoryImage;
-
-use App\Helpers\StoreHelper;
-
-use App\Jobs\OrderPlaced;
-use App\Jobs\OrderDispatched;
+use App\Models\ProdImageMap;
 use App\Jobs\ConfirmSubscription;
-use App\Jobs\SubscriptionConfirmed;
-use App\Jobs\Welcome;
-use App\Jobs\DeleteImageJob;
-use App\Jobs\DeleteProductJob;
-use App\Jobs\BackInStock;
 
 use App\Traits\Logger;
 
@@ -81,22 +68,17 @@ use App\Traits\Logger;
  * In a system with no Administration sub-system, this Controller is required. 
  *
  * {FIX_2017-01-10} "StoreFrontController.php" - Added CID value to cookie to trap the new customer ID in the browser as an encrypted cookie.
- * {FIX_2017-07-09} "StoreFrontController.php" - Outof stock notify call failing with 500's
+ * {FIX_2017-07-09} "StoreFrontController.php" - Outof stock notify call failing with 500's.
  * {INFO_2017-08-29} "StoreFrontController.php" - Added support for Themes :)
  * {INFO_2017-09-23} "StoreFrontController.php" - Starting to add virtual product support and attributes.
- * {INFO_2017-10-28} "StoreFrontController.php" - Refactored to use new classes
- * {INFO_2018-01-13} "StoreFrontController.php" - Added support for attributes such as size on front page
+ * {INFO_2017-10-28} "StoreFrontController.php" - Refactored to use new classes.
+ * {INFO_2018-01-13} "StoreFrontController.php" - Added support for attributes such as size on front page.
+ * {INFO_2018-09-12} "StoreFrontController.php" - Removed ShowProductPage into its own controller.
  */
 class StoreFrontController extends Controller
 {
 use Logger;
 
-/**
- * Store settings from DB
- * @var array $settings
- */
-protected $global_settings;
-protected $store_settings;
 
 
 	/**
@@ -106,23 +88,7 @@ protected $store_settings;
 	 */
 	public function __construct()
 	{
-		$store = app("store");
-		#
-		# gather settings that we are interested in and apply them.
-		#
-		$this->global_settings = StoreSetting::where('setting_store_id',0)->get();
-		$this->store_settings  = StoreSetting::where('setting_store_id',$store->id)->get();
-		foreach($this->global_settings as $entry)
-		{
-			if($entry->setting_name == "ENABLE_LOGGING")
-			{
-				if($entry->setting_value == "1")
-				{
-				# 
-				}
-			}
-		}
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("StoreFrontController");
 		$this->LogStart();
 		if($cid=Cookie::get('cid','0') > 0)
@@ -141,13 +107,14 @@ protected $store_settings;
 	public function __destruct()
 	{
 		$this->LogEnd();
-
 	}
 
 
 
 	/**
 	 * Render the view for the Main Store Front "Home" page.
+	 * Comprised of a range of random products.
+	 * Plenty of scope to use different products/categories etc.
 	 *
 	 * @param	integer	$MAXPRODUCTS	Count of products to show on the home page
 	 * @return	mixed	View object with data
@@ -156,12 +123,13 @@ protected $store_settings;
 	{
 		$this->LogFunction("ShowStoreFront()");
 		#
-		# Check if the first user (admin) is present, if not run the install, need app key in install to proceed.
+		# Check if the first user (admin) is present,
+		# if not run the install, need app key in install to proceed.
 		#
 		if(Schema::hasTable('users'))
 		{
-			$this->LogMsg("Users table is present");
-			if(Users::count()==0)
+			$this->LogMsg("User table is present");
+			if(User::count()==0)
 			{
 				return view('Install.install-1');
 			}
@@ -178,7 +146,7 @@ protected $store_settings;
 		 * and limit them so the visitor can drill down by category.
 		 */
 		$current_store = app('store');
-		$settings = StoreSetting::all();
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$this->LogMsg("Current Store: ".$current_store->store_name );
 		/*
 		 * Categories relevant to this shop
@@ -214,7 +182,7 @@ protected $store_settings;
 			foreach($cat_prod_rows as $cat_prod_row)
 			{
 				$product = Product::find($cat_prod_row->product_id);
-				if($product->prod_visible == "Y")
+				if(($product->prod_visible == "Y")&&($product->prod_qty>0))
 				{
 					#
 					# @todo - check prod_date_valid_from and prod_date_valid_to columns in later version
@@ -227,13 +195,13 @@ protected $store_settings;
 			$product_id_list = array_unique($product_id_list);
 			if(sizeof($product_id_list) > $MAXPRODUCTS) break;
 		}
-		$list = "";
 		$product_count = 0;
+		$pids = array();
 		foreach($product_id_list as $v)
 		{
-			$list .= " $v ";
 			$pids[$product_count++] = $v;
 		}
+		$list = array_reduce($product_id_list, function($list, $item) { $list .= " $item "; return $list; });
 		$this->LogMsg("Available numbers are: $list ");
 
 		/*
@@ -246,7 +214,7 @@ protected $store_settings;
 		 */
 		$selected = array();
 
-		$attributes = Attribute::get();
+		$attributes = Attribute::where('store_id',$store->id)->get()->toArray();
 		$attribute_values = AttributeValue::get();
 		/*
 		 * Return "products" to view.
@@ -323,9 +291,9 @@ protected $store_settings;
 			 * REFACTOR required, colour and size should not be assigned here
 			 * pass in the attributes and values and let the theme work out what it needs.
 			 */
-			$size_attribute = Attribute::where('attribute_name','Size')->first();
+			$size_attribute = Attribute::where('attribute_name','Size')->where('store_id',$store->id)->first();
 			$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
-			$colour_attribute = Attribute::where('attribute_name','Colour')->first();
+			$colour_attribute = Attribute::where('attribute_name','Colour')->where('store_id',$store->id)->first();
 			$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
 			/*
 			 * END
@@ -348,9 +316,9 @@ protected $store_settings;
 		}
 		else
 		{
-			$size_attribute = Attribute::where('attribute_name','Size')->first();
+			$size_attribute = Attribute::where('attribute_name','Size')->where('store_id',$store->id)->first();
 			$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
-			$colour_attribute = Attribute::where('attribute_name','Colour')->first();
+			$colour_attribute = Attribute::where('attribute_name','Colour')->where('store_id',$store->id)->first();
 			$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
 			$this->LogMsg("Render View Frontend.storefront - No Products assigned to shop");
 			$theme_path = \Config::get('THEME_HOME')."storefront";
@@ -375,7 +343,7 @@ protected $store_settings;
 	 * then we are using the attributes table and attribute_products table
 	 * to select products that have the required attribute (all "Small" sizes for instance).
 	 *
-	 * Use atriutes and parent products to return a collection of basic products.
+	 * Use attributes and parent products to return a collection of basic products.
 	 *
 	 *
 	 * @param	integer	$id	The product_attribute ID to find
@@ -494,6 +462,7 @@ protected $store_settings;
 			$theme_path = \Config::get('THEME_HOME')."storefront";
 			$this->LogMsg("Render View storefront from [".$theme_path."]");
 			return view($theme_path,[
+				'store'=>$current_store,
 				'current_store'=>$current_store,
 				'settings'=>$settings,
 				'sizes'=>$sizes,
@@ -507,307 +476,12 @@ protected $store_settings;
 			$this->LogMsg("Render View --- no attributes found");
 			$theme_path = \Config::get('THEME_ERRORS')."no-matching-products";
 			return view($theme_path,[
+				'store'=>$current_store,
 				'current_store'=>$current_store,
 				'settings'=>$settings ]);
 		}
 	}
 
-
-
-
-	/**
-	 * The product page is for an individual product thats been selected.
-	 *
-	 * Must distinquish between Basic and Parent products.
-	 * First assemble all the data collections then return a view.
-	 *
-	 * Notes:
-	 * - Related Products not yet implemented, 
-	 * - virtual products not yet implemented.
-	 * - Attributes not yet fully implemented.
-	 *
-	 * @param	integer	$id	row id of product to display
-	 * @return	mixed
-	 */
-	public function ShowProductPage($id)
-	{
-		$this->LogFunction("ShowProductPage()");
-		if(is_numeric($id))
-		{
-			$Image = new Image;
-			$Category = new Category;
-			$Product = new Product;
-			$CategoryProduct  = new CategoryProduct;
-			$AttributeProduct = new AttributeProduct;
-
-			$store = app('store');
-			$settings = StoreSetting::all();
-
-			$related_products = array();
-			$images = array();
-			$thumbnails = array();
-			if($id > 0)
-			{
-				$product = Product::where('id',$id)->first();
-				##Amqp::publish('product_view', "{'product_id':'".$product->id."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
-				$image_list = ProdImageMap::where('product_id',$product->id)->get();
-				$this->LogMsg("Fetch images for this product");
-				foreach($image_list as $i)
-				{
-					$this->LogMsg("Image [".$i->image_id."]");
-					$row = Image::where('id',$i->image_id)->first();
-					array_push($images,$row);
-					array_push($thumbnails,$row);
-				}
-				#
-				# TODO - need to call a method in Image Model to find the main image given the ID
-				#        then read the folder from the DB
-				#
-				$main_image_folder_name = $this->getStoragePath($id);
-				$main_image_file_name = $id."-1.jpeg";
-				if(sizeof($images)==1)
-				{
-					$main_image_file_name = $images[0]->image_file_name;
-				}
-				$this->LogMsg("Fetching Attributes for PID [".$product->id."]");
-				$attributes = Attribute::all();
-				$product_attributes = AttributeProduct::where('product_id',$product->id)->get();
-				switch($product->prod_type)
-				{
-					case 4:
-						$view = 'vitualproduct';
-						break;
-					case 3:
-						$view = 'limitedvitualproduct';
-						break;
-					case 2:
-						$view = 'parentproduct';
-						break;
-					case 1:
-					default:
-						$view = 'productpage';
-						break;
-				}
-				$categories = Category::where('category_store_id',0)->get();
-
-				$theme_path = \Config::get('THEME_PRODUCT').$view;
-				return view( $theme_path,[
-					'store'=>$store,
-					'categories'=>$categories,
-					'product'=>$product,
-					'attributes'=>$attributes,
-					'prod_attributes'=>$product_attributes,
-					'images'=>$images,
-					'thumbnails'=>$thumbnails,
-					'main_image_folder_name'=>$main_image_folder_name,
-					'main_image_file_name'=>$main_image_file_name,
-					'settings'=>$settings,
-					'related'=>$related_products
-					]);
-			}
-			else
-			{
-			}
-
-		}
-	}
-
-
-		
-
-	/**
-	 * Category has been selected on a page so we need to return a view
-	 * to show products from that category only.
-	 * Collect all required data for view.
-	 *
-	 * @param	integer	$id	Row id from category table.
-	 * @return	mixed	view to render
-	 */
-	public function ShowStoreCategory($id)
-	{
-		$this->LogFunction("ShowStoreCategory()");
-
-#		$Product = new Product;
-#		$Category = new Category;
-#		$Image = new Image;
-#		$CategoryProduct  = new CategoryProduct;
-		$CategoryImage = new CategoryImage;
-		$images = $CategoryImage->images();
-		dd($images);
-
-		$category_data = Category::find($id);
-		#
-		# {FIX_2018-04-03} If invalid category then trap here
-		#
-		$store = app('store');
-		if(is_null($category_data))
-		{
-			$theme_path = \Config::get('THEME_ERRORS')."category-not-found";
-			return view($theme_path,['store'=>$store]);
-		}
-
-
-
-		$size_attribute = Attribute::where('attribute_name','Size')->first();
-		$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
-
-		$colour_attribute = Attribute::where('attribute_name','Colour')->first();
-		$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
-
-		##Amqp::publish('category_view', "{'category_id':'".$category_data->id."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
-
-		$current_store = app('store');
-		$this->LogMsg("Current Store: [".$store->store_name."]" );
-		/*
-		 * Categories relevant to this shop
-		 */	
-		$categories = array();
-		/*
-		 * DB rows from
-		 */	
-		$product_rows = array();
-		/*
-		 * $product_id_list contains all product id's includes dupliactes. we need to remove duplicates later and sort list
-		 */	
-		$product_id_list = array();
-		/*
-		 * Product array passed to view
-		 */
-		$products = array();
-		/*
-		 * image array for products
-		 */
-		$images = array();
-
-		if( is_null($current_store) == false)
-		{
-			$cat_prod_rows = CategoryProduct::where('category_id',$id)->get();
-			#
-			#
-			#
-			foreach($cat_prod_rows as $cat_prod_row)
-			{
-				$product = Product::where('id', $cat_prod_row->product_id)->first();
-				if($product->prod_visible == "Y")
-				{
-					#
-					# @todo - check prod_date_valid_from and prod_date_valid_to columns in later version
-					#
-					array_push( $product_id_list, $cat_prod_row->product_id );
-					array_push( $product_rows, $product );
-				}
-			}
-			sort($product_id_list);
-			$product_id_list = array_unique($product_id_list);
-	
-	
-			foreach($product_id_list as $product_id)
-			{
-				$this->LogMsg("Product ID selected [ $product_id ]");
-				$row = $this->FindProduct( $product_rows, $product_id );
-				$path = $this->getStoragePath($product_id);
-	
-				$row->category = $category_data->category_title;
-				$row->category_id = $id;
-
-				$found = 0;
-				$product_images = ProdImageMap::where('product_id',$product_id)->get();
-				$row->image = '/media/product-image-missing.jpeg';
-
-				foreach($product_images as $prod_img_map_entry)
-				{
-					$id = array($prod_img_map_entry);
-					$image_id = $id[0]->image_id;
-					$image_row = Image::where('id',$image_id)->first();
-					$row->image = "/".$image_row->image_folder_name."/".$image_row->image_file_name;
-				}
-				array_push($products,$row);
-			}
-			$theme_path = \Config::get('THEME_CATEGORY').'storecategorypage';
-			return view($theme_path,[
-				'store'=>$current_store,
-				'sizes'=>$sizes,
-				'colours'=>$colours,
-				'category'=>$category_data,
-				'categories'=>$this->GetStoreCategories($current_store->id),
-				'adverts'=>$this->GetAdverts(),
-				'products'=>$products
-				]);
-		}
-		else
-		{
-			$theme_path = \Config::get('THEME_CATEGORY').'storecategorypage';
-			return view($theme_path,[
-				'store'=>$current_store,
-				'sizes'=>$sizes,
-				'colours'=>$colours,
-				'category'=>$category_data,
-				'categories'=>array(),
-				'adverts'=>$this->GetAdverts(),
-				'products'=>$products]);
-		}
-	}
-	
-
-	/**
-	 * Insert into the "notifications" table the stock SKU and the persons email address
-	 * Called via an AJAX call from user web page.
-	 * and return a JSON string data with status code.
-	 *
-	 * email address = nf
-	 * input field = sku
-	 *
-	 * POST ROUTE: /notify/outofstock
-	 *
-	 * @return	string
-	 */
-	public function OutOfStockNotify(Request $request)
-	{
-		$this->LogFunction("OutOfStockNotify() - AJAX Call");
-
-		$rid = 0;
-		if(Request::ajax())
-		{
-			$this->LogMsg("Process AJAX call");
-
-			$form_data = Input::all();
-			$email_address = $form_data['nf'];
-			$sku = $form_data['sku'];
-
-			$this->LogMsg("Captured [".$email_address."]");
-			$this->LogMsg("Product: [".$sku."]");
-
-			if(filter_var($email_address, FILTER_VALIDATE_EMAIL))
-			{
-				##Amqp::publish('subscribe_out_of_stock', "{'email_address':'".$email_address."','sku':'".$sku."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
-				try
-				{
-					$o = new Notification;
-					$o->date_created = date("Y-m-d");
-					$o->time_created = date("H:i:s");
-					$o->product_code = $sku;
-					$o->email_address = $email_address;
-					$o->save();
-					$rid = $o->id;
-				}
-				catch(\Illuminate\Database\QueryException $ex)
-				{
-					$this->LogError("DB insert failed - row may already exist!");
-				}
-				$this->LogMsg("Row ID: [".$rid."]");
-				if($rid>0)
-				{
-					$this->LogMsg("Return AJAX response");
-					$data = array('status'=>'OK','S'=>'OK');
-					return json_encode($data);
-				}
-				$this->LogMsg("Insert failed or user is present.");
-			}
-		}
-		$this->LogMsg("return FAIL response.");
-		$data = array('S'=>'FAIL', 'status'=>'FAIL');
-		return json_encode($data);
-	}
 
 
 
@@ -875,7 +549,6 @@ protected $store_settings;
 			{
 				$this->LogMsg("Get Customer Source Data");
 				$source = CustSource::where('cs_name',"WEBSTORE")->first();
-#				##Amqp::publish('subscribe', "{'email_address':'".$emailaddress."'}", ['exchange_type'=>'direct', 'exchange'=>'laravel', 'auto_delete'=>false]);
 
 				$o = new Customer;
 				$o->customer_name = $name;
@@ -993,18 +666,6 @@ protected $store_settings;
 
 
 	/**
-	 *
-	 */
-	public function getHomeCategory()
-	{
-		$this->LogFunction("getHomeCategory()");
-
-		$category = new \stdClass;
-		$category->category_description = "Storefront Home";
-		return $category;
-	}
-
-	/**
 	 * Remove all site cookies - primarily used for testing
 	 *
 	 * @return	string
@@ -1059,12 +720,6 @@ protected $store_settings;
 	{
 		$product = array_filter($products, function($p) use ($id) { if($p['id'] == $id) { return $p;} });
 		return reset($product);
-
-		#foreach($products as $p)
-		#{
-		#if($p->id == $id) return $p;
-		#}
-		#return null;
 	}
 
 

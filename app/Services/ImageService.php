@@ -3,7 +3,7 @@
  * \class	ImageService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- *
+ * \version	1.0.1
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -25,6 +25,9 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ *
+ * \addtogroup Services
+ * ImageService - Provides some descrete static functions for managing/manipulating product images and image storage.
  */
 namespace App\Services;
 

@@ -62,7 +62,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("SupportController");
 		$this->LogStart();
 	}

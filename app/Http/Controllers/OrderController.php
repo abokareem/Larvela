@@ -3,7 +3,8 @@
  * \class	OrderController
  * \author	Sid Young <sid@off-grif-engineering.com>
  * \date	2017-01-10
- * \version	1.0.1
+ * \version	1.0.2
+ *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -57,7 +58,6 @@ use App\Mail\OrderPendingEmail;
 use App\Mail\OrderDispatchedEmail;
 use App\Mail\OrderOnHoldEmail;
 
-
 use App\Jobs\EmptyCartJob;
 use App\Jobs\OutOfStockJob;
 
@@ -74,7 +74,6 @@ use App\Models\OrderItem;
 
 use App\Models\User;
 use App\Models\CustomerAddress;
-
 
 use App\Traits\Logger;
 
@@ -101,8 +100,8 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("orders");
-		$this->setClassName("CLASS:OrderController");
+		$this->setFileName("larvela-orders");
+		$this->setClassName("OrderController");
 		$this->LogStart();
 	}
 

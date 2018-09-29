@@ -3,7 +3,7 @@
  * \class	ParentProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.1
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -27,8 +27,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  *
- * \addtogroup Store_Administration
- * ParentProductController - THis controller is repsonsible for Parent product administration.
+ * \addtogroup Product_Types
+ * ParentProductController - Provides CRUD like functions for "PARENT" products.
  */
 namespace App\Http\Controllers;
 
@@ -63,6 +63,7 @@ use App\Models\ProductType;
 use App\Models\CategoryProduct;
 
 use App\Models\Attribute;
+use App\Models\AttributeProduct;
 use App\Models\ProdImageMap;
 use App\Models\Notification;
 
@@ -91,9 +92,9 @@ use ProductImageHandling;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
+		$this->setFileName("larvela");
+		$this->setClassName("ParentProductController");
 		$this->LogStart();
-		$this->LogMsg("CLASS:ParentProductController");
 	}
 	
 	/**
@@ -249,6 +250,7 @@ use ProductImageHandling;
 		$stores = Store::all();
 		$categories = Category::all();
 		$product_types = ProductType::all();
+		$attributes = Attribute::get();
 
 		$imagemap = ProdImageMap::where('product_id',$id)->get();
 		$prod_categories = CategoryProduct::where('product_id',$id)->get();
@@ -266,6 +268,7 @@ use ProductImageHandling;
 
 		return view('Admin.Products.editproduct',[
 			'product'=>$product,
+			'attributes'=>$attributes,
 			'product_types'=>$product_types,
 			'images'=>$images,
 			'categories'=>$categories,
@@ -293,9 +296,63 @@ use ProductImageHandling;
 		$this->LogFunction("DebugParentProducts()");
 		$this->LogMsg("Delete Parent Product [".$id."]");
 
+		$parent = Product::find($id);
+		$attribute_values = AttributeValue::get();
+		$product_attributes = AttributeProduct::where('product_id',$id)->orderby('combine_order')->get();
+		$child_products = array();
+		if(sizeof($product_attributes)==1)
+		{
+			foreach($product_attributes as $pa)
+			{
+				$this->LogMsg("PID [".$pa->product_id."]  Attr [".$pa->attribute_id."]");
+				foreach($attribute_values as $at)
+				{
+					if($at->attr_id == $pa->attribute_id)
+					{
+						$sku = $parent->prod_sku."-".$at->attr_value;
+						$product = Product::where('prod_sku',$sku)->first();
+						if(!is_null($product))
+						{
+							$this->LogMsg("SKU ".$product->prod_sku." - QTY [".$product->prod_qty."]");
+							array_push($child_products, $product);
+						}
+					}
+				}
+			}
+		}
+		elseif(sizeof($product_attributes)==2)
+		{
+			$first_attributes = AttributeValue::where('attr_id',1)->orderby('attr_sort_index')->get();
+			$second_attributes = AttributeValue::where('attr_id',2)->orderby('attr_sort_index')->get();
+			foreach($first_attributes as $a1)
+			{
+				foreach($second_attributes as $a2)
+				{
+					$qty = 0;
+					$sku = $product->prod_sku.'-'.$a1->attr_value."-".$a2->attr_value;
+					$product = Product::where('prod_sku',$sku)->first();
+					if(!is_null($product))
+					{
+						$this->LogMsg("SKU ". $product->prod_sku." - QTY [".$product->prod_qty."]");
+						array_push($child_products, $product);
+					}
+				}
+			}
+		}
+		if(sizeof($products)>0) return;
+		dispatch(new DeleteProductJob($id));
 	}
 
 
 
-
+	/**
+	 * return boolean true if this Product type
+	 * has children products.
+	 *
+	 * @return	boolean
+	 */
+	public function hasChildren()
+	{
+		return true;
+	}
 }

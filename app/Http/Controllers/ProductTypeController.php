@@ -57,7 +57,6 @@ use App\Models\CategoryProduct;
 
 use App\Models\Attribute;
 
-
 use App\Traits\Logger;
 
 
@@ -76,7 +75,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
+		$this->setFileName("larvela");
 		$this->setClassName("ProductTypeController");
 		$this->LogStart();
 	}

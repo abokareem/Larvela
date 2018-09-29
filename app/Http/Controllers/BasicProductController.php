@@ -3,7 +3,7 @@
  * \class	BasicProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.1
+ * \version	1.0.4
  *
  * 
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -27,8 +27,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  *
- * \addtogroup Store_Administration
- * BasicProductController - This controller provides admin functions for Basic Products.
+ * \addtogroup  Product_Types
+ * BasicProductController - Provides CRYD like functions for "BASIC" type products.
  */
 namespace App\Http\Controllers;
 
@@ -105,168 +105,6 @@ use ProductImageHandling;
 
 
 
-	/**
-	 * Return an administration view listing the selected products.
-	 *
-	 * GET ROUTE: /admin/products
-	 *
-	 * @pre		none
-	 * @post	none
-	 *
-	 * @param	Request	$request
-	 * @return	mixed
-	 */
-	private function ShowProductsPage(Request $request)
-	{
-		$this->LogFunction("ShowProductsPage()");
-
-		#
-		# {FIX_2017-10-26} ShowProductsPage() - Converted to app('store')
-		#
-		$store = app('store');
-		$stores = Store::all();
-		$categories = Category::all();
-		$store_id = $store->id;
-		$category_id = 0;
-		$this->LogMsg("Default store ID [".$store->id."]");
-		$query = $request->input();
-		foreach($query as $n=>$v)
-		{
-			if(is_string($n)== true)
-			{
-				if(is_string($v)== true)
-				{
-					$this->LogMsg("Checking query N= $n while V= $v");
-					if($n=="s") $store_id = $v;
-					if($n=="c") $category_id = $v;
-				}
-			}
-		}
-		$this->LogMsg("Required store ID [".$store_id."]");
-		$this->LogMsg("Required Category ID [".$category_id."]");
-
-		$products = array();
-		#
-		# Get all products in the matching category
-		#
-		if(($store_id > 0)&&($category_id>0))
-		{
-			$this->LogMsg("Processing for Store/Category [".$store_id."/".$category_id."]");
-			$products_in_category = CategoryProduct::where('category_id', $category_id )->get();
-			foreach($products_in_category as $pic)
-			{
-				array_push($products, Product::find($pic->product_id) );
-			}
-		}
-		elseif($store_id > 0)
-		{
-			$this->LogMsg("Processing for Store Only [".$store_id."/".$category_id."]");
-			#
-			# {FIX_2018-02-25} Converted to first category to reduce number of products show
-			#
-			$first_category = Category::where('category_store_id',$store_id)
-				->where('category_status',"A")
-				->first();
-			$products_in_category = CategoryProduct::where('category_id', $first_category->id )->get();
-			foreach($products_in_category as $pic)
-			{
-				array_push($products, Product::find($pic->product_id) );
-			}
-		}
-		else
-		{
-			$this->LogMsg("Processing for All Products [".$store_id."/".$category_id."]");
-			#
-			# Just get ALL products
-			#
-			$products = Product::where('prod_status',"A")->get();
-		}
-		return view('Admin.Products.products',[
-			'store_id'=>$store_id,
-			'category_id'=>$category_id,
-			'store'=>$store,
-			'stores'=>$stores,
-			'categories'=>$categories,
-			'products'=>$products
-			]);
-	}
-
-
-
-	/**
-	 * Present a new page which allows SKU entry, then post back.
-	 *
-	 * {FIX_2017-10-24} Refactored product fetch using eloquent call in ShowCopyProductPage()
-	 *
-	 * GET ROUTE: /admin/product/copy/{id}
-	 *
-	 * @param	integer	$id		Product to copy
-	 * @return	mixed
-	 */
-	private  function ShowCopyProductPage($id)
-	{
-		$this->LogFunction("ShowCopyProductPage()");
-		$product = Product::find($id);
-		return view('Admin.Products.copy',['product'=>$product]);
-	}
-
-
-
-	/**
-	 * Using the new SKU, read the existing product using the ID, insert a new product with the new SKU.
-	 * Dont copy the images.
-	 * Dont match the categories.
-	 *
-	 * POST ROUTE: /admin/product/copy/{id}
-	 *
-	 * @param	integer	$id		Product to use as a tempalte to copy from.
-	 * @return	mixed
-	 */
-	private function CopyProductPage(Request $request, $id)
-	{
-		$this->LogFunction("CopyProductPage()");
-		$this->LogMsg("Source Product ID [".$id."]");
-
-		$base_product = Product::find($id);
-		$duplicate_count  = Product::where('prod_sku',$request['prod_sku'])->count();
-		if($duplicate_count == 0)
-		{
-			$base_product['prod_sku'] = $request['prod_sku'];
-			$prod_categories = CategoryProduct::where('product_id',$id)->get();
-			foreach($prod_categories as $pc)
-			{
-				$this->LogMsg("Product is assigned to category [".$pc->category_id."]");
-			}
-
-			$data = $base_product->toArray();
-			$this->LogMsg("New Product".print_r($data, true));
-			$new_pid = ProductService::insertArray($data);
-			$this->LogMsg("Product [".$id."] copied, new Product ID [".$new_pid."]");
-			$saved_categories = array();
-			$this->LogMsg("Checking for duplicates?");
-			foreach($prod_categories as $pc)
-			{
-				if(!in_array($pc->category_id, $saved_categories))
-				{
-					$this->LogMsg("Insert Cat [".$pc->category_id."]   Prod [".$new_pid."]");
-					$o = new CategoryProduct;
-					$o->category_id = $pc->category_id;
-					$o->product_id  = $new_pid;
-					$o->save();
-					array_push($saved_categories, $pc->category_id);
-				}
-				else
-				{
-					$this->LogMsg("Duplicate category found [".$pc->category_id."]");
-				}
-			}
-		}
-		else
-		{
-			\Session::flash('flash_error','ERROR - Product SKU alreay in Database!');
-		}
-		return Redirect::to("/admin/products");
-	}
 
 
 
@@ -446,73 +284,6 @@ use ProductImageHandling;
 
 
 
-	/**
-	 * Render a view edit page, first collect the existing data and
-	 * format it up for the view we are about to call.
-	 *
-	 * GET ROUTE: /admin/product/edit/{id}
-	 *
-	 * @param $id int row id to be checked against before insert
-	 * @return mixed - view object
-	 */
-	private function ShowEditProductPage($id)
-	{
-		$this->LogFunction("ShowEditProductPage(".$id.")");
-
-		$product = Product::find($id);
-		$store = app('store');
-		$stores = Store::all();
-		$categories = Category::all();
-		$product_types = ProductType::all();
-
-		$imagemap = ProdImageMap::where('product_id',$id)->get();
-		$prod_categories = CategoryProduct::where('product_id',$id)->get();
-
-		$images = array();
-		foreach($imagemap as $mapping)
-		{
-			$this->LogMsg("Found image ID [".$mapping->image_id."]");
-			$img = Image::find($mapping->image_id);
-			$this->LogMsg("           Name[".$img->image_file_name."]");
-			array_push($images, $img);
-		}
-		$text = "There are ".sizeof($images)." images assembled.";
-		$this->LogMsg( $text );
-
-		return view('Admin.Products.editproduct',[
-			'product'=>$product,
-			'product_types'=>$product_types,
-			'images'=>$images,
-			'categories'=>$categories,
-			'store'=>$store,
-			'stores'=>$stores,
-			'catmappings'=>$prod_categories]);
-	}
-
-
-
-
-	/**
-	 * Call the view to present the "Add New" Product page
-	 *
-	 * GET ROUTE: /admin/product/addnew
-	 *
-	 * @return mixed - view object
-	 */
-	private function ShowAddProductPage()
-	{
-		$this->LogFunction("ShowEditProductPage()");
-
-		$categories = Category::where('category_status','A')->orderBy('category_title')->get();
-		$stores = Store::all();
-		$product_types = ProductType::all();
-
-		return view('Admin.Products.addproduct',[
-			'categories'=>$categories,
-			'product_types'=>$product_types,
-			'stores'=>$stores
-			]);
-	}
 
 
 
@@ -727,7 +498,7 @@ use ProductImageHandling;
 	 *
 	 * @return	mixed
 	 */
-	public function ShowAttributesPage()
+	private function ShowAttributesPage()
 	{
 		$stores = Store::all();
 		$store_names = array();
@@ -788,5 +559,18 @@ use ProductImageHandling;
 			\Session::flash('flash_error',"ERROR - Product ID is invalid!");
 		}
 		return Redirect::to("/admin/products");
+	}
+
+
+
+	/**
+	 * return boolean true if this Product type
+	 * has children products.
+	 *
+	 * @return	boolean
+	 */
+	pubic function hasChildren()
+	{
+		return false;
 	}
 }

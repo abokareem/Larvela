@@ -3,7 +3,7 @@
  * \class	VirtualProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-04-03
- * \version	1.0.1
+ * \version	1.0.5
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -26,6 +26,8 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ * \addtogroup Product_Types
+ * VirtualProductController - Provides CRUD like functions relevant to all "VIRTUAL" products.
  */
 namespace App\Http\Controllers;
 
@@ -87,8 +89,8 @@ use ProductImageHandling;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
-		$this->setClassName("BasicProductController");
+		$this->setFileName("larvela");
+		$this->setClassName("VirtualProductController");
 		$this->LogStart();
 	}
 	
@@ -108,6 +110,8 @@ use ProductImageHandling;
 	 * Given the ID of a Virtual Product remove it totally from the server.
 	 * use a form because only admin can get the form and the ID
 	 * must be encoded in the form and the call must be authenticated as an admin user.
+	 *
+	 * Called from the ProductControler $obj->Delete(Request, integer);
 	 *
 	 * @param	integer	$id		Product to delete
 	 * @return	mixed
@@ -329,7 +333,7 @@ use ProductImageHandling;
 	 * @param $id int row id to be checked against before insert
 	 * @return mixed - view object
 	 */
-	public function ShowEditProductPage($id)
+	private function ShowEditProductPage($id)
 	{
 		$this->LogFunction("ShowEditProductPage(".$id.")");
 
@@ -373,7 +377,7 @@ use ProductImageHandling;
 	 *
 	 * @return mixed - view object
 	 */
-	public function ShowAddProductPage()
+	private function ShowAddProductPage()
 	{
 		$this->LogFunction("ShowEditProductPage()");
 
@@ -393,7 +397,7 @@ use ProductImageHandling;
 	/**
 	 * Update the products table with our changes (if any).
 	 *
-	 * POST ROUTE: /admin/product/update/{id}
+	 * Called via the Product Factory $obj->Update($id);
 	 *
 	 * @pre form must present all valid columns
 	 * @post new row inserted into database table "products" 
@@ -407,6 +411,7 @@ use ProductImageHandling;
 
 		CategoryProduct::where('product_id',$id)->delete();
 		$categories = $request->category;	/* array of category id's */
+
 		if(sizeof($categories)>0)
 		{
 			$this->LogMsg("Assign categories");
@@ -464,7 +469,7 @@ use ProductImageHandling;
 	 * Save the form just posted back to the server
 	 * Handle the images (if any) separately.
 	 *
-	 * POST ROUTE: /admin/product/save
+	 * Called via the Product Factory $obj->Save(Request);
 	 *
 	 * @pre form must present all valid columns
 	 * @post new row inserted into database table "products" 
@@ -474,8 +479,6 @@ use ProductImageHandling;
 	public function Save(ProductRequest $request)
 	{
 		$this->LogFunction("Save()");
-
-dd($request);
 
 		$pid=0;
 		$categories = $request->categories;	/* array of category id's */
@@ -524,8 +527,14 @@ dd($request);
 
 
 
+	/**
+	 * return boolean true if this Product type
+	 * has children products.
+	 *
+	 * @return	boolean
+	 */
+	pubic function hasChildren()
+	{
+		return false;
+	}
 }
-
-
-
-

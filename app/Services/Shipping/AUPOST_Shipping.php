@@ -1,9 +1,9 @@
 <?php
 /**
- * \class	AdvertService
- * \date	2016-12-08
- * \author	Sid Young <sid@off-grid-engineering.com>
+ * \class	AUPOST_Shipping
+ * \date 	2018-08-24
  * \version	1.0.1
+ *
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -26,22 +26,72 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
- *
- * \addtogroup Service
- * AdvertService - Placeholder for future module to provide advertising content
- * into the store, usually in place of a product in a group of products. 
- * - Exact design yet to be finalized.
  */
-namespace App\Services;
+namespace App\Services\Shipping;
 
 
-use App\Http\Requests\AdvertRequest;
-
-use App\Models\Advert;
+use App\Models\Store;
+use App\Models\Cart;
+use App\Models\Product;
+use App\Models\Customer;
+use App\Models\CustomerAddress;
 
 /**
- * \brief Service layer for the Adverts table
+ * \brief Module to return Local Shipping options
  */
-class AdvertService
+class AUPOST_Shipping implements IShippingModule
 {
+
+private $MODULE_CODE = "LARVELA_AUPOST";
+
+
+	/**
+	 * Return the unique module code <provider>_<shipping_type>
+	 *
+	 * @return	string
+	 */
+	public function getModuleCode()
+	{
+		return $this->MODULE_CODE;
+	}
+
+
+
+	/**
+	 *
+	 * @param	mixed	$store
+	 * @param	mixed	$cart
+	 * @param	mixed	$products
+	 * @param	mixed	$customer_address
+	 */
+	public function Calculate($store, $cart, $products, $customer_address)
+	{
+		$options = array();
+
+		$code = "";
+		$post_packs = Product::where('prod_combine_code',"AUPOST")
+			->orderBy("prod_weight")->get();
+
+		foreach($post_packs as $p)
+		{
+			$option = new \stdClass;
+			$option->cost = 0.0;
+			$option->display = $p->prod_title;
+#
+# get the AUPOST products using the combine_code
+#
+			
+
+			$option->value=$this->MODULE_CODE."-".$code;
+
+			array_push($options, $option);
+		}
+		return $options;
+	}
+
+
+	public function isActive()
+	{
+		return true;
+	}
 }

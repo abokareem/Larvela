@@ -3,7 +3,7 @@
  * \class	AdminProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-22
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -38,6 +38,7 @@ use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 use App\Services\ProductService;
+use App\Services\ProductPageFactory;
 
 use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;
@@ -57,10 +58,12 @@ use App\Models\Store;
 use App\Traits\Logger;
 
 /**
- * \brief MVC Controller to Handle the Product Administration functions.
+ * \brief MVC Controller to Handle the Product Administration functions initiated from the admin dashboard.
+ * - Not specific to a type of product (avoid specific calls, use factories where possible).
  *
  * {INFO_2018-03-01} Removed all code except copy and product add 
  * {INFO_2018-03-04} Coded up Parent product view call
+ * {INFO_2018-09-24} Refactored various calls so just core admin functions are present.
  */
 class AdminProductController extends Controller
 {
@@ -161,7 +164,7 @@ use Logger;
 		{
 			$this->LogMsg("Processing for All Products [".$store_id."/".$category_id."]");
 			#
-			# Just get ALL products
+			# Just get ALL products, need to redo this later
 			#
 			$products = Product::where('prod_status',"A")->get();
 		}
@@ -182,6 +185,7 @@ use Logger;
 	/**
 	 * Call the view to present the "Add New" Product page
 	 * was "/admin/product/addnew"
+	 *
 	 * GET ROUTE: /admin/select/type
 	 *
 	 * @return mixed - view object
@@ -189,10 +193,16 @@ use Logger;
 	public function SelectType()
 	{
 		$this->LogFunction("SelectType()");
+
 		$store = app('store');
-		$stores = Store::all();
-		$product_types = ProductType::all();
-		return view('Admin.Products.selecttype',[ 'product_types'=>$product_types, 'stores'=>$stores ]);
+		$stores = Store::get();
+		$product_types = ProductType::get();
+
+		return view('Admin.Products.selecttype',[
+			'store'=>$store,
+			'stores'=>$stores,
+			'product_types'=>$product_types
+			]);
 	}
 
 
@@ -206,24 +216,31 @@ use Logger;
 	public function RouteToPage($id)
 	{
 		$this->LogFunction("RouteToPage()");
-		$product_type = ProductType::where('product_type',"Basic Product")->first();
+
+		$product_type = ProductType::find($id);
 		$product_types = ProductType::get();
-		foreach($product_types as $pt)
-		{
-			if($id == $pt->id)
-			{
-				$product_type = $pt;
-				break;
-			}
-		}
+	#	foreach($product_types as $pt)
+	#	{
+	#		if($id == $pt->id)
+	#		{
+	#			$product_type = $pt;
+	#			break;
+	#		}
+	#	}
 
 		$store = app('store');
-		$stores = Store::all();
-		$categories = Category::all();
+		$stores = Store::get();
+		$categories = Category::get();
 
 		$ProductType = \App\Services\ProductTypeFactory::BuildRoute($product_type->id);
 		$route = "Admin.Products.".$ProductType;
-		return view($route,[ 'product_types'=>$product_types,'product_type'=>$product_type, 'stores'=>$stores, 'store'=>$store,'categories'=>$categories]);
+		$this->LogMsg("Routing to [".$ProductType."]");
+		return view($route,[
+			'product_types'=>$product_types,
+			'product_type'=>$product_type,
+			'stores'=>$stores,
+			'store'=>$store,
+			'categories'=>$categories]);
 	}
 
 
@@ -249,10 +266,11 @@ use Logger;
 
 
 	/**
-	 * Using the new SKU, read the existing product using the ID,
-	 * insert a new product with the new SKU.
-	 * Dont copy the images.
-	 * Dont match the categories.
+	 * Using the new SKU posted back in the form:
+	 * - Read the existing product using the ID,
+	 * - Insert a new product with the new SKU.
+	 * - Dont copy the images.
+	 * - Dont match the categories.
 	 *
 	 * POST ROUTE: /admin/product/copy/{id}
 	 *
@@ -313,47 +331,49 @@ use Logger;
 	 *
 	 * GET ROUTE: /admin/product/edit/{id}
 	 *
-	 * @param $id int row id to be checked against before insert
-	 * @return mixed - view object
+	 * @param	integer		$id
+	 * @return	mixed
 	 */
 	public function ShowEditProductPage($id)
 	{
 		$this->LogFunction("ShowEditProductPage(".$id.")");
 
 		$product = Product::find($id);
-		$store = app('store');
-		$stores = Store::all();
-		$categories = Category::all();
-		$product_types = ProductType::all();
-
-
-#
-# use factory to get edit page name/route and route accordingly.
-#
-
-
-		$imagemap = ProdImageMap::where('product_id',$id)->get();
-		$prod_categories = CategoryProduct::where('product_id',$id)->get();
-
-		$images = array();
-		foreach($imagemap as $mapping)
+		if(!is_null($product))
 		{
-			$this->LogMsg("Found image ID [".$mapping->image_id."]");
-			$img = Image::find($mapping->image_id);
-			$this->LogMsg("           Name[".$img->image_file_name."]");
-			array_push($images, $img);
-		}
-		$text = "There are ".sizeof($images)." images assembled.";
-		$this->LogMsg( $text );
+			$this->LogMsg("Found Product (sku) [".$product->prod_sku."]");
+			$store = app('store');
+			$stores = Store::all();
+			$attributes = Attribute::get();
+			$categories = Category::all();
+			$product_types = ProductType::all();
+			$page_object = ProductPageFactory::build($product);
+			$view = $page_object->getEditPageRoute();
+			$imagemap = ProdImageMap::where('product_id',$id)->get();
+			$prod_categories = CategoryProduct::where('product_id',$id)->get();
+			$images = array();
+			foreach($imagemap as $mapping)
+			{
+				$this->LogMsg("Found image ID [".$mapping->image_id."]");
+				$img = Image::find($mapping->image_id);
+				$this->LogMsg("           Name[".$img->image_file_name."]");
+				array_push($images, $img);
+			}
+			$text = "There are ".sizeof($images)." images assembled.";
+			$this->LogMsg( $text );
 
-		return view('Admin.Products.editproduct',[
-			'product'=>$product,
-			'product_types'=>$product_types,
-			'images'=>$images,
-			'categories'=>$categories,
-			'store'=>$store,
-			'stores'=>$stores,
-			'catmappings'=>$prod_categories]);
+			return view('Admin.Products.'.$view, [
+				'product'=>$product,
+				'product_types'=>$product_types,
+				'attributes'=>$attributes,
+				'images'=>$images,
+				'categories'=>$categories,
+				'store'=>$store,
+				'stores'=>$stores,
+				'catmappings'=>$prod_categories]);
+		}
+		\Session::flash('flash_error','ERROR - Selected Product is invalid!');
+		return Redirect::to("/admin/products");
 	}
 
 

@@ -5,6 +5,7 @@
  * \date	2018-08-22
  * \version	1.0.0
  *
+ *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -55,7 +56,6 @@ use App\Mail\OrderPendingEmail;
 use App\Mail\OrderDispatchedEmail;
 use App\Mail\OrderOnHoldEmail;
 
-
 use App\Jobs\EmptyCartJob;
 use App\Jobs\OutOfStockJob;
 
@@ -94,7 +94,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("admin");
+		$this->setFileName("larvela-admin");
 		$this->setClassName("AdminOrderController");
 		$this->LogStart();
 	}

@@ -66,9 +66,9 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store-admin");
+		$this->setFileName("larvela-admin");
+		$this->setClassName("AdminController");
 		$this->LogStart();
-		$this->LogMsg("CLASS::AdminController");
 	}
 
 
@@ -79,7 +79,6 @@ use Logger;
 	 */
 	public function __destruct()
 	{
-		$this->LogMsg("CLASS::AdminController");
 		$this->LogEnd();
 	}
 

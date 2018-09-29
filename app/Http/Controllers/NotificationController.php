@@ -3,7 +3,8 @@
  * \class	NotificationController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-09-18
- * \version	1.0.0
+ * \version	1.0.1
+ *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -58,7 +59,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela-admin");
 		$this->setClassName("NotificationController");
 		$this->LogStart();
 	}

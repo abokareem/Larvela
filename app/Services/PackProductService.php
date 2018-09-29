@@ -3,7 +3,7 @@
  * \class	PackProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  *
@@ -82,6 +82,20 @@ protected $product;
 	{
 		return "packproduct";
 	}
+
+
+
+	/**
+	 * Return the name of the page used for editing this specific product type.
+	 * View will be "Admin/Product/edit_pack.blade.php"
+	 *
+	 * @return	string
+	 */
+	public function getEditPageRoute()
+	{
+		return "edit_pack";
+	}
+
 
 
 	# @todo devise the variables needed for a page display of a basic product.
