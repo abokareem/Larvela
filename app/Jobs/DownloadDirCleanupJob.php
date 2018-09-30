@@ -3,7 +3,7 @@
  * \class	DownloadDirCleanupJob
  * \date	2018-09-26
  * \author	Sid Young <suid@off-grid-engineering.com>
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -43,15 +43,25 @@
 namespace App\Jobs;
 
 
+use App\Models\StoreSetting;
 use App\Traits\Logger;
 
 
 /**
  * \brief CRON task to cleanup old files in the public/download/[0-F]/<GUID> directory structure
+ * {INFO_2018-09-30} Add code to support store setting DOWNLOAD_LIFESPAN
  */
 class DownloadDirCleanupJob extends Job
 {
 use Logger;
+
+
+/**
+ * Keep downloaded virtual products in public for this number of days.
+ * @var integer $remove_after_days
+ */
+protected $remove_after_days=7;
+
 
     /**
      * Create a new job instance.
@@ -59,6 +69,22 @@ use Logger;
      */
     public function __construct()
     {
+		$this->setFileName("larvela-cron");
+		$this->setClassName("DownloadDirCleanupJob");
+		$this->LogStart();
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get()->toArray();
+		$this->LogMsg("There are [".sizeof($settings)."] store settings to check.");
+		if(!is_null($settings))
+		{
+		$this->remove_after_days = array_reduce( $settings,
+			function($default,$s)
+			{
+				$this->LogMsg("Found [".$s['setting_name']."]");
+				return ($s['setting_name']=="DOWNLOAD_LIFESPAN") ? $s['setting_value'] : $default;
+			},$this->remove_after_days);
+		}
+		$this->LogMsg("Remove files after [".$this->remove_after_days."] days.");
     }
 
     /**
@@ -82,10 +108,7 @@ use Logger;
      */
 	public function Run()
 	{
-		$this->setFileName("larvela-cron");
-		$this->setClassName("DownloadDirCleanupJob");
-		$this->LogStart();
-		$purge_time = strtotime('-1 days');
+		$purge_time = strtotime("-".$this->remove_after_days." days");
 		$this->LogMsg("Purge time [".$purge_time."]");
 		$this->LogMsg("Fetch base dir and check for required sub dirs.");
 		$base = base_path()."/public/download";
