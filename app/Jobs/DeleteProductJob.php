@@ -3,7 +3,7 @@
  * \class	DeleteProductJob
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-01
- * \version	1.0.0
+ * \version	1.0.2
  * 
  * 
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -40,15 +40,15 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 use App\Jobs\EmailUserJob;
 
-use App\Traits\TemplateTrait;
 use App\Traits\Logger;
 
 use	App\Models\Image;
 use App\Models\Product;
 use	App\Models\ProdImageMap;
 use App\Models\ImageProduct;
-use App\Models\CategoryProduct;
 use App\Models\Notification;
+use App\Models\CategoryProduct;
+use App\Models\AttributeProduct;
 
 
 /**
@@ -57,7 +57,6 @@ use App\Models\Notification;
  */
 class DeleteProductJob extends Job 
 {
-use TemplateTrait;
 use Logger;
 
 
@@ -66,6 +65,7 @@ use Logger;
  * @var int $product_id
  */
 protected $product_id;
+
 
 
 
@@ -114,6 +114,7 @@ protected $product_id;
 		$this->LogMsg("Cleanup any customer notification requests");
 		Notification::where('product_code',$product->prod_sku)->delete();
 
+		AttributeProduct::where('product_id',$product->id)->delete();
 		$this->LogMsg("Fetch images id from pivot table");
 		$images = $product->images()->get();
 		$this->LogMsg("There are [".sizeof($images)."] images associated with this product");
