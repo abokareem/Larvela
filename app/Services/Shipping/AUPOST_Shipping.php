@@ -29,13 +29,14 @@
 namespace App\Services\Shipping;
 
 
-use App\Service\Shipping\IShippingModule;
 
 use App\Models\Store;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
+use App\Services\Shipping\IShippingModule;
+
 
 /**
  * \brief Module to return Local Shipping options
@@ -81,8 +82,6 @@ private $MODULE_CODE = "LARVELA_AUPOST";
 #
 # get the AUPOST products using the combine_code
 #
-			
-
 			$option->value=$this->MODULE_CODE."-".$code;
 
 			array_push($options, $option);

@@ -36,6 +36,10 @@ use App\Models\Product;
 use App\Models\Customer;
 use App\Models\CustomerAddress;
 
+use App\Services\Shipping\IShippingModule;
+
+
+
 /**
  * \brief Module for calculating postage costs and options for using AU Post
  */
