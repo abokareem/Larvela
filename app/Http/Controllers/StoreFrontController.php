@@ -316,10 +316,18 @@ use Logger;
 		}
 		else
 		{
+			$sizes = array();
+			$colours = array();
 			$size_attribute = Attribute::where('attribute_name','Size')->where('store_id',$store->id)->first();
-			$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
+			if(!is_null($size_attribute))
+			{
+				$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
+			}
 			$colour_attribute = Attribute::where('attribute_name','Colour')->where('store_id',$store->id)->first();
-			$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
+			if(!is_null($colour_attribute))
+			{
+				$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
+			}
 			$this->LogMsg("Render View Frontend.storefront - No Products assigned to shop");
 			$theme_path = \Config::get('THEME_HOME')."storefront";
 			return view($theme_path,[
