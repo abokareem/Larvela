@@ -1,10 +1,32 @@
 <?php
 /**
  * \class	EmailUserJob
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2016-10-19
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2016-10-19
+ * \version	1.0.0
+ * 
  *
- * [CC]
+ *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  *
  * \addtogroup Internal
  * EmailUserJob - Common routine to Email a user.
@@ -88,14 +110,21 @@ protected $mailer;
     public function __construct($to, $from, $subject, $body)
     {
 		$this->setFileName("larvela-emails");
+		$this->setClassName("larvela-emails");
 		$this->to = $to;
 		$this->from = $from;
 		$this->subject = $subject;
 		$this->body = $body;
-		$this->LogMsg( "TO [".$to."]  FROM [".$from."] - ".$subject );
+		if(is_array($from))
+			$this->LogMsg( "TO [".$to."]  FROM [".print_r($from,1)."] - ".$subject );
+		else
+			$this->LogMsg( "TO [".$to."]  FROM [".$from."] - ".$subject );
 
-		$this->transport = Swift_SmtpTransport::newInstance('localhost', 25);
-		$this->mailer = Swift_Mailer::newInstance($this->transport);
+		#
+		# 2018-10-08 Replaced with NEW
+		#$this->transport = Swift_SmtpTransport::newInstance('localhost', 25);
+		$this->transport = new Swift_SmtpTransport('localhost', 25);
+		$this->mailer =  new Swift_Mailer($this->transport);
     }
 
 
@@ -108,18 +137,11 @@ protected $mailer;
      */
     public function handle()
     {
-		$message = Swift_Message::newInstance($this->subject);
+		$message =  new Swift_Message($this->subject);
 		$message->setTo($this->to);
 		$message->setFrom($this->from);
 		$message->setBody($this->body, 'text/html');
 		$this->mailer->send($message);
 		$this->LogMsg( "Email sent.");
-
-#
-# Capture all emails
-# test code, jobs now coded to send to store owner ID=1
-#
-#		$message->setTo("sid.young@gmail.com");
-#		$this->mailer->send($message);
     }
 }
