@@ -47,6 +47,6 @@ class Kernel extends ConsoleKernel
 		$schedule->call('\App\Jobs\CheckPendingOrders@handle')->dailyAt('5:00');
 		$schedule->call('\App\Jobs\BuildReleaseInfo@handle')->dailyAt('23:30');
 
-		$schedule->call('\App\Jobs\DownloadDirCleanupJob@handle')->everyFifteenMinutes();
+		$schedule->call('\App\Jobs\DownloadDirCleanupJob@handle')->hourly();
     }
 }
