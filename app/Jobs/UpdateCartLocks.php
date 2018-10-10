@@ -15,7 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 use App\Models\Product;
-use App\Models\ProductLocks;
+use App\Models\ProductLock;
 use App\Traits\Logger;
 use DB;
 
@@ -55,9 +55,9 @@ use Logger;
 
 	public function Run()
 	{
-		$this->setFileName("store-cron");
+		$this->setFileName("larvela-cron");
 		$stale_time = time()-300;
-		$product_locks = ProductLocks::all();
+		$product_locks = ProductLock::all();
 		if(sizeof($product_locks)>0)
 		{
 			$this->LogStart();

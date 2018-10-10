@@ -4,8 +4,8 @@
  * \author	Sid Young
  * \class	ProcessAbandonedCart
  *
- * \addtogroup CRON
- * Retrieve all the cart items and if:
+ * \addtogroup Cart_Abandonment
+ * ProcessAbandonedCart - Retrieve all the cart items and if:
  * - Any dated yesterday then send AbandonedCartEmail.
  * - Any dated a week old, send AbandonedWeekOldCartEmail.
  * - Run ONCE a day!
@@ -27,7 +27,7 @@ use App\Jobs\AbandonedCart;
 use App\Jobs\AbandonedWeekOldCart;
 
 
-use App\Models\Users;
+use App\Models\User;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Store;
@@ -67,7 +67,7 @@ use Logger;
 
 	public function Run()
 	{
-		$this->setFileName("store-cron");
+		$this->setFileName("larvela-cron");
 		
 		$found=0;
 		$yesterday = date("Y-m-d", strtotime("-1 days"));
@@ -98,7 +98,7 @@ use Logger;
 					else
 					{
 						$cart = Cart::find($item->cart_id);
-						$user = Users::find($cart->user_id);
+						$user = User::find($cart->user_id);
 						$found++;
 						$this->LogMsg("Process cart ID [".$item->id."] - Customer [".$user->email."]");
 						$this->LogMsg("Dispatch Job");
@@ -131,7 +131,7 @@ use Logger;
 					else
 					{
 						$cart = Cart::find($item->cart_id);
-						$user = Users::find($cart->user_id);
+						$user = User::find($cart->user_id);
 						$found++;
 						$this->LogMsg("Process cart ID [".$item->id."] - Customer was [".$user->email."]");
 						$this->LogMsg("Dispatch Job");

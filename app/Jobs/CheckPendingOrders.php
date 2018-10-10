@@ -99,7 +99,7 @@ use Logger;
      */
 	public function Run()
 	{
-		$this->setFileName("store-cron");
+		$this->setFileName("larvela-cron");
 		$store = app('store');
 		$one_week_ago = date("Y-m-d", strtotime("-1 week"));
 		$pending_orders = Order::where('order_status','W')->get();

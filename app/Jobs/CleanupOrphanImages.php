@@ -83,7 +83,7 @@ use Logger;
      */
 	public function Run()
 	{
-		$this->setFileName("store-cron");
+		$this->setFileName("larvela-cron");
 		$this->LogStart();
 
 		$this->LogMsg("Fetch all parent images");
