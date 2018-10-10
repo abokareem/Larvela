@@ -115,7 +115,7 @@ protected $remove_after_days=7;
 		$this->CheckCreateDir($base);
 
 		$this->LogMsg("Check/Create GUID directories");
-		for($i=0;$i<16;$i++)
+		for($i=0;$i<17;$i++)
 		{
 			$guid_path = base_path()."/public/download/".dechex($i);
 			$this->LogMsg("Checking for [".$guid_path."]");
@@ -127,7 +127,7 @@ protected $remove_after_days=7;
 		}
 
 		$this->LogMsg("Checking each download directory:");
-		for($i=0;$i<16;$i++)
+		for($i=0;$i<17;$i++)
 		{
 			$full_guid_path = base_path()."/public/download/".dechex($i);
 			$guid_path = "/public/download/".dechex($i);
@@ -156,6 +156,7 @@ protected $remove_after_days=7;
 								if(filemtime($file_path) < $purge_time)
 								{
 									$this->LogMsg(" - Remove file [".$f."]");
+									unlink($file_path);
 								}
 							}
 						}
