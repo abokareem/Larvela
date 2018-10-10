@@ -1,10 +1,31 @@
 <?php
 /**
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2017-08-28
  * \class	ThemeServiceProvider
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2017-08-28
+ * \version	1.0.1
  *
- * [CC]
+ *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  *
  *
  * \addtogroup Themes
@@ -22,8 +43,8 @@ use App\Models\Theme;
 
 /**
  * \brief Provides a series of global variables that can be used
- * to access the required Theme Directory structure. Once "store Theme"
- * is defined, set that as the default theme name.
+ * to access the required Theme Directory structure.
+ * Once the "store Theme" is defined, set that as the default theme name.
  * 2017-10-20 - Added support for DB table check as it will not during initial install.
  */
 class ThemeServiceProvider extends ServiceProvider
@@ -40,6 +61,15 @@ class ThemeServiceProvider extends ServiceProvider
     public function boot()
     {
 		$theme_name = "default";
+		#
+		# {INFO_2018-10-10} ThemeServiceProvider - Add support for store theme.
+		#
+		$store = app('store');
+		if(strlen($store->store_theme)>3)
+		{
+			$theme_name = $store->store_theme;
+		}
+
 		$today = strtotime(date("Y-m-d"));
 		#
 		# 1. Get theme names from DB table
@@ -73,7 +103,6 @@ class ThemeServiceProvider extends ServiceProvider
 			$default_blade_path = "Themes.default.".$theme_dir.".";
 
 			$path = resource_path("views/Themes/".$theme_name."/".$theme_dir);
-			#echo "PATH: ".$path."<br>";
 			if(file_exists($path) && is_dir($path))
 			{
 				View::share($theme_u_dir, $blade_path);
