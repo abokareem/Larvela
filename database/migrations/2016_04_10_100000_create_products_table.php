@@ -25,6 +25,7 @@ class CreateProductsTable extends Migration
 			$table->decimal('prod_base_cost',13,2);
 			$table->decimal('prod_retail_cost',13,2);
 			$table->string( 'prod_combine_code');
+			$table->string( 'prod_status');
 			$table->date('prod_date_created');
 			$table->time('prod_time_created');
 			$table->date('prod_date_updated');
