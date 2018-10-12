@@ -65,7 +65,7 @@ class AppServiceProvider extends ServiceProvider
 
 		if(Schema::hasTable('stores'))
         {
-			$Store = new Store;
+			$store = new Store;
 			if(($store_code=getenv("STORE_CODE"))!=false)
 			{
 				$store = Store::where('store_env_code', $store_code )->first();
