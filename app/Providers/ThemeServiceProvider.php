@@ -60,14 +60,18 @@ class ThemeServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+		$temp_theme_name = "";
 		$theme_name = "default";
 		#
 		# {INFO_2018-10-10} ThemeServiceProvider - Add support for store theme.
 		#
-		$store = app('store');
-		if(strlen($store->store_theme)>3)
+		if(Schema::hasTable('stores'))
 		{
-			$theme_name = $store->store_theme;
+			$store = app('store');
+			if(strlen($store->store_theme)>3)
+			{
+				$theme_name = $store->store_theme;
+			}
 		}
 
 		$today = strtotime(date("Y-m-d"));
@@ -86,7 +90,7 @@ class ThemeServiceProvider extends ServiceProvider
 			#
 			if(($today >= strtotime($t->theme_date_from)) && ($today <=strtotime($t->theme_date_to)))
 			{
-				$theme_name = $t->theme_name;
+				$temp_theme_name = $t->theme_name;
 				break;
 			}
 		}
@@ -102,6 +106,9 @@ class ThemeServiceProvider extends ServiceProvider
 			$blade_path  = "Themes.".$theme_name.".".$theme_dir.".";
 			$default_blade_path = "Themes.default.".$theme_dir.".";
 
+			#
+			# 
+			#
 			$path = resource_path("views/Themes/".$theme_name."/".$theme_dir);
 			if(file_exists($path) && is_dir($path))
 			{
