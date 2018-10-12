@@ -77,7 +77,9 @@ class AppServiceProvider extends ServiceProvider
 			if(is_null($store))
 			{
 				$store = new Store;
+				$store->store_env_code = "DEMO";
 				$store->store_name = "DEMO";
+				$store->store_parent_id = 0;
 			}
 			$this->app->instance('store', $store);
 			Config::set("app.url", $store->store_url);
