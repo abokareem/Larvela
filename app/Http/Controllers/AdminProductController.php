@@ -3,7 +3,7 @@
  * \class	AdminProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-22
- * \version	1.0.2
+ * \version	1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -40,20 +40,21 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use App\Services\ProductService;
 use App\Services\ProductPageFactory;
 
-use App\Jobs\DeleteImageJob;
-use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
+use App\Jobs\DeleteImageJob;
+use App\Jobs\DeleteProductJob;
 
-use App\Models\Attribute;
-use App\Models\Category;
-use App\Models\CategoryProduct;
 use App\Models\Image;
-use App\Models\Notification;
-use App\Models\Product;
-use App\Models\ProductType;
-use App\Models\ProdImageMap;
 use App\Models\Store;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Attribute;
+use App\Models\ProductType;
+use App\Models\Notification;
+use App\Models\ProdImageMap;
+use App\Models\CategoryProduct;
+use App\Models\AttributeProduct;
 
 use App\Traits\Logger;
 
@@ -219,18 +220,11 @@ use Logger;
 
 		$product_type = ProductType::find($id);
 		$product_types = ProductType::get();
-	#	foreach($product_types as $pt)
-	#	{
-	#		if($id == $pt->id)
-	#		{
-	#			$product_type = $pt;
-	#			break;
-	#		}
-	#	}
 
 		$store = app('store');
 		$stores = Store::get();
 		$categories = Category::get();
+		$attributes = Attribute::where('store_id',$store->id)->get();
 
 		$ProductType = \App\Services\ProductTypeFactory::BuildRoute($product_type->id);
 		$route = "Admin.Products.".$ProductType;
@@ -238,6 +232,7 @@ use Logger;
 		return view($route,[
 			'product_types'=>$product_types,
 			'product_type'=>$product_type,
+			'attributes'=>$attributes,
 			'stores'=>$stores,
 			'store'=>$store,
 			'categories'=>$categories]);
@@ -344,8 +339,18 @@ use Logger;
 			$this->LogMsg("Found Product (sku) [".$product->prod_sku."]");
 			$store = app('store');
 			$stores = Store::all();
-			$attributes = Attribute::get();
-			$categories = Category::all();
+			$attributes = Attribute::where('store_id',$store->id)->get();
+			$product_attributes = AttributeProduct::where('product_id',$product->id)->orderby('combine_order')->get();
+			$category_collection = Category::all();
+			$categories = array();
+			foreach($category_collection as $cc)
+			{
+				if(is_null($cc->category_store_id))
+				{
+					$cc->category_store_id = 0;
+				}
+				array_push($categories, $cc);
+			}
 			$product_types = ProductType::all();
 			$page_object = ProductPageFactory::build($product);
 			$view = $page_object->getEditPageRoute();
@@ -365,7 +370,9 @@ use Logger;
 			return view('Admin.Products.'.$view, [
 				'product'=>$product,
 				'product_types'=>$product_types,
+				'product_categories'=>$prod_categories,
 				'attributes'=>$attributes,
+				'product_attributes'=>$product_attributes,
 				'images'=>$images,
 				'categories'=>$categories,
 				'store'=>$store,
@@ -382,13 +389,20 @@ use Logger;
 	/**
 	 * Call the view to present the "Add New" Product page
 	 *
+	 *----------------------------------------------------------------------
+	 *
+	 *      Deprecated
+	 *
+	 *----------------------------------------------------------------------
+	 *
 	 * GET ROUTE: /admin/product/addnew
 	 *
 	 * @return mixed - view object
 	 */
 	public function ShowAddProductPage()
 	{
-		$this->LogFunction("ShowEditProductPage()");
+dd($this);
+		$this->LogFunction("ShowAddProductPage()");
 
 		$categories = Category::where('category_status','A')->orderBy('category_title')->get();
 		$stores = Store::all();
