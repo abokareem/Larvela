@@ -80,13 +80,6 @@ protected $fillable = array(
 		'store_country_code'
 		);
 
-protected $data = array();
-
-
-	function __construct()
-	{
-	}
-
 
 
 	/**
