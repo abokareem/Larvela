@@ -12,7 +12,7 @@
 		<div class="form-group">
 			<label class="control-label col-xs-2">Environment Code:</label>
 			<div class="col-xs-2">
-				<input type="text" class="form-control" name="store_env_code" id='store_anv_code' placeholder="2 or 3 chars">
+				<input type="text" class="form-control" name="store_env_code" id='store_anv_code' placeholder="2 or 3 chars" style='text-transform:uppercase'>
 		 	</div>
 		</div>
 		<div class="form-group">
@@ -24,7 +24,7 @@
 		<div class="form-group">
 			<label class="control-label col-xs-2">URL:</label>
 			<div class="col-xs-7">
-				<input type="text" class="form-control" id='store_url' name="store_url" value=''>
+				<input type="text" class="form-control" id='store_url' name="store_url" value='' style='text-transform:lowercase'>
 		 	</div>
 		</div>
 		<div class="form-group">
@@ -43,6 +43,9 @@
 			<div class="col-xs-4">
 				<select class="form-control" name="store_currency">
 				<option value='AUD' selected>AUD</option>
+				<option value='CAN'>CAN</option>
+				<option value='EUR'>EUR</option>
+				<option value='GBP'>GBP</option>
 				<option value='NZD'>NZD</option>
 				<option value='USD'>USD</option>
 				</select>
