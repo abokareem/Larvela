@@ -1,4 +1,4 @@
-@extends('Tempates.admin-master')
+@extends('Templates.admin-master')
 @section('title','SEO Management')
 @section('content')
 
