@@ -42,12 +42,16 @@
 			<label class="control-label col-xs-2">Currency:</label>
 			<div class="col-xs-4">
 				<select class="form-control" name="store_currency">
-				<option value='AUD' selected>AUD</option>
-				<option value='CAN'>CAN</option>
-				<option value='EUR'>EUR</option>
-				<option value='GBP'>GBP</option>
-				<option value='NZD'>NZD</option>
-				<option value='USD'>USD</option>
+				<option value='AUD' selected>Australian Dollar</option>
+				<option value='CAD'>Canadian Dollar</option>
+				<option value='EUR'>Euro</option>
+				<option value='GBP'>Great British Pound</option>
+				<option value='JPY'>Japanese Yen</option>
+				<option value='NZD'>New Zealand Dollar</option>
+				<option value='RMB'>Renminbi</option>
+				<option value='CNY'>Chinese Yuan</option>
+				<option value='SGD'>Singapore dollar</option>
+				<option value='USD'>United States Dollar</option>
 				</select>
 		 	</div>
 		</div>
