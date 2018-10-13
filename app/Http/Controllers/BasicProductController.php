@@ -3,7 +3,7 @@
  * \class	BasicProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.4
+ * \version	1.0.5
  *
  * 
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -63,6 +63,7 @@ use App\Models\ProdImageMap;
 use App\Models\Notification;
 
 use App\Traits\Logger;
+use App\Traits\PathManagementTrait;
 use App\Traits\ProductImageHandling;
 
 
@@ -77,6 +78,7 @@ class BasicProductController extends Controller
 {
 use Logger;
 use ProductImageHandling;
+use PathManagementTrait;
 
 
 	/**
@@ -538,13 +540,14 @@ use ProductImageHandling;
 	{
 		$this->LogFunction("DeleteProduct(".$id.")");
 
+		$store = app('store');
 		$form = Input::all();
 		if(array_key_exists('id',$form))
 		{
 			if($id == $form['id'])
 			{
 				$this->LogMsg("Dispatch Job.");
-				$cmd = new DeleteProductJob($id);
+				$cmd = new DeleteProductJob($store, $id);
 				$this->dispatch($cmd);
 			}
 			else
@@ -569,7 +572,7 @@ use ProductImageHandling;
 	 *
 	 * @return	boolean
 	 */
-	pubic function hasChildren()
+	public function hasChildren()
 	{
 		return false;
 	}
