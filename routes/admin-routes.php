@@ -2,6 +2,12 @@
 
 #
 #  Routes for Admin operations
+# Uses the CheckRole middle ware to ensure the user has the right role
+#
+# Route::get('/path',['uses'=>'Controller@function','roles'=>'ADMIN']);
+# Route::get('/path',['uses'=>'Controller@function','roles'=>['ADMIN','USER'] ]);
+#
+#
 #
 Route::group(['middleware'=>['auth','roles']], function()
 {
@@ -66,7 +72,7 @@ Route::post('/admin/store/save','AdminStoreController@SaveNewStore');
 Route::post('/admin/store/update/{id}','AdminStoreController@UpdateStore');
 #
 #
-Route::get('/admin/customers',['uses'=>'CustomerController@ShowCustomers','roles'=>'root']);
+Route::get('/admin/customers',['uses'=>'CustomerController@ShowCustomers','roles'=>['ADMIN','root']]);
 Route::get('/admin/customer/edit/{id}','CustomerController@ShowEditCustomerPage');
 Route::get('/admin/customer/addnew','CustomerController@ShowAddCustomerPage');
 Route::post('/admin/customer/save','CustomerController@SaveNewCustomer');
@@ -90,30 +96,35 @@ Route::post('/admin/category/deletecat/{id}','CategoryController@DoDeleteCategor
 #
 #
 #
-Route::get('/admin/products/select/type','ProductController@SelectType');
-Route::get('/admin/select/type/{id}','ProductController@RouteToPage');
-Route::post('/admin/product/save-bp','BasicProductController@Save');
-Route::post('/admin/product/save-pp','ParentProductController@Save');
-Route::post('/admin/product/save-lv','VirtualProductController@SaveLimitedVirtual');
-Route::post('/admin/product/save-uv','VirtualProductController@SaveUnLimitedVirtual');
+Route::get('/admin/products/select/type','AdminProductController@SelectType');
+Route::get('/admin/select/type/{id}','AdminProductController@RouteToPage');
+
+
+#
+# 2018-09-22 replace these with ProductFactory call in ProductController.
+#
+##Route::post('/admin/product/save-bp','BasicProductController@Save');
+##Route::post('/admin/product/save-pp','ParentProductController@Save');
+##Route::post('/admin/product/save-lv','VirtualProductController@SaveLimitedVirtual');
+##Route::post('/admin/product/save-uv','VirtualProductController@SaveUnLimitedVirtual');
 
 #
 #
 #
-Route::get('/admin/products','ProductController@ShowProductsPage');
-Route::get('/admin/product/addnew','BasicProductController@ShowAddProductPage');
-Route::get('/admin/product/edit/{id}','BasicProductController@ShowEditProductPage');
-Route::post('/admin/product/update/{id}','BasicProductController@UpdateProduct');
-Route::post('/admin/product/delete/{id}','BasicProductController@DeleteProduct');
+Route::get('/admin/products','AdminProductController@ShowProductsPage');
+Route::get('/admin/product/addnew','AdminProductController@ShowAddProductPage');
+Route::get('/admin/product/edit/{id}','AdminProductController@ShowEditProductPage');
 #
-# 2018-03-04 OLD product save, now relaced with save-pp, save-vl, asve-bp,save-uv
+# 2018-09-22 use factory object in product controller to route to product
 #
-Route::post('/admin/product/save','BasicProductController@SaveNewProduct');
+Route::post('/admin/product/save','ProductController@Save');
+Route::post('/admin/product/update/{id}','ProductController@Update');
+Route::post('/admin/product/delete/{id}','ProductController@Delete');
 #
 #
 #
-Route::get( '/admin/product/copy/{id}','ProductController@ShowCopyProductPage');
-Route::post('/admin/product/copy/{id}','ProductController@CopyProductPage');
+Route::get( '/admin/product/copy/{id}','AdminProductController@ShowCopyProductPage');
+Route::post('/admin/product/copy/{id}','AdminProductController@CopyProductPage');
 #
 #
 #
