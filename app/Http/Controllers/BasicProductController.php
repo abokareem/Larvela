@@ -380,6 +380,8 @@ use PathManagementTrait;
 	{
 		$this->LogFunction("SaveNewProduct()");
 
+		$store=app('store');
+
 		$pid=0;
 		$categories = $request->categories;	/* array of category id's */
 		$pid = ProductService::insert($request);
