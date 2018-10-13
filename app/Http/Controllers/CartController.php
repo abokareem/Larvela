@@ -125,6 +125,7 @@ private $user;
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$user = User::find(Auth::user()->id);
 		$address = null;
+		$thumbnails = array();
 		$customer = Customer::where('customer_email',$user->email)->first();
 		if(!is_null($customer))
 		{
@@ -163,19 +164,22 @@ private $user;
 		$quantities = array();
 		$qtymap = array();
 		$this->LogMsg("Iterate through cart - look for duplicate products");
-		foreach($items as $item)
+		if(is_null($items) == false)
 		{
-			$this->LogMsg("Item: ".$item->id."  - Cart [".$item->cart_id."]  Product ID [".$item->product_id."] QTY [".$item->qty."]");
-			if(in_array($item->product_id, $quantities)==true)
+			foreach($items as $item)
 			{
-				$qtymap[$item->product_id] = $item->qty; 
-				$this->LogMsg( "Item in cart already, inc QTY [".$qtymap[$item->product_id]."]" );
-			}
-			else
-			{
-				$qtymap[$item->product_id] = $item->qty;
-				array_push( $quantities, $item->product_id);
-				$this->LogMsg( "Item added" );
+				$this->LogMsg("Item: ".$item->id."  - Cart [".$item->cart_id."]  Product ID [".$item->product_id."] QTY [".$item->qty."]");
+				if(in_array($item->product_id, $quantities)==true)
+				{
+					$qtymap[$item->product_id] = $item->qty; 
+					$this->LogMsg( "Item in cart already, inc QTY [".$qtymap[$item->product_id]."]" );
+				}
+				else
+				{
+					$qtymap[$item->product_id] = $item->qty;
+					array_push( $quantities, $item->product_id);
+					$this->LogMsg( "Item added" );
+				}
 			}
 		}
 		$this->LogMsg("Exit Loop.");
@@ -186,52 +190,38 @@ private $user;
 		$products = array();
 		$total = 0;
 		$this->LogMsg("Iterate through cart - Add up duplicate products");
-		foreach($items as $item)
+		if(is_null($items)==false)
 		{
-			if(in_array($item->product_id, $product_id_list)==true) continue;
-			/*
-			 * Save it in array so we skip it and get one entry in the shoping cart
-			 */
-			$this->LogMsg("[".$item->product_id."] not in product_id_list array --- ADD!");
-			array_push($product_id_list,$item->product_id);
-			$product = Product::find($item->product_id);
-
-			$thumbnails = ImageService::getThumbnails($product);
-
-			$this->LogMsg("Item qty value is [".$item->qty."]");
-			$product['qty'] = $item->qty;
-
-			$this->LogMsg("calc price retail =[".$product->prod_retail_cost." * ".$qtymap[$item->product_id] );
-			$sub_total = $product->prod_retail_cost * $qtymap[$item->product_id];
-			
-			$product['sub_total'] = $sub_total;
-#			$base_images = ProdImageMap::where('product_id',$item->product_id)->get();
-#			foreach($base_images as $bi)
-#			{
-#				$bimage = Image::find($bi->image_id);
-#				if($bimage->image_order == 0)
-#				{
-#					$thumbnails = $bimage->thumbnails()->get();
-#					foreach($thumbnails as $t)
-#					{
-#						if($t->image_order==1)
-#						{
-#							$thumbnail = $t;
-#							break;
-#						}
-#					}
-#				}
-#			}
-			if(is_array($thumbnails))
+			foreach($items as $item)
 			{
-				$product['thumbnail'] = $thumbnails[0]->image_folder_name."/".$thumbnails[0]->image_file_name;
+				if(in_array($item->product_id, $product_id_list)==true) continue;
+				/*
+				 * Save it in array so we skip it and get one entry in the shoping cart
+				 */
+				$this->LogMsg("[".$item->product_id."] not in product_id_list array --- ADD!");
+				array_push($product_id_list,$item->product_id);
+				$product = Product::find($item->product_id);
+	
+				$thumbnails = ImageService::getThumbnails($product);
+	
+				$this->LogMsg("Item qty value is [".$item->qty."]");
+				$product['qty'] = $item->qty;
+	
+				$this->LogMsg("calc price retail =[".$product->prod_retail_cost." * ".$qtymap[$item->product_id] );
+				$sub_total = $product->prod_retail_cost * $qtymap[$item->product_id];
+				
+				$product['sub_total'] = $sub_total;
+				if(is_array($thumbnails))
+				{
+					$product['thumbnail'] = $thumbnails[0]->image_folder_name."/".$thumbnails[0]->image_file_name;
+				}
+				if(sizeof($thumbnails)==0)
+				{
+					$product['thumbnail'] = "media/product-image-missing.jpeg";
+				}
+				array_push($products, $product);
+				$total += $sub_total;
 			}
-			if(sizeof($thumbnails)==0)
-			{
-				$product['thumbnail'] = "media/product-image-missing.jpeg";
-			}
-			array_push($products, $product);
-			$total += $sub_total;
 		}
 
 		#
@@ -266,9 +256,12 @@ private $user;
 	/**
 	 * Calculate the total weight of our cart items and the shipping options.
 	 *
-	 * @todo - Change shipping logic to possibly use Chain Of Responsilility pattern 
-	 * to ask each shipping module for the shipping options, cost and displayable description and a form id value to pass back.
 	 *
+	 *======================================================================
+	 * @todo - Change shipping logic to possibly use Chain Of Responsilility pattern 
+	 * to ask each shipping module for the shipping options, cost and displayable
+	 * description and a form id value to pass back.
+	 *======================================================================
 	 *
 	 * cart ->SHIPPING -> confirm/payment -> purchased
 	 *        --------
@@ -504,7 +497,7 @@ private $user;
 	 * Display a formatted error page inticating the page timed out waiting for the user to
 	 * complete the action.
 	 *
-	 * Note: A background task will unlock the loked products the user has attempted to purchase.
+	 * Note: A background task will unlock the locked products the user has attempted to purchase.
 	 *
 	 *
 	 * @return	mixed
@@ -539,6 +532,11 @@ private $user;
 	/**
 	 * Route to the appropriate payment page to collect payment at/after this view renders.
 	 * Confirm stage is after the shipping has been selected and the payment method, 
+	 *
+	 *======================================================================
+	 * @todo  Move this to another controller
+	 *======================================================================
+	 *
 	 *
 	 * Check and Lock products at this point... 5 minute time in CRON will ensure the products remain locked.
 	 * If QTY is zero on a product, divert to an ERROR page.
@@ -605,8 +603,9 @@ private $user;
 
 		$this->LogMsg("Work out Payment Method - Route");
 
-		#
+		#======================================================================
 		#  @todo Redesign to use route factory or call payment gateways to get the route for each gateway
+		#======================================================================
 		#
 		switch($payment_method)
 		{
@@ -764,8 +763,8 @@ private $user;
 		$cartItem->cart_id = $cart->id;
 		$cartItem->qty = $qty;
 		$cartItem->save();
-		$m = new AddToCartMessage($store,Auth::user(),$cart,$product);
-		$m->dispatch();
+#		$m = new AddToCartMessage($store,Auth::user(),$cart,$product);
+#		$m->dispatch();
 		return redirect('/cart');
 	}
 
@@ -867,9 +866,6 @@ private $user;
 				if($iid == $item->id)
 				{
 					$itemrow = CartItem::where('id',$item->id)->first();
-					#
-					# 2017-09-13 added code to use wty column
-					#
 					if($itemrow->qty == 1)
 					{
 						CartItem::where('id',$item->id)->delete();
