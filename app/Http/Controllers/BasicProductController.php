@@ -128,9 +128,8 @@ use PathManagementTrait;
 		$text = "Product ID [".$pid."]";
 		$this->LogMsg($text);
 
-		$cmd = new DeleteImageJob($id);
-		$this->dispatch($cmd);
-		return $this->ShowEditProductPage($pid);
+		dispatch(new DeleteImageJob($id));
+		return Redirect::to("/admin/products");
 	}
 
 
