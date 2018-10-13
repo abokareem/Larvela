@@ -27,20 +27,20 @@
 	<form class='form-horizontal' name='add' id='add' method='post'>
 	<div class="row">
 		<div class="form-group">
-			<label class="control-label col-xs-2">Token Name:</label>
-			<div class="col-xs-6">
+			<label class="control-label col-xs-12 col-sm-2">Token Name:</label>
+			<div class="col-xs-12 col-sm-6">
 				<input type="text" class="form-control" id='seo_token' name="seo_token" value=''>
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">HTML:</label>
-			<div class="col-xs-8">
+			<label class="control-label col-xs-12 col-sm-2">HTML:</label>
+			<div class="col-xs-12 col-sm-8">
 				<textarea class="form-control" id='seo_html_data' name="seo_html_data" placeholder="html content here..."></textarea>
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">HTML:</label>
-			<div class="col-xs-8">
+			<label class="control-label col-xs-12 col-sm-2">HTML:</label>
+			<div class="col-xs-12 col-sm-8">
 				<select name="seo_store_id" id="seo_store_id" class="form-control">
 				@foreach($stores as $s)
 					@if($s->id == $store->id)
@@ -53,8 +53,8 @@
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class='control-label col-xs-2'>Active:</label>
-			<div class='col-xs-4'>
+			<label class='control-label col-xs-12 col-sm-2'>Active:</label>
+			<div class='col-xs-12 col-sm-4'>
 			<input class="bootstrap-switch" id="cb_status" data-on-text="Yes" data-off-text="No" data-off-color="danger" data-on-color="success" type="checkbox" name='seo_status' value='A' checked>
 			</div>
 		</div>
@@ -64,8 +64,8 @@
 
 	<div class="row">
 		<div class="form-group">
-			<label class="control-label col-xs-2"> </label>
-			<div class="col-xs-6">
+			<label class="control-label col-xs-12 col-sm-2"> </label>
+			<div class="col-xs-12 col-sm-10">
 				<button id='btnsave'   type="button" class="btn btn-success">Save Block</button>
 				<button id='btncancel' type="button" class="btn btn-warning">Cancel</button>
 		 	</div>
