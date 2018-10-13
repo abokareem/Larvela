@@ -26,7 +26,8 @@ class StoresTableSeeder extends Seeder
 			'store_address'=>'Call for Address',
 			'store_address2'=>'Australia',
 			'store_country'=>'Australia',
-			'store_country_code'=>'AU'
+			'store_country_code'=>'AU',
+			'store_parent_id'=>0
 			]);
     }
 }
