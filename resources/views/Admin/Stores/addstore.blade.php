@@ -1,4 +1,4 @@
-@extends('admin-master')
+@extends('Templates.admin-master')
 @section('name','Add New Store')
 @section('content')
 

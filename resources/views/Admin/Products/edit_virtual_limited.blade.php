@@ -1,5 +1,5 @@
 @extends('Templates.admin-master')
-@section('title','Edit Product')
+@section('title','Edit Virtual Product')
 @section('content')
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
@@ -19,10 +19,6 @@ function IsChecked($id, $items)
 ?>
 
 <div class='container-fluid'>
-	<div class="row">
-			<div class="col-lg-12"><h3 class="page-header">Edit Product</h3></div>
-	</div>
-
 
 	@if(count($errors)>0)
 	<div class="row">
@@ -63,8 +59,10 @@ function IsChecked($id, $items)
 			<label class="control-label col-xs-2">Product Type:</label>
 			<div class="col-xs-4">
 				<select id="prod_type" name="prod_type" class="form-control">
+				<?php $token=""; ?>
 				@foreach($product_types as $pt)
 					@if($product->prod_type == $pt->id)
+					<?php $token = $pt->product_type_token; ?>
 					<option value="{{ $pt->id }}" selected>{{ $pt->product_type }}</option>
 					@else
 					<option value="{{ $pt->id }}">{{ $pt->product_type }}</option>
@@ -89,16 +87,27 @@ function IsChecked($id, $items)
 				</div>
 		 	</div>
 		</div>
+		<input type="hidden" id='prod_reorder_qty' name="prod_reorder_qty" value="0">
+		@if($token=="VLIMITED")
 		<div class="form-group">
-			<label class="control-label col-xs-2">Qty in stock:</label>
+			<label class="control-label col-xs-2">Qty:</label>
 			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_qty' name="prod_qty" value='{{ $product->prod_qty }}'>
-		 	</div>
-			<label class="control-label col-xs-2">Reorder Qty:</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_reorder_qty' name="prod_reorder_qty" value='{{ $product->prod_reorder_qty }}'>
+				<div class='input-group'>
+					<input type="text" class="form-control" id='prod_qty' name="prod_qty" value='{{ $product->prod_qty }}'>
+					<span class="input-group-addon">Maximum Available for sale</span>
+				</div>
 		 	</div>
 		</div>
+		@else
+		<div class="form-group">
+			<label class="control-label col-xs-2">Qty:</label>
+			<div class="col-xs-2">
+				<div class='input-group'>
+					<input type="text" class="form-control" id='prod_qty' name="prod_qty" value='{{ $product->prod_qty }}'>
+					<span class="input-group-addon">Sold so far</span>
+				</div>
+		 	</div>
+		@endif
 		<div class="form-group">
 			<label class="control-label col-xs-2">Weight (grams):</label>
 			<div class="col-xs-2">
@@ -274,9 +283,7 @@ $('#edit').validate(
 	rules:
 	{
 		prod_sku: { required: true, minlength: 3 },
-		prod_qty: { required: true },
 		prod_title: { required: true, minlength: 3 },
-		prod_weight: { required: true, minlength: 2 },
 		prod_short_desc: { required: true, minlength: 7 },
 		prod_long_desc: { required: true, minlength: 7 }
 	}

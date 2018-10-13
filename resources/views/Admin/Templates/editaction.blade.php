@@ -1,4 +1,4 @@
-@extends('admin-master')
+@extends('Templates.admin-master')
 @section('title','Edit System Actions')
 @section('content')
 

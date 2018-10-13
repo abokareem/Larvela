@@ -1,4 +1,4 @@
-@extends('admin-master')
+@extends('Templates.admin-master')
 @section('title','Product Management')
 @section('content')
 
@@ -16,6 +16,11 @@ foreach($product_types as $pt)
 
 	@include('Templates.messages')
 
+	<div class="row">
+		<a href='/admin/products/select/type'><button class="btn btn-sm btn-success">
+			<i class="fa fa-user-plus"></i> Add Product </button>
+		</a>
+	</div>
 	<div class="row">
 		<div class='pull-right'>
 			<select class="form-control" id="store_id" name="store_id">
@@ -94,14 +99,14 @@ foreach($product_types as $pt)
 
 	<div class="row">
 		<div class='col-xs-6'>
-			{-!-!- $products->render() !-!-}
 		</div>
 	</div>
 
 
 	<div class="row">
-		<a href='/admin/products/select/type'><button class="btn btn-success">
-			<i class="fa fa-user-plus"></i> Add Product </button></a>
+		<a href='/admin/products/select/type'><button class="btn btn-sm btn-success">
+			<i class="fa fa-user-plus"></i> Add Product </button>
+		</a>
 	</div>
 <script>
 

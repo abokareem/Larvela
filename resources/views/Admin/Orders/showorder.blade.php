@@ -1,4 +1,4 @@
-@extends("admin-master")
+@extends("Templates.admin-master")
 @section("title","Order Management")
 <?php
 #
@@ -146,7 +146,11 @@
 		<div  class="text-center">
 			<button id="btnps" class="btn btn-success"> Packing Slip </button>&nbsp;&nbsp;
 			<button id="btninv" class="btn btn-success"> Store Invoice </button>&nbsp;&nbsp;
+			@if($order->order_dispatch_status != "D")
 			<button id="btndispatch" class="btn btn-danger"> Dispatch Goods </button>
+			@else
+			<button id="btncancel" class="btn btn-warning"> Exit </button>
+			@endif
 		</div>
 	</div>
 </div>
@@ -156,6 +160,13 @@ $('#btninv').click(function()
 var url = '/admin/order/pdf/shopinvoice/{{$order->id}}';
 window.location.href = url;
 });
+
+$('#btncancel').click(function()
+{
+var url = '/admin/orders';
+window.location.href = url;
+});
+
 
 $('#btnps').click(function()
 {

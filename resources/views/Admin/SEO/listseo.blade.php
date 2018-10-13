@@ -1,4 +1,4 @@
-@extends('admin-master')
+@extends('Tempates.admin-master')
 @section('title','SEO Management')
 @section('content')
 

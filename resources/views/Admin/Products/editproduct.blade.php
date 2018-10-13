@@ -1,4 +1,4 @@
-@extends('admin-master')
+@extends('Templates.admin-master')
 @section('title','Edit Product')
 @section('content')
 
@@ -305,4 +305,8 @@ $('#btndelete').click(function()
 </script>
 <script src="//cdn.tinymce.com/4/tinymce.min.js"></script>
 <script>tinymce.init({ selector:'textarea' });</script>
+<!-- Framework Version: {{ app()::VERSION }} -->
+<!-- Theme Name: {{ $THEME_NAME }} -->
+<!-- Theme Home: {{ $THEME_HOME }} -->
+<!-- Store Code: {{ $store->store_env_code }} -->
 @stop

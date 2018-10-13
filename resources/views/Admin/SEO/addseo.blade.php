@@ -1,4 +1,4 @@
-@extends('admin-master')
+@extends('Templates.admin-master')
 @section('title','Add Block')
 @section('content')
 <link href="/css/bootstrap-switch.css" rel="stylesheet">
