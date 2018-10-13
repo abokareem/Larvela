@@ -155,10 +155,13 @@ use Logger;
 			$first_category = Category::where('category_store_id',$store_id)
 				->where('category_status',"A")
 				->first();
-			$products_in_category = CategoryProduct::where('category_id', $first_category->id )->get();
-			foreach($products_in_category as $pic)
+			if(is_null($first_category)==false)
 			{
-				array_push($products, Product::find($pic->product_id) );
+				$products_in_category = CategoryProduct::where('category_id', $first_category->id )->get();
+				foreach($products_in_category as $pic)
+				{
+					array_push($products, Product::find($pic->product_id) );
+				}
 			}
 		}
 		else
