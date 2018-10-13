@@ -6,7 +6,7 @@
  *
  * [CC]
  *
- * \addtogroup WelcomeProgram
+ * \addtogroup Subscription 
  * SubscriptionConfirmed - Customer has clicked the URL link in the previously sent email and confirmed their email address.
  * We can now update the subscription table record and send them a welcome email.
  */
@@ -143,8 +143,7 @@ private $ACTION="SUBSCRIPTION_CONFIRMED";
 		$record = SubscriptionRequest::where('sr_email',$this->email)->first();
 		$hash_value = hash('ripemd160', $this->email.$this->store->store_env_code);
 
-		$path = base_path();
-		$file = $path."/templates/".$this->store->store_env_code."/".$this->template_file_name;
+		$file = $this->getTemplatePath($this->store).$this->template_file_name;
 
 		$text = "<h1>WARNING</h1><p>Subscription Request email NOT sent to: ".$this->to."</p><br/><br/>Check Template file! - <b>".$file."</b>";
 		if(file_exists($file))
@@ -163,7 +162,8 @@ private $ACTION="SUBSCRIPTION_CONFIRMED";
 			$footer = SEOHelper::getText($footer_tag);
 
 			$t1 = $header.$body.$footer;
-			$text = $Store->translate($t1, $this->store);
+			$t2 = $Store->translate($t1, $this->store);
+			$text = str_replace("{CUSTOMER_EMAIL}",$this->to,$t2);
 
 			$cmd = new EmailUserJob($this->to, $this->from, $this->subject, $text);
 			dispatch($cmd);
@@ -188,7 +188,10 @@ private $ACTION="SUBSCRIPTION_CONFIRMED";
 	 */
 	protected function MarkAsConfirmed($email)
 	{
-		$SubscriptionRequest = new SubscriptionRequest;
-		$SubscriptionRequest->MarkAsCompleted( $email );
+		$o = SubscriptionRequest::where('sr_email',$email)->first();
+		$o->sr_status = 'C';
+		$o->sr_process_value = 0;
+		$o->sr_date_updated = date("Y-m-d");
+		$o->save();
     }
 }

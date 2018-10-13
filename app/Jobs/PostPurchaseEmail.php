@@ -6,9 +6,9 @@
  *
  * [CC]
  *
- * \addtogroup PostPurchase
- * PostPurchaseEmail - Sent a some period after the sale to congratulate customer on their purcase and entice them back.
- * Could be used to send additional information related to the product or similar products.
+ * \addtogroup Post_Purchase
+ * PostPurchaseEmail - Send abn email at some period after the sale to congratulate customer on their purchase and entice them back.
+ * - Could be used to send additional information related to the product or similar products.
  */
 namespace App\Jobs;
 
@@ -24,7 +24,7 @@ use App\Jobs\EmailUserJob;
 
 
 use App\Models\Customer;
-use App\Models\Users;
+use App\Models\User;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -123,8 +123,7 @@ private $ACTION="POST_PURCHASE";
 		$Customer = new Customer;
 		$Store = new Store;
 
-		$path = base_path();
-		$file = $path."/templates/".$this->store->store_env_code."/".$this->template_file_name;
+		$file = $this->getTemplatePath($this->store).$this->template_file_name;
 		$text = "<h1>WARNING</h1><p>Post Purchase email NOT sent to: ".$this->to."</p><br/><br/>Check Template file! - <b>".$file."</b>";
 		if(file_exists($file))
 		{

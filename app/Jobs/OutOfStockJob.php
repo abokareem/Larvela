@@ -3,39 +3,62 @@
  * \class	OutOfStockJob
  * \date	2016-12-06
  * \author	Sid Young <sid@off-grid-engineering.com>
+ * \version	1.0.0
  *
- * [CC]
  *
- * \addtogroup ProductReplenishment
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ *
+ * \addtogroup Product_Replenishment
  * OutOfStockJob - Email notification for store admins that the product is now at qty 0.
  */
 namespace App\Jobs;
 
 use App\Jobs\Job;
-use App\Helpers\SEOHelper;
+
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+
 
 use App\Models\Customer;
 use App\Models\Store;
 use App\Models\Product;
 
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-
-use App\Jobs\EmailUserJob;
-use App\Traits\TemplateTrait;
-
 
 
 /**
- * \brief Send an Out of stock notification to the store owner when the last of a product is purchased.
- * Also sends an email to the administration user (customer ID=1).
- * {INFO_2017-10-28} "OutOfStockJob.php" - Moved template to ./store_env_code/...
-
+ * \brief Called when an Out of stock notification is generated.
  */
-class OutOfStockJob extends Job 
+class OutOfStockJob extends ShouldQueue
 {
-use TemplateTrait;
+use IntractsWithQueue, Queueable, SerializeModels;
+
+
 
 
 /**
@@ -47,31 +70,9 @@ protected $store;
 
 /**
  * The email address to send the email to.
- * @var string $to
+ * @var string email$
  */
-protected $to;
-
-
-/**
- * The email address sent from.
- * @var string $from
- */
-protected $from;
-
-
-/**
- * The subject line for this email
- * @var string $subject
- */
-protected $subject;
-
-
-/**
- * The filename and path for email template to use.
- * Note: Template may also be made of SEOHelper calls.
- * @var string template_file_name
- */
-protected $template_file_name;
+protected $email;
 
 
 /**
@@ -81,11 +82,6 @@ protected $template_file_name;
 protected $product;
 
 
-/**
- * The template to get
- * @var string $ACTION
- */
-private $ACTION="PRODUCT_OUT_OF_STOCK";
 
     /**
      * Create a new job instance initialize mail transport and save store and email details away.
@@ -100,60 +96,17 @@ private $ACTION="PRODUCT_OUT_OF_STOCK";
     {
 		$this->store = $store;
 		$this->product = $product;
-
-		$this->to = $email;
-		$this->subject = "Product out of Stock!";
-		$this->from = $this->store->store_sales_email;
-
-		$this->template_file_name = $this->getTemplate($this->ACTION);
-		echo "Template: ". $this->template_file_name. "</br>";
-		if(strlen($this->template_file_name)==0)
-		{
-			$this->template_file_name = strtolower($this->ACTION).".email";
-		}
+		$this->email = $email;
     }
 
 
 
     /**
-     * Fetch the template, parse with the store helper and
-	 * then send using Swift Mailer. 
-	 *
-	 * {FIX_2017-11-05} - OutOfStockJob.php - removed call to StrReplace, refactored code.
+	 * Place holder for any additional Business Logic when a product is out of stock.
 	 *
      * @return void
      */
     public function handle()
     {
-		$Customer = new Customer;
-		$Product = new Product;
-		$Store = new Store;
-
-		$path = base_path();
-		$file = $path."/templates/".$this->store->store_env_code."/".$this->template_file_name;
-		$text = "Product Out Of Stock Template not loadable! - ".$file;
-		if(file_exists($file))
-		{
-			$body = file_get_contents($file);
-			$store_name_lower = strtoupper($this->store->store_name);
-			$store_name = str_replace(" ","_", $store_name_lower);
-			$header_tag = $store_name."_EMAIL_HEADER";
-			$footer_tag = $store_name."_EMAIL_FOOTER";
-
-			$header = SEOHelper::getText($header_tag);
-			$footer = SEOHelper::getText($footer_tag);
-
-			$t1 = $header.$body.$footer;
-			$t2 = $Product->translate($t1, $this->product);
-			$text = $Store->translate($t2, $this->store);
-
-			$cmd = new EmailUserJob($this->to, $this->from, $this->subject, $text);
-			dispatch($cmd);
-		}
-
-		$admin_user = Customer::find(1);
-		$admin_email = $admin_user->customer_email;
-		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] OutofStock Notification", $text);
-		dispatch($cmd);
     }
 }

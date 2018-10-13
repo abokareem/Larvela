@@ -23,9 +23,9 @@ use App\Traits\Logger;
 /**
  * \brief Given a base image, resize into a series of thumbnails.
  *
- * Given the Product ID and the Image ID, retrieve image and build
+ * - Given the Product ID and the Image ID, retrieve image and build
  * a series of smaller images that are then mapped to the parent Image.
- * These are used on main page and product page.
+ * - Resized images are available for the Store front, Product and Category pages.
  */
 class ResizeImages extends Job
 {
@@ -34,14 +34,14 @@ use Logger;
 
 /**
  * The product row id from the "products" table.
- * @var	int $product_id
+ * @var	integer $product_id
  */
 protected $product_id;
 
 
 /**
  * The image row id from the "images" table.
- * @var	int $image_id
+ * @var	integer $image_id
  */
 protected $image_id;
 

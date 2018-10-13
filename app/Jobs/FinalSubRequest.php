@@ -1,13 +1,13 @@
 <?php
 /**
- * \class	ReSendSubRequest
+ * \class	FinalSubRequest
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \date	2017-01-10
+ * \date	2018-03-10
  *
  * [CC]
  *
  * \addtogroup Subscription
- * ReSendSubRequest - Used by the CRON automation job to resent a subscription request at some point later.
+ * FinalSubRequest - Used by the CRON automation job to resent a subscription request at some point later.
  */
 namespace App\Jobs;
 
@@ -31,15 +31,8 @@ use App\Traits\Logger;
 
 /**
  * \brief Re-Send templated email asking for confirmation of the email address and subscription to site.
- *
- * Workflow is:
- * CONFIRM_SUBSCRIPTION ---> SUBCRIPTION_CONFIRMED
- *                      \---> PLEASE_CONFIRM (CRON) <---- ReSendSubRequest
- * Requests "CONFIRM_SUBSCRIPTION" template from template_mapping table.
- * {INFO_2017-10-28} Moved template to ./store_env_code/...
- * {INFO_2018-03-10} Changed to use subscription_requests table.
  */
-class ReSendSubRequest extends Job 
+class FinalSubRequest extends Job 
 {
 use TemplateTrait;
 use Logger;
@@ -55,7 +48,7 @@ protected $store;
  * The email address to send the Subscription Confirmation to.
  * @var string $to
  */
-protected $email;
+protected $to;
 
 
 /**
@@ -87,7 +80,7 @@ protected $subject;
 protected $template_file_name;
 
 
-private $ACTION="RESEND_SUB_REQUEST";
+private $ACTION="FINAL_SUB_REQUEST";
 
 
 
@@ -103,10 +96,9 @@ private $ACTION="RESEND_SUB_REQUEST";
     public function __construct($store, $email)
     {
 		$this->store = $store;
-		$this->email = $email;
-		$sales_email = $store->store_sales_email;
-		$this->from = ["$sales_email"=>"Sales Team"];
-		$this->subject = "Subscription Confirmation Required";
+		$this->to = $email;
+		$this->from = ["$store->store_sales_email"=>"Sales Team"];
+		$this->subject = "Final Subscription Confirmation Requested";
 
 		$this->hashed_url = hash('ripemd160', $email.$store->store_env_code);
 
@@ -130,9 +122,9 @@ private $ACTION="RESEND_SUB_REQUEST";
 		$Store = new Store;
 
 		$file = $this->getTemplatePath($this->store).$this->template_file_name;
-		$subscription_request = SubscriptionRequest::where('sr_email', $this->email )->first();
+		$subscription_request = SubscriptionRequest::where('sr_email', $this->to )->first();
 		$cid = 0;
-		$text = "<h1>WARNING</h1><p>Resend Subscription Request email NOT sent to: ".$this->email."</p><br/><br/>Check Template file! - <b>".$file."</b>";
+		$text = "<h1>WARNING</h1><p>Final Subscription Request email NOT sent to: ".$this->to."</p><br/><br/>Check Template file! - <b>".$file."</b>";
 		if(!is_null($subscription_request))
 		{
 			$cid = $subscription_request->id;
@@ -153,20 +145,20 @@ private $ACTION="RESEND_SUB_REQUEST";
 		
 				$t1 = $header.$body.$footer;
 				$t2 = $Store->translate($t1, $this->store);
-				$text = str_replace("{CUSTOMER_EMAIL}",$this->email,$t2);
+				$text = str_replace("{CUSTOMER_EMAIL}",$this->to,$t2);
 	
-				$cmd = new EmailUserJob($this->email, $this->from, $this->subject, $text);
+				$cmd = new EmailUserJob($this->to, $this->from, $this->subject, $text);
 				dispatch($cmd);
 				$admin_user = Customer::find(1);
 				$admin_email = $admin_user->customer_email;
-				$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Resend Subscription Request message sent to [".$this->email."]", $text);
+				$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Final Subscription Request message sent to [".$this->to."]", $text);
 				dispatch($cmd);
 				return true;
 			}
 		}
 		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
-		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Resend Subscription Request message NOT sent to [".$this->email."]", $text);
+		$cmd = new EmailUserJob($admin_email, $this->from, "[LARVELA] Final Subscription Request message NOT sent to [".$this->to."]", $text);
 		dispatch($cmd);
 		return true;
     }
