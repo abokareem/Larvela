@@ -109,6 +109,16 @@ protected $product;
 	 */
 	public function getEditPageRoute()
 	{
+		$type = ProductType::find($this->product->prod_type);
+		switch($type->product_type_token)
+		{
+			case "VLIMITED":
+					return	"edit_virtual_limited";
+				break;
+			case "VUNLIMITED":
+					return	"edit_virtual_unlimited";
+					break;
+		}
 		return "edit_virtual";
 	}
 
