@@ -29,8 +29,6 @@ protected $MEDIADIR= '/media';
 
 
 
-
-
 	/**
 	 * Save the image thats been uploaded for this product
 	 *
@@ -53,8 +51,8 @@ protected $MEDIADIR= '/media';
 			{
 				$extension = $file_type[1];
 				$filename = $file_data->getClientOriginalName();
-				$subpath = $this->getStorageSubPath($id+0);
-				$filepath = $this->getStoragePath($id+0);
+				$subpath = $this->getStorageSubPath($id);
+				$filepath = $this->getStoragePath($id);
 				#
 				# if no images mapped then parent image is "product_id"-"image_order"."extension"
 				#        otherwise, access prod_image_maps and determine the order of images, so increment image order.
@@ -135,92 +133,4 @@ protected $MEDIADIR= '/media';
 		}
 		$this->LogMsg("function Done");
 	}
-
-
-	/**
-	 * Create the path needed to store product images and return the full filesystem path to place file.
-	 *
-	 * @pre		none
-	 * @post	creates directory structure as needed
-	 *
-	 * @param	integer	$id - the product ID
-	 * @return	string 
-	 */
-	protected function getStoragePath( $id )
-	{
-		$this->LogFunction("getStoragePath(".$id.")");
-		$path="";
-		$length = strlen($id);
-		$id = "".$id."";
-		for($i=0 ; $i < $length ; $i++)
-		{
-			$path.="/".$id[$i];
-		}
-		$finalpath = public_path()."/media".$path;
-		if(is_dir($finalpath))
-		{
-			$this->LogMsg("PATH [".$finalpath."]");
-			return $finalpath;
-		}
-		else
-		{	
-			$this->LogMsg("Create Path [".$finalpath."]");
-			try { mkdir($finalpath,0775,true); }
-			catch(Exception $e)
-			{
-				$this->LogError("Failed to create Path [".$finalpath."]");
-			}
-		}
-		$this->LogMsg("PATH [".$finalpath."]");
-		return $finalpath;
-	}
-
-
-	/**
-	 * Create the subpath needed to store product images and return a partial filesystem path.
-	 *
-	 * @pre none
-	 * @post none
-	 *
-	 * @param	integer	$id - the product ID
-	 * @return	string
-	 */
-	protected function getStorageSubPath($id)
-	{
-		$this->LogFunction("getStorageSubPath(".$id.")");
-
-		$path="media";
-		$length = strlen($id);
-		$id = "".$id."";
-		for($i=0 ; $i < $length ; $i++)
-		{
-			$path.="/".$id[$i];
-		}
-		$this->LogMsg("PATH [".$path."]");
-		return $path;
-	}
-
-
-
-	/**
-	 * Temporary method
-	 *
-	 * @return	void
-	 */
-	protected function xLogFunction($m)
-	{
-	}
-
-
-
-	/**
-	 * Temporary method
-	 *
-	 *
-	 * @return	void
-	 */
-	protected function xLogMsg($m)
-	{
-	}
-
 }
