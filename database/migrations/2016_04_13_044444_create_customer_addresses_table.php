@@ -17,10 +17,11 @@ class CreateCustomerAddressesTable extends Migration
             $table->integer('customer_cid');
             $table->string('customer_email')->default('undefined');
             $table->string('customer_address')->default('undefined');
-            $table->string('customer_suburb')->default('Brisbane');;
-            $table->string('customer_postcode')->default('4000');
-            $table->string('customer_state')->default('QLD');
-            $table->string('customer_country')->default('AU');
+            $table->string('customer_suburb')->default('undefined');;
+            $table->string('customer_postcode')->default('0000');
+            $table->string('customer_city')->default('undefined');
+            $table->string('customer_state')->default('');
+            $table->string('customer_country')->default('');
             $table->string('customer_status')->default('A');
 			$table->date('customer_date_created');
 			$table->date('customer_date_updated');
