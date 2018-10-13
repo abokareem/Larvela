@@ -1,6 +1,10 @@
-@extends('admin-master')
-@section('title','Sales Dashboard')
+@extends('Templates.admin-master')
+@section('title','Larvela Dashboard')
 @section('content')
+<style>
+.chip { display: inline-block; padding: 0 25px; height: 50px; font-size: 16px; line-height: 50px; border-radius: 25px; background-color: #f1f1f1; }
+.chip img { float: left; margin: 0 10px 0 -25px; height: 50px; width: 50px; border-radius: 50%; }
+</style>
 
 <?php
 # JSON={"tab_title":"Sales Today","tab_anchor":"salestoday"}
@@ -62,11 +66,12 @@
 				<table class="table table-hover">
 				@foreach($subscriptions as $s)
 					<tr>
-						<td>{{ $s->id }}</td>
+						<td><a href="/admin/subscription/show/{{ $s->id }}">{{ $s->id }}</a></td>
 						<td>{{ $s->customer_name }} ( {{ $s->customer_email }} )</td>
 						<td>{{ $s->customer_mobile }}</td>
 						<td>{{ $s->customer_source_id }}</td>
 						<td>{{ $s->customer_date_created }}</td>
+						<td><a href="/admin/subscription/delete/{{ $s->id }}"><i class="fa fa-trash"></i></a></td>
 					</tr>
 				@endforeach
 				</table>
