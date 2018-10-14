@@ -1,11 +1,11 @@
 <?php
 /**
  * \class	LogFailedLogin
- * @date	2017-09-01
- * @author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2017-09-01
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \version	1.0.1
  *
- *
- * [CC]
+ * 
  */
 namespace App\Listeners;
 
@@ -19,14 +19,15 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 
 use App\Models\Store;
-use App\Jobs\LoginFailedEmail;
+use App\Jobs\LoginFailed;
 
 
 use App\Traits\Logger;
 
 
 /**
- * Triggered when framework detects a failed login, we need to kick off a job to send a failed email and
+ * \brief Triggered when framework detects a failed login.
+ * - Need to kick off a job to send a failed email and
  * allow for the update of a security log somewhere?
  */
 class LogFailedLogin
@@ -66,7 +67,6 @@ use Logger;
 
 		$store = app('store');
 		
-		$cmd = new LoginFailedEmail($store, $email);
-		dispatch($cmd);
+		dispatch(new LoginFailed($store, $email));
     }
 }
