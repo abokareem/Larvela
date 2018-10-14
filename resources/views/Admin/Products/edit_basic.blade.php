@@ -149,25 +149,23 @@ function IsChecked($id, $items)
 					</div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-2">Valid From:</label>
-					<div class="col-xs-3">
-						<div class='input-group date' id='datetimepicker1'>
-							<input type='text' class="form-control"  name='prod_date_valid_from' value='{{ $product->prod_date_valid_from }}'>
-							<span class="input-group-addon">
-								<span class="fa fa-calendar"></span>
-							</span>
-						</div>
+			<div class="form-group">
+				<label class="control-label col-xs-12 col-sm-2">Valid From:</label>
+				<div class="col-xs-3">
+					<div class='input-group date' id='datetimepicker1'>
+						<input type='text' class="form-control"  name='prod_date_valid_from' value='{{ $product->prod_date_valid_from }}'>
+						<span class="input-group-addon">
+							<span class="fa fa-calendar"></span>
+						</span>
 					</div>
-					<label class="control-label col-xs-12 col-sm-2">Valid To:</label>
-					<div class="col-xs-3">
-						<div class='input-group date' id='datetimepicker2'>
-							<input type='text' class="form-control"  name='prod_date_valid_to' value='{{ $product->prod_date_valid_to }}'>
-							<span class="input-group-addon">
-								<span class="fa fa-calendar"></span>
-							</span>
-						</div>
+				</div>
+				<label class="control-label col-xs-12 col-sm-2">Valid To:</label>
+				<div class="col-xs-3">
+					<div class='input-group date' id='datetimepicker2'>
+						<input type='text' class="form-control"  name='prod_date_valid_to' value='{{ $product->prod_date_valid_to }}'>
+						<span class="input-group-addon">
+							<span class="fa fa-calendar"></span>
+						</span>
 					</div>
 				</div>
 			</div>
@@ -185,27 +183,10 @@ function IsChecked($id, $items)
 		<?php array_push($mapping, $cm->category_id); ?>
 	@endforeach
 	
-		<div class='tab-pane' id='categories'>
-			<div class="row">
-				<div class="control-group">
-					<label class="control-label col-xs-12 col-sm-2">Category:</label>
-					<div class="col-xs-8">
-					@foreach($categories as $cat)
-						@if(in_array($cat->id, $mapping))
-							<input type='checkbox' name='category[]' value='{{$cat->id}}' checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
-						@else
-						<input type='checkbox' name='category[]' value='{{$cat->id}}'> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
-						@endif
-					@endforeach
-					</div>
-				</div>
-			</div>
-		</div>
-	
 		<div class='tab-pane' id='images'>
 			@if(sizeof($images)>0)
 			<div class="row">
-				<label class="control-label">Images:</label>
+				<label class="control-label">Assigned Images:</label>
 			</div>
 			<div class="row">
 				<table  class="table table-hover">
@@ -229,7 +210,6 @@ function IsChecked($id, $items)
 					@endforeach
 					</tbody>
 				</table>
-				</div>
 			</div>
 			@else
 			<div class="row">
@@ -245,24 +225,40 @@ function IsChecked($id, $items)
 			<div class="row">
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-2">Image:</label>
-					<div class="col-xs-3">
+					<div class="col-xs-12 col-sm-10">
 					<input name="file" type="file" id="file">
-					<label class="btn btn-default btn-file">
-					</label>
+					<!-- label class="btn btn-default btn-file">Upload</label -->
 					</div>
 				</div>
 			</div>
 		</div>
 		
+
+		<div class='tab-pane' id='categories'>
 			<div class="row">
-				<div class="form-group">
-				<label class="control-label col-xs-12 col-sm-2"> </label>
-				<div class="col-xs-6">
-					<button id='btnsave'   type="button" class="btn btn-success">Save Product</button>
-					<button id='btncancel' type="button" class="btn btn-warning">Cancel</button>
-					<button id='btndelete' type="button" class="btn btn-danger">Delete</button>
-			 	</div>
+				<div class="control-group">
+					<label class="control-label col-xs-12 col-sm-2">Category:</label>
+					<div class="col-xs-8">
+					@foreach($categories as $cat)
+						@if(in_array($cat->id, $mapping))
+							<input type='checkbox' name='category[]' value='{{$cat->id}}' checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+						@else
+						<input type='checkbox' name='category[]' value='{{$cat->id}}'> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+						@endif
+					@endforeach
+					</div>
+				</div>
 			</div>
+		</div>
+	
+		<div class="row" style="padding-top:25px;">
+			<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-2"> </label>
+			<div class="col-xs-6">
+				<button id='btnsave'   type="button" class="btn btn-success">Save Product</button>
+				<button id='btncancel' type="button" class="btn btn-warning">Cancel</button>
+				<button id='btndelete' type="button" class="btn btn-danger">Delete</button>
+		 	</div>
 		</div>
 		<input type='hidden' name='id' value='{{ $product->id }}'>
 		{!! Form::token() !!}
