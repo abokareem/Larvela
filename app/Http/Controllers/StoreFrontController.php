@@ -291,10 +291,10 @@ use Logger;
 			 * REFACTOR required, colour and size should not be assigned here
 			 * pass in the attributes and values and let the theme work out what it needs.
 			 */
-			$size_attribute = Attribute::where('attribute_name','Size')->where('store_id',$store->id)->first();
-			$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
-			$colour_attribute = Attribute::where('attribute_name','Colour')->where('store_id',$store->id)->first();
-			$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
+	#		$size_attribute = Attribute::where('attribute_name','Size')->where('store_id',$store->id)->first();
+	#		$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
+	#		$colour_attribute = Attribute::where('attribute_name','Colour')->where('store_id',$store->id)->first();
+	#		$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
 			/*
 			 * END
 			 */
@@ -310,8 +310,8 @@ use Logger;
 				'products'=>$products,
 				'attributes'=>$attributes,
 				'attribute_values'=>$attribute_values,
-				'sizes'=>$sizes,
-				'colours'=>$colours
+			#	'sizes'=>$sizes,
+			#	'colours'=>$colours
 				]);
 		}
 		else
@@ -505,25 +505,27 @@ use Logger;
 	{
 		$this->LogFunction("GetCartData()");
 
+		$c = 0;
+		$v = 0;
 		if(Request::ajax())
 		{
 			if(Auth::check())
 			{
-				$Product = new Product;
 				$cart = Cart::where('user_id',Auth::user()->id)->first();
 				if($cart)
 				{
-					$c = 0;
-					$v = 0;
 					$items = $cart->cartItems;
-					foreach($items as $item)
+					if(!is_null($items))
 					{
-						$product = Product::find($item->product_id);
-						$v += $product->prod_retail_cost;
-						$c += $item->qty;
+						foreach($items as $item)
+						{
+							$product = Product::find($item->product_id);
+							$v += $product->prod_retail_cost;
+							$c += $item->qty;
+						}
+						$data = array('c'=>$c,'v'=>number_format($v,2));
+						return json_encode($data);
 					}
-					$data = array('c'=>$c,'v'=>number_format($v,2));
-					return json_encode($data);
 				}
 			}
 		}
