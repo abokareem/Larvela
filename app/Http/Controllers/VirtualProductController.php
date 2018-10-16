@@ -3,7 +3,7 @@
  * \class	VirtualProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-04-03
- * \version	1.0.5
+ * \version	1.0.6
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,7 +42,6 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Mail;
 
 
-use App\Helpers\StoreHelper;
 use App\Services\ProductService;
 
 
@@ -67,6 +66,7 @@ use App\Models\Notification;
 
 use App\Traits\Logger;
 use App\Traits\ProductImageHandling;
+use App\Traits\PathManagementTrait;
 
 
 /**
@@ -80,6 +80,7 @@ class VirtualProductController extends Controller
 {
 use Logger;
 use ProductImageHandling;
+use PathManagementTrait;
 
 
 	/**
@@ -109,7 +110,8 @@ use ProductImageHandling;
 	/**
 	 * Given the ID of a Virtual Product remove it totally from the server.
 	 * use a form because only admin can get the form and the ID
-	 * must be encoded in the form and the call must be authenticated as an admin user.
+	 * must be encoded in the form and the call must be authenticated 
+	 * as an admin user.
 	 *
 	 * Called from the ProductControler $obj->Delete(Request, integer);
 	 *
@@ -166,7 +168,6 @@ use ProductImageHandling;
 
 
 
-
 	/**
 	 * Given the ID of an image remove it totally from the server.
 	 * Return back to the product edit page we were on when we pressed delete.
@@ -191,6 +192,40 @@ use ProductImageHandling;
 
 
 
+	/**
+	 * Save the uploaded file.
+	 *
+	 *
+	 * @param	integer	$id	product ID
+	 * @return	void
+	 */
+	public function SaveUploadedFile($id)
+	{
+		$this->LogFunction("SaveUploadedFile(".$id.")");
+		$file_data = Input::file('dfile');
+		$file_name = "N/A";
+		if($file_data)
+		{
+			$this->LogMsg("Processing File Data");
+			$file_type = explode("/",$file_data->getClientMimeType());
+			$file_extension = $file_type[1];
+			$file_path = $this->getDownloadPath($id);
+			$file_name = $file_data->getClientOriginalName();
+			$file_data->move($file_path,$file_name);
+
+			$this->LogMsg("File name [".$file_name."]");
+			$this->LogMsg("     Type [".print_r($file_type,1)."]");
+			$this->LogMsg("      Ext [".$file_extension."]");
+		}
+		else
+		{
+			$this->LogError("Invalid file Data.");
+			\Session::flash('flash_error',"ERROR - Invalid file type");
+		}
+		return $file_name;
+	}
+
+
 
 
 	/**
@@ -198,7 +233,8 @@ use ProductImageHandling;
 	 *
 	 * TODO - more work needed on this.
 	 *
-	 * @return void
+	 * @param	integer	$id		Product ID
+	 * @return	void
 	 */
 	public function SaveUploadedImage($id)
 	{
@@ -263,6 +299,7 @@ use ProductImageHandling;
 				$text = "New File name [".$newname."]";
 				$this->LogMsg($text);
 
+				$this->LogMsg("Create Image Entry");
 				list($width, $height, $type, $attr) = getimagesize($newname);
 				$size = filesize($newname);
 				$o = new Image;
@@ -273,12 +310,9 @@ use ProductImageHandling;
 				$o->image_width = $width;
 				$o->image_parent_id = 0;
 				$o->image_order = 0;
-
-				$this->LogMsg("Create Image Entry");
 				$o->save();
 				$iid = $o->id;
-				$text = "New Image ID [".$iid."]";
-				$this->LogMsg($text);
+				$this->LogMsg("New Image ID [".$iid."]");
 				#
 				# Use Eloquent to insert into Pivot table
 				#
@@ -287,7 +321,6 @@ use ProductImageHandling;
 
 				$this->LogMsg("Dispatch resize job");
 				dispatch( new ResizeImages($id, $iid) );
-				$this->LogMsg("Back in Controller");
 			}
 			else
 			{
@@ -298,99 +331,6 @@ use ProductImageHandling;
 		$this->LogMsg("function Done");
 	}
 
-
-
-
-	/**
-	 * Present product images and show an upload form
-	 * $id is product id to use.
-	 *
-	 * GET ROUTE: /admin/prodimage/edit/{id}
-	 *
-	 * {FIX_2017-10-24} Refactored product fetch using eloquent call in ShowImageUploadPage()
-	 *
-	 * @param $id int - row ID from products table
-	 * @return mixed - view object
-	 */
-	public function ShowImageUploadPage($id)
-	{
-		$this->LogFunction("ShowImageUploadPage(".$id.")");
-
-		$product = Product::find($id);
-		$images = ProdImageMap::where('product_id',$id)->get();
-		return view('Admin.Products.editproductimages',[ 'product'=>$product, 'images'=>$images ]);
-	}
-
-
-
-
-	/**
-	 * Render a view edit page, first collect the existing data and
-	 * format it up for the view we are about to call.
-	 *
-	 * GET ROUTE: /admin/product/edit/{id}
-	 *
-	 * @param $id int row id to be checked against before insert
-	 * @return mixed - view object
-	 */
-	private function ShowEditProductPage($id)
-	{
-		$this->LogFunction("ShowEditProductPage(".$id.")");
-
-		$product = Product::find($id);
-		$store = app('store');
-		$stores = Store::where('store_status','A')->get();
-		$categories = Category::all();
-		$product_types = ProductType::get();
-
-		$imagemap = ProdImageMap::where('product_id',$id)->get();
-		$prod_categories = CategoryProduct::where('product_id',$id)->get();
-
-		$images = array();
-		foreach($imagemap as $mapping)
-		{
-			$this->LogMsg("Found image ID [".$mapping->image_id."]");
-			$img = Image::find($mapping->image_id);
-			$this->LogMsg("           Name[".$img->image_file_name."]");
-			array_push($images, $img);
-		}
-		$text = "There are ".sizeof($images)." images assembled.";
-		$this->LogMsg( $text );
-
-		return view('Admin.Products.editproduct',[
-			'product'=>$product,
-			'product_types'=>$product_types,
-			'images'=>$images,
-			'categories'=>$categories,
-			'store'=>$store,
-			'stores'=>$stores,
-			'catmappings'=>$prod_categories]);
-	}
-
-
-
-
-	/**
-	 * Call the view to present the "Add New" Product page
-	 *
-	 * GET ROUTE: /admin/product/addnew
-	 *
-	 * @return mixed - view object
-	 */
-	private function ShowAddProductPage()
-	{
-		$this->LogFunction("ShowEditProductPage()");
-
-		$categories = Category::where('category_status','A')->orderBy('category_title')->get();
-		$stores = Store::all();
-		$product_types = ProductType::all();
-
-		return view('Admin.Products.addproduct',[
-			'categories'=>$categories,
-			'product_types'=>$product_types,
-			'stores'=>$stores
-			]);
-	}
 
 
 
@@ -479,12 +419,27 @@ use ProductImageHandling;
 	public function Save(ProductRequest $request)
 	{
 		$this->LogFunction("Save()");
-
-		$pid=0;
+		$store = app('store');
 		$categories = $request->categories;	/* array of category id's */
 		$pid = ProductService::insert($request);
 		$this->LogMsg("Insert New Product new ID [".$pid."]");
 		$this->LogMsg("Process product assigned categories");
+		$product = Product::find($pid);
+
+		$form = Input::all();
+/*		$saveactions = $form['saveactions'];
+		$afteractions = $form['afteractions'];
+		if(isset($saveactions))
+		{
+			dd($saveactions);
+		}
+		if(isset($afteractions))
+		{
+			dd($afteractions);
+		}
+*/
+
+
 		if(isset($categories))
 		{
 			foreach($categories as $c)
@@ -498,11 +453,11 @@ use ProductImageHandling;
 		}
 		else
 		{
-			#
-			# @todo Need to assign to somethign or else product will not show up in list!
-			#
 			$this->LogMsg("No categories to assign (yet)");
 		}
+		$filename = $this->SaveUploadedFile($pid);
+		$product->prod_combine_code = $filename;
+		$product->save();
 		$this->SaveUploadedImage($pid);
         $store_id = $store->id;
         $category_id = 0;
@@ -528,12 +483,12 @@ use ProductImageHandling;
 
 
 	/**
-	 * return boolean true if this Product type
+	 * Return boolean true if this Product type
 	 * has children products.
 	 *
 	 * @return	boolean
 	 */
-	pubic function hasChildren()
+	public function hasChildren()
 	{
 		return false;
 	}
