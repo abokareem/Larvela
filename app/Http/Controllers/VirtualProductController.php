@@ -3,7 +3,7 @@
  * \class	VirtualProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-04-03
- * \version	1.0.6
+ * \version	1.0.7
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -75,6 +75,7 @@ use App\Traits\PathManagementTrait;
  * {INFO_2017-09-11} Added support for prod_has_free_shipping
  * {INFO_2017-10-26} Added Support for BackInStock Job dispatch
  * {INFO_2018-07-19} Added Support for BackInStockEMail
+ * {INFO_2018-10-16} Added Support for Multiple Product file uploads
  */
 class VirtualProductController extends Controller
 {
@@ -195,34 +196,57 @@ use PathManagementTrait;
 	/**
 	 * Save the uploaded file.
 	 *
+	 2018-10-16|16:11:46|OK|VirtualProductController|Illuminate\Http\UploadedFile Object
+	 (
+	     [test:Symfony\Component\HttpFoundation\File\UploadedFile:private] => 
+     [originalName:Symfony\Component\HttpFoundation\File\UploadedFile:private] => 905-Santorini-17810367345809.jpg
+	     [mimeType:Symfony\Component\HttpFoundation\File\UploadedFile:private] => image/jpeg
+	     [size:Symfony\Component\HttpFoundation\File\UploadedFile:private] => 128687
+	     [error:Symfony\Component\HttpFoundation\File\UploadedFile:private] => 0
+	     [hashName:protected] => 
+	     [pathName:SplFileInfo:private] => /tmp/phpgE38IH
+	     [fileName:SplFileInfo:private] => phpgE38IH
+	 )
 	 *
 	 * @param	integer	$id	product ID
-	 * @return	void
+	 * @return	integer
 	 */
-	public function SaveUploadedFile($id)
+	public function SaveUploadedFile(ProductRequest $request, $id)
 	{
 		$this->LogFunction("SaveUploadedFile(".$id.")");
-		$file_data = Input::file('dfile');
+		
+		$bad_extensions = array("exe","bat","com","cmd","bin","cpl","csh","sh","inf","ins","inx","lnk","out","ps1","scr","sct","u3p","run","reg","rgs","vbs","shb","vb","ws","wsf","wsh");
+		$file_count = 0;
 		$file_name = "N/A";
-		if($file_data)
+		if($request->hasFile('dfile'))
 		{
-			$this->LogMsg("Processing File Data");
-			$file_type = explode("/",$file_data->getClientMimeType());
-			$file_extension = $file_type[1];
-			$file_path = $this->getDownloadPath($id);
-			$file_name = $file_data->getClientOriginalName();
-			$file_data->move($file_path,$file_name);
-
-			$this->LogMsg("File name [".$file_name."]");
-			$this->LogMsg("     Type [".print_r($file_type,1)."]");
-			$this->LogMsg("      Ext [".$file_extension."]");
+			$this->LogMsg("There are files in request");
+			$files = $request->file('dfile');
+			$file_count = sizeof($files);
+			foreach($files as $file)
+			{
+				$this->LogMsg( print_r($file,1) );
+				$file_type = explode("/",$file->getClientMimeType());
+				$file_extension = strtolower($file_type[1]);
+				$file_path = $this->getDownloadPath($id);
+				$file_name = $file->getClientOriginalName();
+				$this->LogMsg("File name [".$file_name."]");
+				if(!in_array($file_extension, $bad_extensions))
+				{
+					$file->move($file_path,$file_name);
+					$this->LogMsg(" - Moved");
+				}
+				$this->LogMsg("     Type [".print_r($file_type,1)."]");
+				$this->LogMsg("      Ext [".$file_extension."]");
+				$this->LogMsg("     Path [".$file_path."]");
+			}
 		}
 		else
 		{
 			$this->LogError("Invalid file Data.");
 			\Session::flash('flash_error',"ERROR - Invalid file type");
 		}
-		return $file_name;
+		return $file_count;
 	}
 
 
@@ -244,6 +268,7 @@ use PathManagementTrait;
 		if($file_data)
 		{
 			$this->LogMsg("Processing File Data");
+
 			$file_type = explode("/",$file_data->getClientMimeType());
 			$text = "File Data ".print_r($file_type,true);
 			$this->LogMsg($text);
@@ -349,6 +374,7 @@ use PathManagementTrait;
 	{
 		$this->LogFunction("Update(".$id.")");
 
+		$store = app('store');
 		CategoryProduct::where('product_id',$id)->delete();
 		$categories = $request->category;	/* array of category id's */
 
@@ -375,7 +401,6 @@ use PathManagementTrait;
 		#
 		$product = Product::find($id);
 		$this->LogMsg("Check stock levels for Product [".$id."] - [".$product->prod_sku."]");
-		$store = app('store');
 		if($product->prod_qty == 0)
 		{
 			$this->LogMsg("Existing stock level is 0");
@@ -399,6 +424,7 @@ use PathManagementTrait;
 		$request['id'] = $id;
 		ProductService::update($request);
 		$this->SaveUploadedImage($id);
+		$this->SaveUploadedFile($request, $id);
 		return Redirect::to("/admin/products");
 	}
 
