@@ -746,14 +746,17 @@ private $user;
 		$items = $cart->items;	# uses Eloquent hasMany relationship to get cart_items with cart_id set to cart->id
 		$this->LogMsg("Qty to save is [".$qty."]");
 
-		foreach($items as $item)
+		if(!is_null($items))
 		{
-			if($item->product_id == $id)
+			foreach($items as $item)
 			{
-				$this->LogMsg("Item found - add [".$qty."] to existing qty of [".$item->qty."]");
-				$item->qty = $item->qty+$qty;
-				$item->save();
-				return redirect('/cart');
+				if($item->product_id == $id)
+				{
+					$this->LogMsg("Item found - add [".$qty."] to existing qty of [".$item->qty."]");
+					$item->qty = $item->qty+$qty;
+					$item->save();
+					return redirect('/cart');
+				}
 			}
 		}
 		$product = Product::find($id);
