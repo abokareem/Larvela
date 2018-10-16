@@ -7,16 +7,6 @@
 
 
 
-<?php
-function IsChecked($id, $items)
-{
-	foreach($items as $item)
-	{
-#		if($item->category_id == $id) return " checked ";
-	}
-	return "";
-}
-?>
 
 <div class='container-fluid'>
 
@@ -32,34 +22,43 @@ function IsChecked($id, $items)
 	</div>
 	@endif
 	<form class='form-horizontal' name='edit' id='edit' method='post' enctype='multipart/form-data'>
-	<div class="row">
-		<div class="form-group">
-			<label class="control-label col-xs-2">SKU:</label>
-			<div class="col-xs-2">
-				<input type="text" class="form-control" id='prod_sku' name="prod_sku" value='{{ $product->prod_sku }}'>
-		 	</div>
-			<label class="control-label col-xs-1">Title:</label>
-			<div class="col-xs-6">
-				<input type="text" class="form-control" id='prod_title' name="prod_title" value='{{ $product->prod_title }}'>
-		 	</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-2">Short Description:</label>
-			<div class="col-xs-10">
-				<input type="text" class="form-control" id='prod_short_desc' name="prod_short_desc" value='{{ $product->prod_short_desc }}'>
-		 	</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-2">Long Description:</label>
-			<div class="col-xs-10">
-				<textarea class="form-control" id='prod_long_desc' name="prod_long_desc" rows="12">{{ $product->prod_long_desc }}</textarea>
-		 	</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-2">Product Type:</label>
-			<div class="col-xs-4">
-				<select id="prod_type" name="prod_type" class="form-control">
-				<?php $token=""; ?>
+
+	<ul id='tabs' class='nav nav-tabs' data-tabs='tabs'>
+		<li class='active'><a href='#details' data-toggle='tab'>Details</a></li>
+		<li><a href='#images' data-toggle='tab'>Images</a></li>
+		<li><a href='#categories' data-toggle='tab'>Categories</a></li>
+		<li><a href='#actions' data-toggle='tab'>Actions</a></li>
+	</ul>
+	<div id="my-tab-content" class="tab-content" style="padding-top:25px;">
+		<div class='tab-pane active' id='details'>
+			<div class="row">
+				<div class="form-group">
+					<label class="control-label col-xs-2">SKU:</label>
+					<div class="col-xs-2">
+						<input type="text" class="form-control" id='prod_sku' name="prod_sku" value='{{ $product->prod_sku }}'>
+				 	</div>
+					<label class="control-label col-xs-1">Title:</label>
+					<div class="col-xs-6">
+						<input type="text" class="form-control" id='prod_title' name="prod_title" value='{{ $product->prod_title }}'>
+				 	</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Short Description:</label>
+					<div class="col-xs-10">
+						<input type="text" class="form-control" id='prod_short_desc' name="prod_short_desc" value='{{ $product->prod_short_desc }}'>
+				 	</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Long Description:</label>
+					<div class="col-xs-10">
+						<textarea class="form-control" id='prod_long_desc' name="prod_long_desc" rows="12">{{ $product->prod_long_desc }}</textarea>
+				 	</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-2">Product Type:</label>
+					<div class="col-xs-4">
+						<select id="prod_type" name="prod_type" class="form-control">
+						<?php $token=""; ?>
 				@foreach($product_types as $pt)
 					@if($product->prod_type == $pt->id)
 					<?php $token = $pt->product_type_token; ?>
@@ -147,28 +146,29 @@ function IsChecked($id, $items)
 			</div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="form-group">
-			<label class="control-label col-xs-2">Valid From:</label>
-			<div class="col-xs-3">
-				<div class='input-group date' id='datetimepicker1'>
-					<input type='text' class="form-control"  name='prod_date_valid_from' value='{{ $product->prod_date_valid_from }}'>
-					<span class="input-group-addon">
-						<span class="fa fa-calendar"></span>
-					</span>
-				</div>
-			</div>
-			<label class="control-label col-xs-2">Valid To:</label>
-			<div class="col-xs-3">
-				<div class='input-group date' id='datetimepicker2'>
-					<input type='text' class="form-control"  name='prod_date_valid_to' value='{{ $product->prod_date_valid_to }}'>
-					<span class="input-group-addon">
-						<span class="fa fa-calendar"></span>
-					</span>
+			<div class="row">
+				<div class="form-group">
+					<label class="control-label col-xs-2">Valid From:</label>
+					<div class="col-xs-3">
+						<div class='input-group date' id='datetimepicker1'>
+							<input type='text' class="form-control"  name='prod_date_valid_from' value='{{ $product->prod_date_valid_from }}'>
+							<span class="input-group-addon">
+								<span class="fa fa-calendar"></span>
+							</span>
+						</div>
+					</div>
+					<label class="control-label col-xs-2">Valid To:</label>
+					<div class="col-xs-3">
+						<div class='input-group date' id='datetimepicker2'>
+							<input type='text' class="form-control"  name='prod_date_valid_to' value='{{ $product->prod_date_valid_to }}'>
+							<span class="input-group-addon">
+								<span class="fa fa-calendar"></span>
+							</span>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 
 
 
@@ -184,82 +184,91 @@ function IsChecked($id, $items)
 		<?php array_push($mapping, $cm->category_id); ?>
 	@endforeach
 	
-	<div class="row">
-		<div class="control-group">
-			<label class="control-label col-xs-2">Category:</label>
-			<div class="col-xs-8">
-			@foreach($categories as $cat)
-				@if(in_array($cat->id, $mapping))
-					<input type='checkbox' name='category[]' value='{{$cat->id}}' checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
-				@else
-				<input type='checkbox' name='category[]' value='{{$cat->id}}'> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
-				@endif
-			@endforeach
+		<div class='tab-pane' id='categories'>
+			<div class="row">
+				<div class="control-group">
+					<label class="control-label col-xs-2">Category:</label>
+					<div class="col-xs-8">
+					@foreach($categories as $cat)
+						@if(in_array($cat->id, $mapping))
+							<input type='checkbox' name='category[]' value='{{$cat->id}}' checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+						@else
+						<input type='checkbox' name='category[]' value='{{$cat->id}}'> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+						@endif
+					@endforeach
+					</div>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	@if(sizeof($images)>0)
-	<div class="row">
-		<label class="control-label">Images:</label>
-	</div>
-	<div class="row">
-		<table  class="table table-hover">
-			<thead>
-				<th>Order</th>
-				<th>Name</th>
-				<th>Folder</th>
-				<th>Size</th>
-				<th>HxW</th>
-			</thead>
-			<tbody>
-			@foreach($images as $image)
-				<tr>
-					<td>{{ $image->image_order }}</td>
-					<td>{{ $image->image_file_name }}</td>
-					<td>{{ $image->image_folder_name }}</td>
-					<td>{{ $image->image_size }} Bytes</td>
-					<td>{{ $image->image_height }} x {{ $image->image_width }}</td>
-					<td><i class="fa fa-trash"></i> <a href="/admin/image/delete/{{$image->id }}/{{ $product->id }}">Delete</a></td>
-				</tr>
-			@endforeach
-			</tbody>
-		</table>
-		</div>
-	</div>
-	@else
-	<div class="row">
-		<div class="form-group">
-			<label class="control-label col-xs-2">Images:</label>
-			<div class="col-xs-6">
-				<strong>Warning!</strong> - No Images have been uploaded for this product.
+
+
+
+		<div class='tab-pane' id='images'>
+			@if(sizeof($images)>0)
+			<div class="row">
+				<label class="control-label">Images:</label>
 			</div>
-		</div>
-	</div>
-
-	@endif
-	<div class="row">
-		<div class="form-group">
-			<label class="control-label col-xs-2">Image:</label>
-			<div class="col-xs-3">
-			<input name="file" type="file" id="file">
-			<label class="btn btn-default btn-file">
-			</label>
+			<div class="row">
+				<table  class="table table-hover">
+					<thead>
+						<th>Order</th>
+						<th>Name</th>
+						<th>Folder</th>
+						<th>Size</th>
+						<th>HxW</th>
+					</thead>
+					<tbody>
+					@foreach($images as $image)
+						<tr>
+							<td>{{ $image->image_order }}</td>
+							<td>{{ $image->image_file_name }}</td>
+							<td>{{ $image->image_folder_name }}</td>
+							<td>{{ $image->image_size }} Bytes</td>
+							<td>{{ $image->image_height }} x {{ $image->image_width }}</td>
+							<td><i class="fa fa-trash"></i> <a href="/admin/image/delete/{{$image->id }}/{{ $product->id }}">Delete</a></td>
+						</tr>
+					@endforeach
+					</tbody>
+				</table>
+				</div>
 			</div>
-		</div>
-	</div>
+			@else
+			<div class="row">
+				<div class="form-group">
+					<label class="control-label col-xs-2">Images:</label>
+					<div class="col-xs-6">
+						<strong>Warning!</strong> - No Images have been uploaded for this product.
+					</div>
+				</div>
+			</div>
+			@endif
 
-	<div class="row">
-		<div class="form-group">
-			<label class="control-label col-xs-2"> </label>
-			<div class="col-xs-6">
-				<button id='btnsave'   type="button" class="btn btn-success">Save Product</button>
-				<button id='btncancel' type="button" class="btn btn-warning">Cancel</button>
-				<button id='btndelete' type="button" class="btn btn-danger">Delete</button>
-		 	</div>
+			<div class="row">
+				<div class="form-group">
+					<label class="control-label col-xs-2">Image:</label>
+					<div class="col-xs-3">
+					<input name="file" type="file" id="file">
+					<label class="btn btn-default btn-file">
+					</label>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="form-group">
+					<label class="control-label col-xs-2"> </label>
+					<div class="col-xs-6">
+						<button id='btnsave'   type="button" class="btn btn-success">Save Product</button>
+						<button id='btncancel' type="button" class="btn btn-warning">Cancel</button>
+						<button id='btndelete' type="button" class="btn btn-danger">Delete</button>
+				 	</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<input type='hidden' name='id' value='{{ $product->id }}'>
+	<input type="hidden' name="prod_type" value="{{ }}">
 	{!! Form::token() !!}
 	{!! Form::close() !!}
 	<br/>
