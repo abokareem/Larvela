@@ -48,6 +48,13 @@
 .port-1.effect-1:hover .text-desc{top: 0;}
 </style>
 
+<?php
+$sizes = array();
+
+$colours = array();
+
+?>
+
 
 <div class="container">
 	<div class="row">
