@@ -29,13 +29,15 @@
  */
 namespace App\Services;
 
-
+use Auth;
+use Request;
+use App\Http\Requests;
 
 
 use App\Models\Cart;
+use App\Models\Product;
 use App\Models\CartData;
 use App\Models\CartItem;
-use App\Models\Product;
 
 
 use App\User;
