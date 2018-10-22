@@ -55,6 +55,7 @@ class CartItemService
 	 * If qty is set in URL then add the item multiple times so cart reflect correctly.
 	 * Creates a new cart if needed (initial add).
 	 *
+	 * @pre		User must be logged in.
 	 * @param	integer	$id		Product ID to add
 	 * @return	void
 	 */
@@ -74,8 +75,7 @@ class CartItemService
 			$cart->user_id=Auth::user()->id;
 			$cart->save();
 		}
-		$items = $cart->items;	# uses Eloquent hasMany relationship to get cart_items with cart_id set to cart->id
-
+		$items = $cart->items;
 		if(!is_null($items))
 		{
 			foreach($items as $item)
@@ -103,12 +103,10 @@ class CartItemService
 	 *
 	 * @pre		User must be logged in.
 	 * @param	integer	$id		ID of product to remove.
-	 * @return	mixed
+	 * @return	void
 	 */
-	public function removeItem($id)
+	public function DeleteItem($id)
 	{
-		$this->LogFunction("removeItem()");
-
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
 		$items = $cart->items;
 		foreach($items as $item)
@@ -118,7 +116,6 @@ class CartItemService
 				CartItem::destroy($item->id);
 			}
 		}
-		return redirect('/cart');
 	}
 
 
