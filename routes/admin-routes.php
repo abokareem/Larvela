@@ -15,24 +15,24 @@ Route::get('/admin/mailrun/control','MailRunController@ShowPanel');
 Route::post('/admin/mailrun/control','MailRunController@StartMailRun');
 
 
-Route::get('/admin','AdminController@ShowDashboard');
-Route::get('/dashboard','AdminController@ShowDashboard');
+Route::get('/admin','Admin\AdminController@ShowDashboard');
+Route::get('/dashboard','Admin\AdminController@ShowDashboard');
 #
-Route::get('/admin/orders','AdminOrderController@ShowCurrentOrders');
-Route::get('/admin/order/view/{id}','AdminOrderController@ShowOrder');
+Route::get('/admin/orders','Admin\AdminOrderController@ShowCurrentOrders');
+Route::get('/admin/order/view/{id}','Admin\AdminOrderController@ShowOrder');
 #
 #
 # TO ADD TO PROD
-Route::get('/admin/order/boitem/{id}','AdminOrderController@BackOrderAnItem');
+Route::get('/admin/order/boitem/{id}','Admin\AdminOrderController@BackOrderAnItem');
 #
-Route::get('/admin/order/cancel/{id}','AdminOrderController@MarkOrderAsCancelled');
-Route::post('/admin/order/dispatch/{id}','AdminOrderController@OrderDispatched');
-Route::get('/admin/order/update/paid/{id}','AdminOrderController@MarkOrderPaid');
-Route::get('/admin/order/update/unpaid/{id}','AdminOrderController@MarkOrderUnPaid');
-Route::get('/admin/order/update/onhold/{id}','AdminOrderController@MarkOrderOnHold');
-Route::get('/admin/order/update/waiting/{id}','AdminOrderController@MarkOrderAsWaiting');
-Route::get('/admin/order/pdf/shopinvoice/{id}','AdminOrderController@DispayPDFShopInvoice');
-Route::get('/admin/order/pdf/packingslip/{id}','AdminOrderController@DispayPDFPackingSlip');
+Route::get('/admin/order/cancel/{id}','Admin\AdminOrderController@MarkOrderAsCancelled');
+Route::post('/admin/order/dispatch/{id}','Admin\AdminOrderController@OrderDispatched');
+Route::get('/admin/order/update/paid/{id}','Admin\AdminOrderController@MarkOrderPaid');
+Route::get('/admin/order/update/unpaid/{id}','Admin\AdminOrderController@MarkOrderUnPaid');
+Route::get('/admin/order/update/onhold/{id}','Admin\AdminOrderController@MarkOrderOnHold');
+Route::get('/admin/order/update/waiting/{id}','Admin\AdminOrderController@MarkOrderAsWaiting');
+Route::get('/admin/order/pdf/shopinvoice/{id}','Admin\AdminOrderController@DispayPDFShopInvoice');
+Route::get('/admin/order/pdf/packingslip/{id}','Admin\AdminOrderController@DispayPDFPackingSlip');
 #
 #
 Route::get('/admin/images', 'ImageManagement@Show');
@@ -64,12 +64,12 @@ Route::post('/admin/template/update/{id}', 'TemplateController@Update');
 Route::post('/admin/template/delete/{id}', 'TemplateController@Delete');
 #
 #
-Route::get('/admin/stores','AdminStoreController@ShowStoresPage');
-Route::get('/admin/store/add','AdminStoreController@ShowAddStorePage');
-Route::get('/admin/store/edit/{id}','AdminStoreController@ShowEditStorePage');
-Route::get('/admin/store/addnew','AdminStoreController@ShowAddStorePage');
-Route::post('/admin/store/save','AdminStoreController@SaveNewStore');
-Route::post('/admin/store/update/{id}','AdminStoreController@UpdateStore');
+Route::get('/admin/stores','Admin\AdminStoreController@ShowStoresPage');
+Route::get('/admin/store/add','Admin\AdminStoreController@ShowAddStorePage');
+Route::get('/admin/store/edit/{id}','Admin\AdminStoreController@ShowEditStorePage');
+Route::get('/admin/store/addnew','Admin\AdminStoreController@ShowAddStorePage');
+Route::post('/admin/store/save','Admin\AdminStoreController@SaveNewStore');
+Route::post('/admin/store/update/{id}','Admin\AdminStoreController@UpdateStore');
 #
 #
 Route::get('/admin/customers',['uses'=>'CustomerController@ShowCustomers','roles'=>['ADMIN','root']]);
@@ -96,8 +96,8 @@ Route::post('/admin/category/deletecat/{id}','CategoryController@DoDeleteCategor
 #
 #
 #
-Route::get('/admin/products/select/type','AdminProductController@SelectType');
-Route::get('/admin/select/type/{id}','AdminProductController@RouteToPage');
+Route::get('/admin/products/select/type','Admin\AdminProductController@SelectType');
+Route::get('/admin/select/type/{id}','Admin\AdminProductController@RouteToPage');
 
 
 #
@@ -111,9 +111,9 @@ Route::get('/admin/select/type/{id}','AdminProductController@RouteToPage');
 #
 #
 #
-Route::get('/admin/products','AdminProductController@ShowProductsPage');
-Route::get('/admin/product/addnew','AdminProductController@ShowAddProductPage');
-Route::get('/admin/product/edit/{id}','AdminProductController@ShowEditProductPage');
+Route::get('/admin/products','Admin\AdminProductController@ShowProductsPage');
+Route::get('/admin/product/addnew','Admin\AdminProductController@ShowAddProductPage');
+Route::get('/admin/product/edit/{id}','Admin\AdminProductController@ShowEditProductPage');
 #
 # 2018-09-22 use factory object in product controller to route to product
 #
@@ -123,11 +123,11 @@ Route::post('/admin/product/delete/{id}','ProductController@Delete');
 #
 #
 #
-Route::get( '/admin/product/copy/{id}','AdminProductController@ShowCopyProductPage');
-Route::post('/admin/product/copy/{id}','AdminProductController@CopyProductPage');
+Route::get( '/admin/product/copy/{id}','Admin\AdminProductController@ShowCopyProductPage');
+Route::post('/admin/product/copy/{id}','Admin\AdminProductController@CopyProductPage');
 #
 #
-#
+# CHECK CHECK CHECK
 Route::get('/admin/attributes','BasicProductController@ShowAttributesPage');
 #
 #
