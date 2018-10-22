@@ -3,7 +3,7 @@
  * \class	CartController
  * \date	2016-09-05
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.5
+ * \version 1.0.6
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -734,8 +734,14 @@ private $user;
 	{
 		$this->LogFunction("addItem()");
 		CartItemService::Additem($request, $id);
-#		$m = new AddToCartMessage($store,Auth::user(),$cart,$product);
-#		$m->dispatch();
+		$store= app('store');
+		$cart = Cart::where('user_id',Auth::user()->id)->first();
+		if(!is_null($cart))
+		{
+			$product = Product::find($id);
+			$m = new AddToCartMessage($store,Auth::user(),$cart,$product);
+			$m->dispatch();
+		}
 		return redirect('/cart');
 	}
 
