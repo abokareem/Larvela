@@ -82,8 +82,8 @@ Route::get('/contact','SupportController@contact');
 # Cart/account related
 #
 Route::get('/cart', 'Cart\CartController@ShowCart');
-Route::get('/cart/incqty/{cid}/{iid}','CartController@incCartQty');
-Route::get('/cart/decqty/{cid}/{iid}','CartController@decCartQty');
+Route::get('/cart/incqty/{cid}/{iid}','Cart\CartController@incCartQty');
+Route::get('/cart/decqty/{cid}/{iid}','Cart\CartController@decCartQty');
 Route::get('/signup', 'StoreController@ShowSignUpForm');
 #
 # 2018-09-19 Split from CartController
@@ -105,8 +105,8 @@ Route::get('/myaccount', 'StoreController@ShowMyAccount');
 #
 # 2016-09-05 Cart Logic
 #
-Route::get('/addtocart/{id}', 'CartController@addItem');
-Route::get('/removeItem/{productId}', 'CartController@removeItem');
+Route::get('/addtocart/{id}', 'Cart\CartController@addItem');
+Route::get('/removeItem/{productId}', 'Cart\CartController@removeItem');
 Route::get('/shipping','CartController@ShowShipping');
 Route::post('/confirm','CartController@Confirm');
 
