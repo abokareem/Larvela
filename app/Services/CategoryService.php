@@ -1,8 +1,31 @@
 <?php
 /**
  * \class	CategoryService
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2016-07-21
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2016-07-21
+ * \version	1.0.1
+ *
+ *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 namespace App\Services;
 
@@ -22,12 +45,26 @@ class CategoryService
 	/**
 	 * Insert a row into the categories table
 	 *
+	 MariaDB [rdstore]> desc category;
+	 +----------------------+------------------+------+-----+---------+----------------+
+	 | Field                | Type             | Null | Key | Default | Extra          |
+	 +----------------------+------------------+------+-----+---------+----------------+
+	 | id                   | int(10) unsigned | NO   | PRI | NULL    | auto_increment |
+	 | category_url         | varchar(255)     | NO   |     | NULL    |                |
+	 | category_title       | varchar(255)     | NO   |     | NULL    |                |
+	 | category_description | varchar(255)     | NO   |     | NULL    |                |
+	 | category_parent_id   | int(10) unsigned | YES  |     | NULL    |                |
+	 | category_status      | varchar(1)       | YES  |     | NULL    |                |
+	 | category_visible     | varchar(1)       | YES  |     | NULL    |                |
+	 | category_store_id    | int(10) unsigned | NO   |     | 0       |                |
+	 +----------------------+------------------+------+-----+---------+----------------+
+	 8 rows in set (0.00 sec)
+
 	 * @param	CategoryRequest	$request	Request validation object
 	 * @return	integer		row id
 	 */
 	public static function insert(CategoryRequest $request)
 	{
-		$rv = 0;
 		$o = new Category;
 		$o->category_title = $request['category_title'];
 		$o->category_url = $request['category_url'];
@@ -36,7 +73,7 @@ class CategoryService
 		$o->category_visible = $request['category_visible'];
 		$o->category_parent_id = $request['category_parent_id'];
 		$o->category_store_id = $request['category_store_id'];
-		if(($rv = $o->save()) > 0)
+		if($o->save() > 0)
 		{
 			\Session::flash('flash_message','Category Saved!');
 		}
@@ -44,7 +81,7 @@ class CategoryService
 		{
 			\Session::flash('flash_error','Category Save FAILED!');
 		}
-		return $rv;
+		return $o->id;
 	}
 
 

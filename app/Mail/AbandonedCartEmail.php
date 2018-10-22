@@ -25,7 +25,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 use App\Models\Customer;
-use App\Models\Users;
+use App\Models\User;
 use App\Models\Cart;
 use App\Models\Store;
 use App\Models\CartItem;
@@ -38,13 +38,13 @@ use App\Traits\Logger;
 /**
  * @brief Send a templated email after the Customer has abandond the cart for a period of time.
  */
-class AbandonedCart extends Mailable
+class AbandonedCartEmail extends Mailable
 {
 use Queueable, SerializesModels;
 use Logger;
 
 /**
- *
+ * The hash used in unsubscribing
  * @var string $hash
  */
 public $hash;
@@ -105,7 +105,7 @@ private $ACTION="cart_abandoned";
 		
 		$this->customer = Customer::where('customer_email', $email)->first();
 		$this->template = "Mail.".$this->store->store_env_code.".".$this->ACTION;
-		$this->hash = "2874-".hash('ripemd160', $email.$store->store_env_code);
+		$this->hash = $this->customer->id."-".hash('ripemd160', $email.$store->store_env_code);
     }
 
 

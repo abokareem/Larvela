@@ -17,9 +17,6 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script src='//www.google.com/recaptcha/api.js'></script>
 </head>
-<!-- style>
-body { background-image: url("/media/xmas-bg.jpeg"); background-repeat: repeat-x; }
-</style -->
 <body>
 @if (view()->exists( $THEME_HEADER.'header') )
 @include( $THEME_HEADER.'header')
@@ -61,5 +58,6 @@ $('[data-toggle="popover"]').popover();
 <!-- Theme Name: {{ $THEME_NAME }} -->
 <!-- Theme Home: {{ $THEME_HOME }} -->
 <!-- Store Code: {{ $store->store_env_code }} -->
+<!-- https://larvela.org/ -->
 </body>
 </html>

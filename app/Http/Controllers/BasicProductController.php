@@ -299,7 +299,6 @@ use PathManagementTrait;
 	 * @param	integer	$id - Row id to be checked against before insert
 	 * @return	mixed
 	 */
-	#public function UpdateProduct(ProductRequest $request, $id)
 	public function Update(ProductRequest $request, $id)
 	{
 		$this->LogFunction("UpdateProduct(".$id.")");

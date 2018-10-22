@@ -8,10 +8,6 @@
  */
 namespace App\Http\Middleware;
 
-/**
- * \class CheckRole
- */
-
 use Closure;
 
 /**

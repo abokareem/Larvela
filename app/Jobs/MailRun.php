@@ -91,7 +91,7 @@ private $ACTION="MAIL_RUN";
      */
     public function __construct($store, $email, $subject, $filename)
     {
-		$this->setFileName("store-cron");
+		$this->setFileName("larvela-cron");
 		$this->store = $store;
 		$this->to = $email;
 		$this->subject = $subject;

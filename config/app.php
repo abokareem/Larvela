@@ -2,11 +2,10 @@
 
 return [
 
-	'test_email'=> env('TEST_EMAIL','you@domain.com'),
+	'metrics_transport'=>['email'],
+	'test_email'=> env('TEST_EMAIL','sid.young@gmail.com'),
+	'facebook'=> [ 'url'=>"https://www.facebook.com/Rockabilly-Dames-170810546337919/" ],
 
-	'facebook'=> [
-		'url'=>"https://www.facebook.com/Rockabilly-Dames-170810546337919/"
-		],
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -163,14 +162,10 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
-		Collective\Html\HtmlServiceProvider::class,
-
-		Illuminate\Notifications\NotificationServiceProvider::class,
-
+        Collective\Html\HtmlServiceProvider::class,
+        Illuminate\Notifications\NotificationServiceProvider::class,
         App\Providers\ThemeServiceProvider::class,
-
-		Barryvdh\Snappy\ServiceProvider::class,
+        Barryvdh\Snappy\ServiceProvider::class,
     ],
 
     /*

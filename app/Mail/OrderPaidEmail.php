@@ -12,6 +12,9 @@
  */
 namespace App\Mail;
 
+
+use Hash;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -107,7 +110,7 @@ public $hash;
 		$this->customer = Customer::where('customer_email', $email)->first();
 		$this->order_items = OrderItem::where('order_item_oid',$this->order->id)->get();
 		$this->template = "Mail.".$this->store->store_env_code.".".$this->ACTION;
-		$this->hash = "2874-".hash('ripemd160', $email.$store->store_env_code);
+		$this->hash = $this->customer->id."-".hash('ripemd160', $email.$store->store_env_code);
     }
 
 

@@ -7,16 +7,6 @@
 
 
 
-<?php
-function IsChecked($id, $items)
-{
-	foreach($items as $item)
-	{
-#		if($item->category_id == $id) return " checked ";
-	}
-	return "";
-}
-?>
 
 <div class='container-fluid'>
 	<div class="row">
@@ -67,20 +57,6 @@ function IsChecked($id, $items)
 				 	</div>
 				</div>
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-2">Product Type:</label>
-					<div class="col-xs-12 col-sm-4">
-						<select id="prod_type" name="prod_type" class="form-control">
-						@foreach($product_types as $pt)
-							@if($product->prod_type == $pt->id)
-							<option value="{{ $pt->id }}" selected>{{ $pt->product_type }}</option>
-							@else
-							<option value="{{ $pt->id }}">{{ $pt->product_type }}</option>
-							@endif
-						@endforeach
-						</select>
-				 	</div>
-				</div>
-				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-2">Retail Cost:</label>
 					<div class="col-xs-12 col-sm-2">
 						<div class="input-group">
@@ -95,6 +71,15 @@ function IsChecked($id, $items)
 							<input type="text" class="form-control" id='prod_base_cost' name="prod_base_cost" value='{{ $product->prod_base_cost }}'>
 						</div>
 				 	</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-12 col-sm-2">Sale Price:</label>
+					<div class="col-xs-12 col-sm-2">
+						<div class="input-group">
+							<span class="input-group-addon">$</span>
+							<input type="text" class="form-control" id="prod_sale_price" name="prod_sale_price" value="">
+						</div>
+					</div>
 				</div>
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-2">Qty in stock:</label>
@@ -224,10 +209,16 @@ function IsChecked($id, $items)
 			@endif
 			<div class="row">
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-2">Image:</label>
-					<div class="col-xs-12 col-sm-10">
-					<input name="file" type="file" id="file">
-					<!-- label class="btn btn-default btn-file">Upload</label -->
+					<label class="control-label col-xs-12 col-sm-2"> </label>
+					<div class="col-xs-12 col-sm-8">
+						<h4>Upload Display Images</h4>
+						<div class="input-group">
+							<label class="input-group-btn">
+								<span class="btn btn-primary"> Browse&hellip; <input type="file" name[]="file" id="file" style="display: none;" multiple></span>
+							</label>
+							<input type="text" class="form-control" readonly>
+						</div>
+						<span class="help-block">Select files that will be downloaded at purchase time...</span>
 					</div>
 				</div>
 			</div>
@@ -260,6 +251,7 @@ function IsChecked($id, $items)
 				<button id='btndelete' type="button" class="btn btn-danger">Delete</button>
 		 	</div>
 		</div>
+		<input type='hidden' name='prod_type' value='{{ $product->prod_type }}'>
 		<input type='hidden' name='id' value='{{ $product->id }}'>
 		{!! Form::token() !!}
 		{!! Form::close() !!}

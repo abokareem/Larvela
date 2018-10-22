@@ -16,10 +16,15 @@ class CreateAttributesTable extends Migration
 		{
 			$table->increments('id');
 			$table->string('attribute_name');
+			$table->string('attribute_token')->unique();
 			$table->unsignedInteger('store_id')->nullable();
 		});
-		DB::table('attributes')->insert(['id'=>1,'attribute_name'=>'Colour','store_id'=>0]);
-		DB::table('attributes')->insert(['id'=>2,'attribute_name'=>'Size','store_id'=>0]);
+		DB::table('attributes')->insert([
+			'id'=>1,'attribute_name'=>'Colour','attribute_token'=>'COLOUR','store_id'=>0
+			]);
+		DB::table('attributes')->insert([
+			'id'=>2,'attribute_name'=>'Size','attribute_token'=>'SIZE','store_id'=>0
+			]);
     }
 
 

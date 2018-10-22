@@ -61,7 +61,7 @@ class Cart extends Model
 	 *
 	 * @return	mixed
 	 */
-	public function cartItems()
+	public function items()
 	{
 		return $this->hasMany('App\Models\CartItem');
 	}

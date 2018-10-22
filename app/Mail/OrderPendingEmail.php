@@ -3,14 +3,38 @@
  * \class	OrderPendingEmail
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-04-08
+ * \version	1.0.0
  *
+ * 
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
- * [CC]
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * 
  * 
  * \addtogroup Transactional
  * OrderPendingEmail - The customer has placed an order but it has not yet been picked or dispatched yet. So send an email using the mailable interface that the order is "Pending".
  */
 namespace App\Mail;
+
+
+use Hash;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -105,7 +129,7 @@ public $hash;
 		$this->customer = Customer::where('customer_email', $email)->first();
 		$this->order_items = OrderItem::where('order_item_oid',$this->order->id)->get();
 		$this->template = "Mail.".$this->store->store_env_code.".".$this->ACTION;
-		$this->hash = "2874-".hash('ripemd160', $email.$store->store_env_code);
+		$this->hash = $this->customer->id."-".hash('ripemd160', $email.$store->store_env_code);
     }
 
 

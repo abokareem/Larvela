@@ -1,4 +1,4 @@
-@extends("admin-master")
+@extends("Templates.admin-master")
 @section("title","Confirm Category Delete")
 @section("content")
 

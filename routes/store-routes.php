@@ -81,7 +81,7 @@ Route::get('/contact','SupportController@contact');
 #
 # Cart/account related
 #
-Route::get('/cart', 'CartController@ShowCart');
+Route::get('/cart', 'Cart\CartController@ShowCart');
 Route::get('/cart/incqty/{cid}/{iid}','CartController@incCartQty');
 Route::get('/cart/decqty/{cid}/{iid}','CartController@decCartQty');
 Route::get('/signup', 'StoreController@ShowSignUpForm');

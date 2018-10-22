@@ -3,7 +3,7 @@
  * \class	ParentProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.3
+ * \version	1.0.5
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -52,24 +52,24 @@ use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
 use App\Mail\BackInStockEmail;
-use App\Jobs\ResizeImages;
 
 
+use App\Models\Image;
 use App\Models\Store;
 use App\Models\Product;
-use App\Models\Image;
 use App\Models\Category;
-use App\Models\ProductType;
-use App\Models\CategoryProduct;
-
 use App\Models\Attribute;
-use App\Models\AttributeProduct;
+use App\Models\ProductType;
 use App\Models\ProdImageMap;
 use App\Models\Notification;
+use App\Models\AttributeValue;
+use App\Models\CategoryProduct;
+use App\Models\AttributeProduct;
 
 
 use App\Traits\Logger;
 use App\Traits\ProductImageHandling;
+use App\Traits\PathManagementTrait;
 
 
 /**
@@ -84,6 +84,7 @@ class ParentProductController extends Controller
 {
 use Logger;
 use ProductImageHandling;
+use PathManagementTrait;
 
 	/**
 	 * Open log file
@@ -114,22 +115,36 @@ use ProductImageHandling;
 	 * Save the Parent Product
 	 * Handle the images (if any) separately.
 	 *
-	 * POST ROUTE: /admin/product/save-pp
+	 * POST ROUTE: /admin/product/save
 	 *
-	 * @pre form must present all valid columns
-	 * @post new row inserted into database table "products" 
-	 * @param $request mixed Validation request object
-	 * @return mixed - view object
+	 * @pre		form must present all valid columns
+	 * @post	new row inserted into database table "products" 
+	 * @param	$request mixed Validation request object
+	 * @return	mixed - view object
 	 */
 	public function Save(ProductRequest $request)
 	{
 		$this->LogFunction("Save()");
 
-		$pid=0;
+		$form = Input::all();
 		$categories = $request->categories;	/* array of category id's */
+		$attributes = $form['attributes'];
+
 		$pid = ProductService::insert($request);
 		$this->LogMsg("Insert New Product new ID [".$pid."]");
-		$this->LogMsg("Process product assigned categories");
+		if(isset($attributes))
+		{
+			$order = 1;
+			foreach($attributes as $a)
+			{
+				$o= new AttributeProduct;
+				$o->product_id = $pid;
+				$o->attribute_id = $a;
+				$o->combine_order = $order++;
+				$o->save();
+				$this->LogMsg("Insert Product - Attribute - Order P[".$pid."] A[".$a."] [".$order."]");
+			}
+		}
 		if(isset($categories))
 		{
 			foreach($categories as $c)
@@ -143,15 +158,9 @@ use ProductImageHandling;
 		}
 		else
 		{
-			#
-			# @todo Need to assign to somethign or else product will not show up in list!
-			#
 			$this->LogMsg("No categories to assign (yet)");
 		}
 
-		#
-		# Need to add this to a trait maybe???
-		#
 		$this->SaveUploadedImage($pid);
 		return Redirect::to("/admin/products");
 	}
@@ -241,7 +250,7 @@ use ProductImageHandling;
 	 * @param $id int row id to be checked against before insert
 	 * @return mixed - view object
 	 */
-	public function Edit($id)
+	private function Edit($id)
 	{
 		$this->LogFunction("Edit(".$id.")");
 
@@ -250,7 +259,8 @@ use ProductImageHandling;
 		$stores = Store::all();
 		$categories = Category::all();
 		$product_types = ProductType::all();
-		$attributes = Attribute::get();
+		$attributes = Attribute::where('store_id',$store->id)->get();
+		$product_attributes = AttributeProduct::where('product_id',$product->id)->orderby('combine_order')->get();
 
 		$imagemap = ProdImageMap::where('product_id',$id)->get();
 		$prod_categories = CategoryProduct::where('product_id',$id)->get();
@@ -266,9 +276,10 @@ use ProductImageHandling;
 		$text = "There are ".sizeof($images)." images assembled.";
 		$this->LogMsg( $text );
 
-		return view('Admin.Products.editproduct',[
+		return view('Admin.Products.edit_parent',[
 			'product'=>$product,
 			'attributes'=>$attributes,
+			'product_attributes'=>$product_attributes,
 			'product_types'=>$product_types,
 			'images'=>$images,
 			'categories'=>$categories,
@@ -329,7 +340,7 @@ use ProductImageHandling;
 				foreach($second_attributes as $a2)
 				{
 					$qty = 0;
-					$sku = $product->prod_sku.'-'.$a1->attr_value."-".$a2->attr_value;
+					$sku = $parent->prod_sku.'-'.$a1->attr_value."-".$a2->attr_value;
 					$product = Product::where('prod_sku',$sku)->first();
 					if(!is_null($product))
 					{
@@ -339,7 +350,7 @@ use ProductImageHandling;
 				}
 			}
 		}
-		if(sizeof($products)>0) return;
+		if(sizeof($child_products)>0) return;
 		dispatch(new DeleteProductJob($id));
 	}
 

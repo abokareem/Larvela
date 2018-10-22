@@ -7,16 +7,6 @@ class Users extends Model
 {
 public $timestamps = false;
 
-protected $id;
-protected $name;
-protected $email;
-protected $password;
-protected $remember_token;
-protected $created_at;
-protected $updated_at;
-protected $role_id;
-
-
 
 protected $fillable = ['name','email','password', 'role_id',
 				'remember_token','created_at','updated_at'];
@@ -44,7 +34,7 @@ protected $fillable = ['name','email','password', 'role_id',
 	
 
 	/**
-	 *
+	 * @deprecated
 	 *
 	 * @return	mixed
 	 */

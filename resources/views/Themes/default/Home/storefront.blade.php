@@ -1,4 +1,23 @@
 @extends( $THEME_HOME.'master-storefront')
+<?php
+#
+# This is the main store front entry page called fromt he StoreFrontController class.
+#
+# Variables passed in:
+#
+# store
+# advert 
+# categories
+# settings
+# products (randon selection of products)
+# attributes
+# attribute_values
+#
+# sizes
+# colours
+#
+#
+?>
 @section('content')
 
 <!-- START:storefront -->

@@ -96,7 +96,7 @@ use Logger;
 
 
 	/**
-	 * new Save method, create prouct controller from factory.
+	 * New Save method, create product controller from factory.
 	 *
 	 *
 	 *

@@ -37,7 +37,7 @@ use Input;
 use App\Models\Customer;
 use App\Models\Country;
 use App\Models\Store;
-use App\Models\Users;
+use App\Models\User;
 
 use App\Http\Requests\AdminDetailsRequest;
 
@@ -69,7 +69,7 @@ class Installer extends Controller
 		if($form['app_key'] == $app_key)
 		{
 			$hash = hash('SHA512',$app_key);
-			$o = new Users;
+			$o = new User;
 			$o->name = $form['admin_name'];
 			$o->email = $form['admin_email'];
 			$o->password = bcrypt($form['admin_pwd']);
@@ -101,7 +101,7 @@ class Installer extends Controller
 		$hash = hash('SHA512',$app_key);
 		if($form['key_hash'] == $hash)
 		{
-			$user = Users::find(1);
+			$user = User::find(1);
 			
 			#
 			# save Store now.

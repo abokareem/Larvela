@@ -26,9 +26,9 @@ class ProductRequest extends Request
 			'prod_title'=>'required|min:4|max:128',
 			'prod_short_desc'=>'required|min:8|max:1024',
 			'prod_long_desc'=>'required|min:8|max:8192',
-			'prod_weight'=>'required|numeric',
-			'prod_qty'=>'required|numeric',
-			'prod_reorder_qty'=>'required|numeric',
+			'prod_weight'=>'numeric',
+			'prod_qty'=>'numeric',
+			'prod_reorder_qty'=>'numeric',
 			'prod_base_cost'=>'required|numeric',
 			'prod_retail_cost'=>'required|numeric'
         ];

@@ -75,10 +75,10 @@ protected $data = array();
 	 * @post internal data array created
 	 * @return void
 	 */
-	function __construct()
-	{
-		$this->BuildData();
-	}
+#	function __construct()
+#	{
+#		$this->BuildData();
+#	}
 
 
 
@@ -137,19 +137,6 @@ protected $data = array();
 		return $category_list;
 	}
 
-
-
-	/**
-	 * Given the store ID, return a collection of rows from the category table
-	 * (single row in collection zero indexed).
-	 *
-	 * @param	integer	$store_id	row ID
-	 * @return	mixed	
-	 */
-#	protected function getByStoreID($store_id)
-#	{
-#		return \DB::table('category')->where(['category_store_id'=>$store_id])->get();
-#	}
 
 
 
@@ -315,32 +302,6 @@ protected $data = array();
 		return $html;
 	}
 
-
-
-	/**
-	 * Return the HTML SELECT List as clickable items
-	 *
-	 * @param 	string	$form_name "name=" attribute to use in seelct list
-	 * @param	integer	$id "id=" attribute label
-	 * @pre 	Categories table has valid data
-	 * @post	None
-	 * @return	string HTML select list
-	 */
-	public function getSelectList($form_name, $id=0)
-	{
-		$rows = $this->getCategories();
-		$html = "<select class='form-control' id='".$form_name."' name='".$form_name."'>";
-		$html .= "<option value='0'>No Parent</option>";
-		foreach($rows as $row)
-		{
-			if($row->id == $id)
-				$html .= "<option value='".$row->id."' selected>".$row->category_title."</option>";
-			else
-				$html .= "<option value='".$row->id."'>".$row->category_title."</option>";
-		}
-		$html .="</select>";
-		return $html;
-	}
 
 
 	/**

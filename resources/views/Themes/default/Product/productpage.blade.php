@@ -42,6 +42,13 @@ if($product->prod_has_free_shipping == 0) $shipping = "8.40";
 <!-- START:productpage mobile-first-->
 <div class="container prodpage-block">
 
+<?php
+#
+# For "trade and wholesale site, you can use the MIN_SPEND setting to set a minimum amount that customers need to spend.
+#
+#
+#?>
+
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<div class="prodpage-mainimage">

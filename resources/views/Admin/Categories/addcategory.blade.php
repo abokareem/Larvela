@@ -22,7 +22,7 @@
 	<form class='form-horizontal' name='add' id='add' method='post'>
 	<div class="row">
 		<div class="form-group">
-			<label class="control-label col-xs-2">Store:</label>
+			<label class="control-label col-xs-12 col-sm-2">Store:</label>
 			<div class="col-xs-6">
 				<select id="category_store_id" name="category_store_id" class="form-control">
 				@foreach($stores as $s)
@@ -32,26 +32,26 @@
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">Title:</label>
-			<div class="col-xs-6">
+			<label class="control-label col-xs-12 col-sm-2">Title:</label>
+			<div class="col-xs-12 col-sm-6">
 				<input type="text" class="form-control" id='category_title' name="category_title" value=''>
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">Description:</label>
-			<div class="col-xs-6">
+			<label class="control-label col-xs-12 col-sm-2">Description:</label>
+			<div class="col-xs-12 col-sm-6">
 				<textarea class="form-control" name="category_description" id='category_description'></textarea>
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">URL:</label>
-			<div class="col-xs-6">
+			<label class="control-label col-xs-12 col-sm-2">URL:</label>
+			<div class="col-xs-12 col-sm-6">
 				<input type="text" class="form-control" id='category_url' name="category_url" value=''>
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-2">Parent:</label>
-			<div class="col-xs-5">
+			<label class="control-label col-xs-12 col-sm-2">Parent:</label>
+			<div class="col-xs-12 col-sm-5">
 				<select id="category_parent_id" name="category_parent_id" class="form-control">
 				<option value="0">No parent</option>
 				@foreach($categories as $c)
@@ -61,7 +61,7 @@
 		 	</div>
 		</div>
 		<div class="control-group">
-			<label class='control-label col-xs-2'>Status:</label>
+			<label class='control-label col-xs-12 col-sm-2'>Status:</label>
 			<div class='col-xs-8'>
 			<input type='radio' name='category_status' value='A' checked> Enabled<br>
 			<input type='radio' name='category_status' value='C'> Disabled<br>
@@ -71,7 +71,7 @@
 
 	<div class="row">
 		<div class="control-group">
-			<label class='control-label col-xs-2'>Visible:</label>
+			<label class='control-label col-xs-12 col-sm-2'>Visible:</label>
 			<div class='col-xs-6'>
 			<input type='radio' name='category_visible' value='Y' checked> Visible on Menu<br>
 			<input type='radio' name='category_visible' value='N'> Hidden<br>
@@ -81,7 +81,7 @@
 
 	<div class="row">
 		<div class="form-group">
-			<label class="control-label col-xs-2"> </label>
+			<label class="control-label col-xs-12 col-sm-2"> </label>
 			<div class="col-xs-6">
 				<button id='btnsave'   type="button" class="btn btn-success">Add Category</button>
 				<button id='btncancel' type="button" class="btn btn-warning">Cancel</button>

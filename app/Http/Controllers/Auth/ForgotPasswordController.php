@@ -1,13 +1,16 @@
 <?php
 /**
  * \class	ForgotPasswordController
- * \version	1.0.0
+ * \version	1.0.1
  *
  */
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+
+use App\Models\StoreSetting;
+
 
 class ForgotPasswordController extends Controller
 {
@@ -43,7 +46,8 @@ class ForgotPasswordController extends Controller
 	public function showLinkRequestForm()
 	{
 		$store = app('store');
-		return view('auth.passwords.email',['store'=>$store]);
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		return view('auth.passwords.email',['store'=>$store,'settings'=>$settings]);
 	}
 
 }

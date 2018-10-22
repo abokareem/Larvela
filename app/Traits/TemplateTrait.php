@@ -1,7 +1,9 @@
 <?php
 /**
- * @date 2016-12-31
- * @author	Sid Young	<sid@off-grid-engineering.com>
+ * @Date 2016-12-31
+ * @Author	Sid Young	<sid@off-grid-engineering.com>
+ *
+ * [CC]
  *
  * \addtogroup Traits
  * TemplateTrait - Used in early version for templating emails etc.

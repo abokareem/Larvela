@@ -3,7 +3,7 @@
 <style>
 .reverse { unicode-bidi: bidi-override; direction: rtl; }
 </style>
-<div class="container">
+<div class="container" style="background-color:#f987c5">
 	<div class="row clearfix">
 		<div class="col-md-3 column">
 			<h3>ONLINE SHOP</h3>

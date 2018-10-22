@@ -12,6 +12,8 @@
  */
 namespace App\Mail;
 
+
+use Hash;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;

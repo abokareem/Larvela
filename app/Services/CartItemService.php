@@ -59,7 +59,7 @@ class CartItemService
 	 * @param	integer	$id		Product ID to add
 	 * @return	void
 	 */
-	public function AddItem(Request $request, $id)
+	public static function AddItem(Request $request, $id)
 	{
 		$store = app('store');
 		$query = Request::input();
@@ -105,7 +105,7 @@ class CartItemService
 	 * @param	integer	$id		ID of product to remove.
 	 * @return	void
 	 */
-	public function DeleteItem($id)
+	public static function DeleteItem($id)
 	{
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
 		$items = $cart->items;

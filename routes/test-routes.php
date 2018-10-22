@@ -2,6 +2,21 @@
 #
 # Routes used in testing - do not push to PROD
 #
+Route::group(['middleware'=>['auth','roles']], function()
+{
+Route::get('/test/category/image','TestController@test_category_image');
+});
+
+Route::get('/test/interfaces','TestController@test_interfaces');
+
+
+
+
+Route::get('/test/cart/show/{id}','CartController@test_cart_show');
+
+
+Route::get('/test/product/packs','TestController@test_product_packs');
+
 
 Route::get('/test/product/show/{id}','TestController@test_product_show');
 
