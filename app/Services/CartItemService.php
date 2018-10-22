@@ -194,7 +194,6 @@ class CartItemService
 						$itemrow->qty = $qty;
 						$itemrow->save();
 					}
-					$this->LogMsg("item removed (1 less)");
 				}
 			}
 		}
