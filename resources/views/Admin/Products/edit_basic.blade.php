@@ -28,6 +28,7 @@
 	<form class='form-horizontal' name='edit' id='edit' method='post' enctype='multipart/form-data'>
 	<ul id='tabs' class='nav nav-tabs' data-tabs='tabs'>
 		<li class='active'><a href='#details' data-toggle='tab'>Details</a></li>
+		<li><a href='#taxes' data-toggle='tab'>Tax</a></li>
 		<li><a href='#images' data-toggle='tab'>Images</a></li>
 		<li><a href='#categories' data-toggle='tab'>Categories</a></li>
 	</ul>
@@ -224,6 +225,28 @@
 			</div>
 		</div>
 		
+
+		<div class='tab-pane' id='taxes'>	
+			<div class="row">
+				<div class="form-group">
+					<label class="control-label col-xs-12 col-sm-2">Tax Applicable:</label>
+					<div class="col-xs-10 checkbox">
+						<label> <input type="radio" name="prod_is_taxable" value="Y"> Product is Taxable </label><br>
+						<label> <input type="radio" name="prod_is_taxable" value="N" checked> Product is Tax free </label><br>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-xs-12 col-sm-2">Tax Rate:</label>
+					<div class="col-xs-3">
+						<div class='input-group'>
+							<input type='text' class="form-control"  name='prod_tax_rate' >
+							<span class="input-group-addon">%</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 
 		<div class='tab-pane' id='categories'>
 			<div class="row">
