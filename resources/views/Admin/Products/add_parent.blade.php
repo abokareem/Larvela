@@ -87,7 +87,7 @@
 				</div>
 				<div class="form-group">
 					<label class='control-label col-xs-12 col-sm-2'>Free Shipping:</label>
-					<div class='col-xs-12 col-ms-8'>
+					<div class='col-xs-12 col-sm-8'>
 						<div class="input-group">
 							<input type='radio' name='prod_has_free_shipping' value='Y'> YES &nbsp;&nbsp;
 							<input type='radio' name='prod_has_free_shipping' value='N' checked> NO
