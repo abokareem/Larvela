@@ -92,12 +92,12 @@ Route::get('/cart/shipping','CheckoutController@ShowShipping');
 Route::get('/cart/checkout','CheckoutController@Checkout');
 #
 #
-Route::post('/ajax/updatelocks/{id}','CartController@UpdateLocks');
-Route::post('/cart/updatelocks/{id}','CartController@UpdateLocks');
+Route::post('/ajax/updatelocks/{id}','Cart\CartController@UpdateLocks');
+Route::post('/cart/updatelocks/{id}','Cart\CartController@UpdateLocks');
 #
 # Error Trapping
 #
-Route::get('/cart/error/cart-timeout','CartController@CartTimeoutError');
+Route::get('/cart/error/cart-timeout','Cart\CartController@CartTimeoutError');
 
 
 Route::post('/myaccount/update/{id}', 'CustomerController@UpdateMyAccount');
@@ -107,8 +107,8 @@ Route::get('/myaccount', 'StoreController@ShowMyAccount');
 #
 Route::get('/addtocart/{id}', 'Cart\CartController@addItem');
 Route::get('/removeItem/{productId}', 'Cart\CartController@removeItem');
-Route::get('/shipping','CartController@ShowShipping');
-Route::post('/confirm','CartController@Confirm');
+Route::get('/shipping','Cart\CartController@ShowShipping');
+Route::post('/confirm','Cart\CartController@Confirm');
 
 #
 # From footer
