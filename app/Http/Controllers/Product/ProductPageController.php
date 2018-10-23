@@ -3,7 +3,7 @@
  * \class	ProductPageController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-12
- * \version	1.0.7
+ * \version	1.0.8
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -27,34 +27,37 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Product;
 
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Routing\Route;
-use App\Http\Requests;
 
 use Auth;
 use Input;
 use Cookie;
 use Session;
 use Config;
+use App\Http\Requests;
+use Illuminate\Routing\Route;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Request;
+
 
 use App\User;
-
-use App\Models\Attribute;
-use App\Models\AttributeProduct;
-use App\Models\AttributeValue;
-use App\Models\Category;
-use App\Models\Product;
-use App\Models\ProductType;
-use App\Models\ProdImageMap;
 use App\Models\Image;
 use App\Models\Store;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Attribute;
+use App\Models\ProductType;
+use App\Models\ProdImageMap;
 use App\Models\StoreSetting;
+use App\Models\AttributeValue;
+use App\Models\AttributeProduct;
 
-use App\Services\ProductPageFactory;
+
 use App\Services\ImageService;
+use App\Services\ProductPageFactory;
+
 
 use App\Traits\Logger;
 

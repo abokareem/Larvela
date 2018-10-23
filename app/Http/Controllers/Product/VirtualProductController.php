@@ -3,7 +3,7 @@
  * \class	VirtualProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-04-03
- * \version	1.0.7
+ * \version	1.0.8
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -29,44 +29,43 @@
  * \addtogroup Product_Types
  * VirtualProductController - Provides CRUD like functions relevant to all "VIRTUAL" products.
  */
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Product;
 
 
 use Input;
 use Redirect;
 
-use Illuminate\Http\Request;
 use App\Http\Requests;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Support\Facades\Mail;
 
 
 use App\Services\ProductService;
 
 
-use App\Jobs\DeleteImageJob;
-use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
-
+use App\Jobs\DeleteImageJob;
+use App\Jobs\DeleteProductJob;
 use App\Mail\BackInStockEmail;
 
 use App\Models\Store;
-use App\Models\Product;
 use App\Models\Image;
+use App\Models\Product;
 use App\Models\Category;
-use App\Models\ProductType;
-use App\Models\CategoryProduct;
-
 use App\Models\Attribute;
+use App\Models\ProductType;
 use App\Models\ProdImageMap;
 use App\Models\Notification;
+use App\Models\CategoryProduct;
 
 
 use App\Traits\Logger;
-use App\Traits\ProductImageHandling;
 use App\Traits\PathManagementTrait;
+use App\Traits\ProductImageHandling;
 
 
 /**
@@ -80,8 +79,8 @@ use App\Traits\PathManagementTrait;
 class VirtualProductController extends Controller
 {
 use Logger;
-use ProductImageHandling;
 use PathManagementTrait;
+use ProductImageHandling;
 
 
 	/**

@@ -3,7 +3,7 @@
  * \class	BasicProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.5
+ * \version	1.0.6
  *
  * 
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -28,39 +28,40 @@
  *
  *
  * \addtogroup  Product_Types
- * BasicProductController - Provides CRYD like functions for "BASIC" type products.
+ * BasicProductController - Provides CRUD like functions for "BASIC" type products.
  */
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Product;
 
 
 use Input;
 use Redirect;
 
-use Illuminate\Http\Request;
 use App\Http\Requests;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Support\Facades\Mail;
 
 use App\Helpers\StoreHelper;
 use App\Services\ProductService;
 
+use App\Jobs\BackInStock;
+use App\Jobs\ResizeImages;
 use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;
-use App\Jobs\BackInStock;
 use App\Mail\BackInStockEmail;
-use App\Jobs\ResizeImages;
 
 use App\Models\Store;
-use App\Models\Product;
 use App\Models\Image;
+use App\Models\Product;
 use App\Models\Category;
-use App\Models\ProductType;
-use App\Models\CategoryProduct;
-
 use App\Models\Attribute;
+use App\Models\ProductType;
 use App\Models\ProdImageMap;
 use App\Models\Notification;
+use App\Models\CategoryProduct;
+
 
 use App\Traits\Logger;
 use App\Traits\PathManagementTrait;
@@ -77,8 +78,8 @@ use App\Traits\ProductImageHandling;
 class BasicProductController extends Controller
 {
 use Logger;
-use ProductImageHandling;
 use PathManagementTrait;
+use ProductImageHandling;
 
 
 	/**
@@ -436,7 +437,7 @@ use PathManagementTrait;
 	 * @param	integer	$id - the product ID
 	 * @return	string 
 	 */
-	protected function getStoragePath( $id )
+	private function getStoragePath( $id )
 	{
 		$this->LogFunction("getStoragePath(".$id.")");
 		$path="";
@@ -475,7 +476,7 @@ use PathManagementTrait;
 	 * @param	integer	$id - the product ID
 	 * @return	string
 	 */
-	protected function getStorageSubPath($id)
+	private function getStorageSubPath($id)
 	{
 		$this->LogFunction("getStorageSubPath(".$id.")");
 

@@ -3,7 +3,7 @@
  * \class	ProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.2
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -27,13 +27,12 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Product;
 
-use Redirect;
 use Input;
-
-use Illuminate\Http\Request;
+use Redirect;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
 
@@ -42,20 +41,21 @@ use App\Helpers\StoreHelper;
 use App\Services\ProductService;
 use App\Services\ProductFactory;
 
-use App\Jobs\DeleteImageJob;
-use App\Jobs\DeleteProductJob;
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
+use App\Jobs\DeleteImageJob;
+use App\Jobs\DeleteProductJob;
 
-use App\Models\Attribute;
-use App\Models\Category;
-use App\Models\CategoryProduct;
 use App\Models\Image;
-use App\Models\Notification;
+use App\Models\Store;
 use App\Models\Product;
+use App\Models\Category;
+use App\Models\Attribute;
 use App\Models\ProductType;
 use App\Models\ProdImageMap;
-use App\Models\Store;
+use App\Models\Notification;
+use App\Models\CategoryProduct;
+
 
 use App\Traits\Logger;
 

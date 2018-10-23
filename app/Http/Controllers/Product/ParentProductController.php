@@ -3,7 +3,7 @@
  * \class	ParentProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.5
+ * \version	1.0.6
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -30,18 +30,19 @@
  * \addtogroup Product_Types
  * ParentProductController - Provides CRUD like functions for "PARENT" products.
  */
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Product;
 
 
 use Input;
 use Redirect;
 
 
-use Illuminate\Http\Request;
 use App\Http\Requests;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Support\Facades\Mail;
 
 
 use App\Helpers\StoreHelper;
@@ -83,8 +84,8 @@ use App\Traits\PathManagementTrait;
 class ParentProductController extends Controller
 {
 use Logger;
-use ProductImageHandling;
 use PathManagementTrait;
+use ProductImageHandling;
 
 	/**
 	 * Open log file
