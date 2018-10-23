@@ -98,16 +98,6 @@ Route::post('/admin/category/deletecat/{id}','CategoryController@DoDeleteCategor
 #
 Route::get('/admin/products/select/type','Admin\AdminProductController@SelectType');
 Route::get('/admin/select/type/{id}','Admin\AdminProductController@RouteToPage');
-
-
-#
-# 2018-09-22 replace these with ProductFactory call in ProductController.
-#
-##Route::post('/admin/product/save-bp','BasicProductController@Save');
-##Route::post('/admin/product/save-pp','ParentProductController@Save');
-##Route::post('/admin/product/save-lv','VirtualProductController@SaveLimitedVirtual');
-##Route::post('/admin/product/save-uv','VirtualProductController@SaveUnLimitedVirtual');
-
 #
 #
 #
@@ -117,9 +107,9 @@ Route::get('/admin/product/edit/{id}','Admin\AdminProductController@ShowEditProd
 #
 # 2018-09-22 use factory object in product controller to route to product
 #
-Route::post('/admin/product/save','ProductController@Save');
-Route::post('/admin/product/update/{id}','ProductController@Update');
-Route::post('/admin/product/delete/{id}','ProductController@Delete');
+Route::post('/admin/product/save','Product\ProductController@Save');
+Route::post('/admin/product/update/{id}','Product\ProductController@Update');
+Route::post('/admin/product/delete/{id}','Product\ProductController@Delete');
 #
 #
 #
@@ -127,16 +117,13 @@ Route::get( '/admin/product/copy/{id}','Admin\AdminProductController@ShowCopyPro
 Route::post('/admin/product/copy/{id}','Admin\AdminProductController@CopyProductPage');
 #
 #
-# CHECK CHECK CHECK
-Route::get('/admin/attributes','BasicProductController@ShowAttributesPage');
 #
-#
-Route::get('/admin/producttypes','ProductTypeController@Show');
-Route::get('/admin/producttype/edit/{id}','ProductTypeController@Edit');
-Route::get('/admin/producttype/addnew','ProductTypeController@Add');
-Route::post('/admin/producttype/save','ProductTypeController@Save');
-Route::post('/admin/producttype/update/{id}','ProductTypeController@Update');
-Route::post('/admin/producttype/delete/{id}','ProductTypeController@Delete');
+Route::get('/admin/producttypes','Product\ProductTypeController@Show');
+Route::get('/admin/producttype/edit/{id}','Product\ProductTypeController@Edit');
+Route::get('/admin/producttype/addnew','Product\ProductTypeController@Add');
+Route::post('/admin/producttype/save','Product\ProductTypeController@Save');
+Route::post('/admin/producttype/update/{id}','Product\ProductTypeController@Update');
+Route::post('/admin/producttype/delete/{id}','Product\ProductTypeController@Delete');
 #
 #
 Route::get('/admin/seo','SEOController@ShowSEOList');

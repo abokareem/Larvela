@@ -66,7 +66,7 @@ Route::get('/attribute/{id}','StoreFrontController@ShopByAttribute');
 #
 # 2018-09-12 refactored this route from StoreFrontController.
 #
-Route::get('/product/{id}','ProductPageController@ShowProductPage');
+Route::get('/product/{id}','Product\ProductPageController@ShowProductPage');
 Route::get('/category/{id}','CategoryPageController@ShowStoreCategory');
 
 #
