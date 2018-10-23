@@ -160,7 +160,7 @@ function IsChecked($id, $items)
 		</div>
 
 
-		<div class='tab-pane active' id='attributetab'>
+		<div class='tab-pane' id='attributetab'>
 			<div class="row">
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-2">Attributes:</label>
@@ -204,7 +204,7 @@ function IsChecked($id, $items)
 			@endforeach
 		</div>
 
-		<div class='tab-pane active' id='categories'>
+		<div class='tab-pane' id='categories'>
 			<div class="row">
 				<div class="control-group">
 					<label class="control-label col-xs-12 col-sm-2">Category:</label>
@@ -223,7 +223,7 @@ function IsChecked($id, $items)
 
 
 
-		<div class='tab-pane active' id='images'>
+		<div class='tab-pane' id='images'>
 
 			@if(sizeof($images)>0)
 			<div class="row">
