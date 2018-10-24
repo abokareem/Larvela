@@ -3,7 +3,7 @@
  * \class	DownloadDirCleanupJob
  * \date	2018-09-26
  * \author	Sid Young <suid@off-grid-engineering.com>
- * \version	1.0.2
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -110,21 +110,11 @@ protected $remove_after_days=7;
 	{
 		$purge_time = strtotime("-".$this->remove_after_days." days");
 		$this->LogMsg("Purge time [".$purge_time."]");
+
 		$this->LogMsg("Fetch base dir and check for required sub dirs.");
 		$base = base_path()."/public/download";
 		$this->CheckCreateDir($base);
-
-		$this->LogMsg("Check/Create GUID directories");
-		for($i=0;$i<17;$i++)
-		{
-			$guid_path = base_path()."/public/download/".dechex($i);
-			$this->LogMsg("Checking for [".$guid_path."]");
-			if(!is_dir($guid_path))
-			{
-				$this->LogMsg("Create path for [".$guid_path."]");
-				$this->CheckCreateDir($guid_path);
-			}
-		}
+		$this->CheckCreateGUIDDirs();
 
 		$this->LogMsg("Checking each download directory:");
 		for($i=0;$i<17;$i++)
@@ -167,6 +157,30 @@ protected $remove_after_days=7;
 		}
 		$this->LogEnd();
 		return 0;
+	}
+
+
+
+		
+	/**
+	 * Iterate through all the GUID directories and create
+	 * them as required
+	 *
+	 * @return	void
+	 */
+	protected function CheckCreateGUIDDirs()
+	{
+		$this->LogMsg("Check/Create GUID directories");
+		for($i=0;$i<17;$i++)
+		{
+			$guid_path = base_path()."/public/download/".dechex($i);
+			$this->LogMsg("Checking for [".$guid_path."]");
+			if(!is_dir($guid_path))
+			{
+				$this->LogMsg("Create path for [".$guid_path."]");
+				$this->CheckCreateDir($guid_path);
+			}
+		}
 	}
 
 
