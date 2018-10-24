@@ -91,9 +91,10 @@ Route::get('/signup', 'StoreController@ShowSignUpForm');
 Route::get('/cart/shipping','CheckoutController@ShowShipping');
 Route::get('/cart/checkout','CheckoutController@Checkout');
 #
+# Moved to Cart\CartLocking
 #
-Route::post('/ajax/updatelocks/{id}','Cart\CartController@UpdateLocks');
-Route::post('/cart/updatelocks/{id}','Cart\CartController@UpdateLocks');
+Route::post('/ajax/updatelocks/{id}','Cart\CartLocking@UpdateLocks');
+Route::post('/cart/updatelocks/{id}','Cart\CartLocking@UpdateLocks');
 #
 # Error Trapping
 #
