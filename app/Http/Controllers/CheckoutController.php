@@ -3,7 +3,7 @@
  * \class	CheckoutController
  * \date	2018-09-19
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.0
+ * \version 1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -288,34 +288,23 @@ private $user;
 		if($free_shipping == 0)
 		{
 			$theme_path = \Config::get('THEME_CART')."2-shipping";
-			$this->LogMsg("View will be [".$theme_path."]");
-			return view($theme_path,[
-				'store'=>$store,
-				'settings'=>$settings,
-				'cart'=>$cart,
-				'cart_data'=>$cart_data,
-				'items'=>$items,
-				'user'=>$user,
-				'customer'=>$customer,
-				'address'=>$address,
-				'postal_options'=>$postal_options
-				]);
 		}
 		else
 		{
 			$theme_path = \Config::get('THEME_CART')."2-freeshipping";
-			$this->LogMsg("View will be [".$theme_path."]");
-			return view($theme_path,[
-				'store'=>$store,
-				'settings'=>$settings,
-				'cart'=>$cart,
-				'cart_data'=>$cart_data,
-				'items'=>$items,
-				'user'=>$user,
-				'customer'=>$customer,
-				'address'=>$address,
-				'postal_options'=>$postal_options
-				]);
+		}
+		$this->LogMsg("View will be [".$theme_path."]");
+		return view($theme_path,[
+			'store'=>$store,
+			'settings'=>$settings,
+			'cart'=>$cart,
+			'cart_data'=>$cart_data,
+			'items'=>$items,
+			'user'=>$user,
+			'customer'=>$customer,
+			'address'=>$address,
+			'postal_options'=>$postal_options
+			]);
 		}
 	}
 
