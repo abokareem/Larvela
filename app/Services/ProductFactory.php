@@ -3,7 +3,7 @@
  * \class	ProductFactory
  * \date	2018-09-22
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -52,8 +52,8 @@ class ProductFactory
 		{
 			$parts = explode(" ",$type->product_type);
 			$object_name = trim(ucwords($parts[0]))."ProductController";
-			$class_name = "App\\Http\\Controllers\\".$object_name;
-			require_once base_path()."/app/Http/Controllers/".$object_name.'.php';
+			$class_name = "App\\Http\\Controllers\\Product\\".$object_name;
+			require_once base_path()."/app/Http/Controllers/Product/".$object_name.'.php';
 			if(class_exists($class_name))
 			{
 				return new $class_name();
