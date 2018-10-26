@@ -1,8 +1,8 @@
 <?php
 /**
- * \class	AUPOST_Shipping
- * \date 	2018-08-24
- * \version	1.0.3
+ * \class	Free_Shipping
+ * \date	2018-08-24
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -25,27 +25,29 @@
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
+ *
  */
 namespace App\Services\Shipping;
-
 
 
 use App\Models\Store;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Customer;
-use App\Models\CartItem;
 use App\Models\CustomerAddress;
+
 use App\Services\Shipping\IShippingModule;
 
 
+
 /**
- * \brief Module to return Local Shipping options
+ * \brief Module for calculating postage costs and options for using AU Post
  */
-class AUPOST_Shipping implements IShippingModule
+class Free_Shipping implements IShippingModule
 {
 
-private $MODULE_CODE = "LARVELA_AUPOST";
+private $MODULE_CODE = "LARVELA_FREE_SHIPPING";
+
 
 
 	/**
@@ -61,65 +63,42 @@ private $MODULE_CODE = "LARVELA_AUPOST";
 
 
 	/**
+	 * Return an array with a single item of "Free Shipping" if all products have free shipping
+	 * - If any products require shipping then return NULL.
 	 *
 	 * @param	mixed	$store
 	 * @param	mixed	$cart
 	 * @param	mixed	$products
 	 * @param	mixed	$customer_address
+	 * @return	array
 	 */
 	public function Calculate($store, $cart, $products, $customer_address)
 	{
-		$options = array();
+		$free_products = array_filter($products, function($p) { if($p->prod_has_free_shipping == 1) { return $p; } });
 
-		$total_weight = 0;
-		$items = CartItem::where('cart_id',$cart->id)->get();
-		foreach($items as $item)
+		if(sizeof($free_products) == sizeof($products))
 		{
-			$filtered_array = array_filter($products,function($p) use ($item){if($p->id==$item->product_id) return $p;});
-			$product =array_shift( $filtered_array );
-			$product_weight = $product->prod_weight * $item->qty;
-			$total_weight += $product_weight;
-		}
-		$post_packs = Product::where('prod_combine_code',"AUPOST")->orderBy("prod_weight")->get()->toArray();
+			$options = array();
 	
-		$post_pack_product_array = array_filter($post_packs, function($postal_product) use ($total_weight)
-			{static $stop_flag = false; if(($postal_product['prod_weight'] > $total_weight)&&(!$stop_flag)) {$stop_flag = true;return $postal_product['prod_weight'];} },$stop_flag=0);
-
-		$post_pack_product = array_shift($post_pack_product_array);
-		$pack_weight = $post_pack_product['prod_weight'];
-		$postal_options = array();
-		foreach($post_packs as $pp)
-		{
-			if($pp['prod_weight'] == $pack_weight)
-			{
-				array_push($postal_options, $pp);
-			}
-		}
-
-		$code = "";
-		foreach($postal_options as $po)
-		{
 			$option = new \stdClass;
-			$option->cost = $po['prod_retail_cost'];
-			$option->display = $po['prod_title'];
-			$option->html = "<input type='radio' name='shipping' value='".$this->MODULE_CODE."-".$po['id']."' >";
-			$option->value=$this->MODULE_CODE."-".$po['id'];
+			$option->count = sizeof($free_products);
+			$option->cost = 0.0;
+			$option->display = "<span id='free_shipping'>Free Shipping</span>";
+			$option->html = "<input type='radio' name[]='shipping' value='".$this->MODULE_CODE."'>";
+			
 			array_push($options, $option);
+			return $options;
 		}
-		return $options;
+		else
+		{
+			return array();
+		}
 	}
 
 
 
-
-
 	/**
-	 * Draft function to return if the module is active or not.
-	 *
-	 *
-	 * @todo Need to change this to use a system variable or future shipping module admin page.
-	 *
-	 *
+	 * Module is always active in this demo code.
 	 * @return	boolean
 	 */
 	public function isActive()

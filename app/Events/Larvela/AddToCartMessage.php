@@ -98,7 +98,11 @@ protected $product;
 	{
 		$this->LogFunction("processMsg()");
 		$this->LogMsg("Store Code [".$this->store->store_env_code."]");
-		$msg = array('store_code'=>$this->store->store_env_code);
+		$msg = array(
+			'store_code'=>$this->store->store_env_code,
+			'product_sku'=>$this->product->prod_sku,
+			'process_time'=>time()
+			);
 		#
 		# @todo Add code to process the message from the add code dispatch()
 		#
