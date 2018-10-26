@@ -124,7 +124,7 @@ class ShippingFactory extends Facade
 			$module_options = $module->Calculate($store, $user, $products, $address);
 			if(!is_null($module_options))
 			{
-				array_push($options, $module_options);
+				$options = array_merge($options, $module_options);
 			}
 		}
 		return $options;
