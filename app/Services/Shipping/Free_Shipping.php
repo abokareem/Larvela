@@ -81,6 +81,7 @@ private $MODULE_CODE = "LARVELA_FREE_SHIPPING";
 			$options = array();
 	
 			$option = new \stdClass;
+			$option->id = 1;
 			$option->count = sizeof($free_products);
 			$option->cost = 0.0;
 			$option->display = "<span id='free_shipping'>Free Shipping</span>";

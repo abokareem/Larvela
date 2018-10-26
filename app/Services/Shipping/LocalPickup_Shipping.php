@@ -78,9 +78,11 @@ private $MODULE_CODE = "LARVELA_LOCAL_PICKUP";
 		$options = array();
 
 		$option = new \stdClass;
+		$option->id = 1;
 		$option->cost = 0.0;
 		$option->display = "Local Pickup";
-		$option->html = "<input type='radio' name='shipping' value='".$this->MODULE_CODE."'>";
+		$option->html = "<input type='radio' name='shipping' value='".$this->MODULE_CODE."-0'>";
+		$option->value = $this->MODULE_CODE."-0";
 		
 		array_push($options, $option);
 		return $options;

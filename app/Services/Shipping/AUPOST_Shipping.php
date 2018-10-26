@@ -100,6 +100,7 @@ private $MODULE_CODE = "LARVELA_AUPOST";
 		foreach($postal_options as $po)
 		{
 			$option = new \stdClass;
+			$option->id = $po['id'];
 			$option->cost = $po['prod_retail_cost'];
 			$option->display = $po['prod_title'];
 			$option->html = "<input type='radio' name='shipping' value='".$this->MODULE_CODE."-".$po['id']."' >";
