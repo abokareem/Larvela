@@ -3,7 +3,7 @@
  * \class	CheckoutController
  * \date	2018-09-19
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.1
+ * \version 1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -38,21 +38,23 @@ use Auth;
 use Session;
 
 use App\Services\CartLocking;
-use App\Events\Larvela\AddToCartMessage;
+use App\Services\ShippingFactory;
 use App\Events\Larvela\ShowCartMessage;
-
-use App\Models\Cart;
-use App\Models\CartData;
-use App\Models\CartItem;
-use App\Models\Product;
-use App\Models\Customer;
-use App\Models\ProdImageMap;
-use App\Models\ProductLock;
-use App\Models\CustomerAddress;
-use App\Models\Image;
-use App\Models\StoreSetting;
+use App\Events\Larvela\AddToCartMessage;
 
 use App\User;
+use App\Models\Cart;
+use App\Models\Image;
+use App\Models\Product;
+use App\Models\Country;
+use App\Models\Customer;
+use App\Models\CartData;
+use App\Models\CartItem;
+use App\Models\ProductLock;
+use App\Models\ProdImageMap;
+use App\Models\StoreSetting;
+use App\Models\CustomerAddress;
+
 use App\Traits\Logger;
 
 
@@ -110,35 +112,49 @@ private $user;
 	 *
 	 * @return	mixed
 	 */
-	public function ShowShipping()
+	public function Checkout()
 	{
-		$this->LogFunction("ShowShipping()");
+		$this->LogFunction("Checkout()");
 
 		$store = app('store');
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$free_shipping = 0;
-		#
-		# The logged in user
-		#
+		$theme_path ="";
+		
 		$user = User::find(Auth::user()->id);
-		#
-		# The users customer data
-		#
 		$customer = Customer::where('customer_email',$user->email)->first();
 		$address = CustomerAddress::firstOrNew(array('customer_cid'=>$customer->id));
-
-		#$this->LogMsg("Customer Data ".print_r($customer,true));
-		#$this->LogMsg("Address Data ".print_r($address,true));
-
-		#
-		# Cart, cart items and cart data
-		#
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
 		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
 		$items = $cart->items;
+		$options = array();
+		$products = array();
 
-		#$this->LogMsg("Cart Contents ".print_r($cart, true));
-		#$this->LogMsg("Cart ITEMS: ".print_r($items, true) );
+		if(sizeof($items) > 0)
+		{
+			$products = array_map(function($item) { return Product::find($item['product_id']); }, $items->toArray());
+			$free_shipping_module = ShippingFactory::getModuleByName("Free_Shipping");
+			if(!is_null($free_shipping_module))
+			{
+				$options = $free_shipping_module->Calculate($store, $user, $products, $address);
+			}
+			#
+			# $options will be NULL if there is no free shipping, in this case go and get
+			# all modules and give each a chance at returning shipping options.
+			#
+			if(sizeof($options)==0)
+			{
+				$modules = ShippingFactory::getAvailableModules();
+				$options = ShippingFactory::getShippingOptions($modules,$store, $user, $products, $address);
+
+				$theme_path = \Config::get('THEME_CART')."2-shipping";
+			}
+			else
+			{
+				$theme_path = \Config::get('THEME_CART')."2-freeshipping";
+			}
+		}
+
 		$quantities = array();
 		$qtymap = array();
 		$this->LogMsg("Iterate through cart - look for duplicate products");
@@ -163,7 +179,6 @@ private $user;
 		#
 		$combine_codes = array();
 		$product_id_list = array();
-		$products = array();
 		$total = 0;
 		$this->LogMsg("Iterate through cart - Add up duplicate products");
 		foreach($items as $item)
@@ -224,126 +239,22 @@ private $user;
 			array_push($products, $product);
 			$total += $sub_total;
 		}
-		# We now have a list of product, the quantities
-		# get 1 copy of each combine code so we can count up how many there are
-		#
-		$distinct_combine_code = array_unique($combine_codes);
-		$this->LogMsg("Distinct combine code array [".print_r($distinct_combine_code,true)."]" );
-		$cc_weight = array();
-		$total_weight = 0;
-		foreach($distinct_combine_code as $cc)
-		{
-			$this->LogMsg("Find all [".$cc."] products");
-			$cc_weight[ $cc ] =0;
-			foreach($products as $p)
-			{
-				if($p->prod_combine_code == $cc)
-				{
-					$this->LogMsg("Checking [".$p->prod_sku."]");
-					$cnt = $qtymap[$p->id];
-					$cc_weight[$cc] += ($p->prod_weight * $cnt);
-					$total_weight += $cc_weight[$cc];
-					$this->LogMsg("Count [".$cnt."]   Weight [".$p->prod_weight."]    Total so far [".$total_weight."]");
-				}
-			}
-		}
-		#
-		# get all postal items sorted by weight, we need to find the
-		# postal option that we can fit our items in
-		#
-		# Note: Currently fixed to AUPOST - make this a separate class with an interface
-		#       we can hook into, factory to return a class based on configured delivery
-		#       options.
-		#
-		$this->LogMsg("Postage items:");
-		$post_packs = Product::where('prod_combine_code',"AUPOST")->orderBy("prod_weight")->get();
+		$countries = Country::orderBy('country_name')->get();
 
-		$postal_options = array();
-		$pack_weight = 0;
-		foreach($post_packs as $pp)
-		{
-			$text = $pp->id." - ".$pp->prod_sku." - ".$pp->prod_short_desc." ".$pp->prod_weight."grams <br>";
-			$this->LogMsg($text);
-			if($pp->prod_weight > $total_weight)
-			{
-				$pack_weight = $pp->prod_weight;
-				break;
-			}
-		}
-		#
-		# get all postal items that have the same weight
-		# allows for express and regular in same weight.
-		#
-		$this->LogMsg("Postal Options are:");
-		foreach($post_packs as $pp)
-		{
-			if($pp->prod_weight == $pack_weight)
-			{
-				array_push($postal_options, $pp);
-				$this->LogMsg($pp->prod_sku." - ".$pp->prod_short_desc);
-			}
-		}
-		$this->LogMsg("Done processing cart - now render view");
-
-		if($free_shipping == 0)
-		{
-			$theme_path = \Config::get('THEME_CART')."2-shipping";
-		}
-		else
-		{
-			$theme_path = \Config::get('THEME_CART')."2-freeshipping";
-		}
 		$this->LogMsg("View will be [".$theme_path."]");
 		return view($theme_path,[
 			'store'=>$store,
 			'settings'=>$settings,
+			'countries'=>$countries,
 			'cart'=>$cart,
 			'cart_data'=>$cart_data,
 			'items'=>$items,
 			'user'=>$user,
 			'customer'=>$customer,
 			'address'=>$address,
-			'postal_options'=>$postal_options
+			'postal_options'=>$options
 			]);
-		}
 	}
-
-
-
-	/**
-	 * Customer has sat on the cart confirm page for too long and the page has timedout
-	 * Display a formatted error page inticating the page timed out waiting for the user to
-	 * complete the action.
-	 *
-	 * Note: A background task will unlock the loked products the user has attempted to purchase.
-	 *
-	 *
-	 * @return	mixed
-	 */
-	public function CartTimeoutError()
-	{
-		$this->LogFunction("CartTimeoutError()");
-
-		$store = app('store');
-		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-
-		$user = User::find(Auth::user()->id);
-		$customer = Customer::where('customer_email', $user->email)->first();
-		$address = CustomerAddress::where('customer_cid', $customer->id)->first();
-		$cart = Cart::where('user_id',Auth::user()->id)->first();
-		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
-
-		$theme_path = \Config::get('THEME_ERRORS')."cart-timeout";
-		return view($theme_path,[
-			'store'=>$store,
-			'settings'=>$settings,
-			'cart'=>$cart,
-			'cart_data'=>$cart_data,
-			'user'=>$user,
-			'customer'=>$customer,
-			'address'=>$address]);
-	}
-
 
 
 
