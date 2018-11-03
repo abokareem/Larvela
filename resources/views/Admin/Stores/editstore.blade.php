@@ -37,12 +37,27 @@
 		<div class="form-group">
 			<label class="control-label col-xs-12 col-sm-2">Country:</label>
 			<div class="col-xs-12 col-sm-4">
-			<select class="form-control" id="store_country_code" name="store_country_code">
+			<select class="form-control" id="store_country" name="store_country">
 			@foreach($countries as $c)
 			@if($c->iso_code == $store->store_country_code)
 				<option value="{{$c->iso_code}}" selected>{{$c->country_name}}</option>
 			@else
 				<option value="{{$c->iso_code}}">{{$c->country_name}}</option>
+			@endif
+			@endforeach
+			</select>
+		 	</div>
+		</div>
+
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-2">Currency:</label>
+			<div class="col-xs-12 col-sm-4">
+			<select class="form-control" id="store_currency" name="store_currency">
+			@foreach($currencies as $c)
+			@if($c->currency_code == $store->store_currency)
+				<option value="{{$c->currency_code}}" selected>{{$c->currency_name}}</option>
+			@else
+				<option value="{{$c->currency_code}}">{{$c->currency_name}}</option>
 			@endif
 			@endforeach
 			</select>
@@ -71,12 +86,6 @@
 			<label class="control-label col-xs-12 col-sm-2">Contact Number:</label>
 			<div class="col-xs-12 col-sm-4">
 				<input type="text" class="form-control" id="store_contact" name="store_contact" value="{{ $store->store_contact }}"/>
-		 	</div>
-		</div>
-		<div class="form-group">
-			<label class="control-label col-xs-12 col-sm-2">Currency:</label>
-			<div class="col-xs-12 col-sm-3">
-				<input type="text" class="form-control" id="store_currency" name="store_currency" value="{{ $store->store_currency }}" style="text-transform:uppercase"/>
 		 	</div>
 		</div>
 		<div class="form-group">
@@ -148,8 +157,7 @@ $("#edit").validate(
 		store_env_code: { required: true, minlength: 2 },
 		store_name: { required: true, minlength: 3 },
 		store_url: { required: true, minlength: 7 },
-		store_hours: { required: true, minlength: 4 },
-		store_currency: { required: true, minlength: 3 }
+		store_hours: { required: true, minlength: 4 }
 	}
 });
 
