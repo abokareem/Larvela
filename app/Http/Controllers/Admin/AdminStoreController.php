@@ -3,7 +3,7 @@
  * \class	AdminStoreController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-22
- * \version	1.0.2
+ * \version	1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,6 +42,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Store;
 use App\Models\Country;
 use App\Models\Customer;
+use App\Models\Currency;
 use App\Models\CustSource;
 use App\Models\CustomerAddress;
 
@@ -109,9 +110,10 @@ use Logger;
 		$this->LogFunction("ShowAddStorePage()");
 		$stores = Store::all();
 		$countries = Country::get();
+		$currencies = Currency::get();
 		$tzdata = explode("/",date_default_timezone_get());
 
-		return view('Admin.Stores.addstore',['stores'=>$stores,'countries'=>$countries,'tzdata'=>$tzdata[0]]);
+		return view('Admin.Stores.addstore',['stores'=>$stores,'countries'=>$countries,'tzdata'=>$tzdata[0],'currencies'=>$currencies]);
 	}
 
 
@@ -129,7 +131,8 @@ use Logger;
 		$this->LogFunction("ShowEditStorePage()");
 		$store = Store::find($id);
 		$countries = Country::get();
-		return view('Admin.Stores.editstore',['store'=>$store,'countries'=>$countries]);
+		$currencies = Currency::get();
+		return view('Admin.Stores.editstore',['store'=>$store,'countries'=>$countries,'currencies'=>$currencies]);
 	}
 
 
@@ -147,6 +150,7 @@ use Logger;
 	 */
 	public function UpdateStore(StoreRequest $request, $id)
 	{
+
 		$this->LogFunction("UpdateStore()");
 		$o = Store::find($id);
 		$o->store_env_code = $request['store_env_code'];
@@ -164,6 +168,7 @@ use Logger;
 		$o->store_sales_email = $request['store_sales_email'];
 		$o->store_address = $request['store_address'];
 		$o->store_address2 = $request['store_address2'];
+		$o->store_country_code = $request['store_country_code'];
 		$o->store_contact = $request['store_contact'];
 		$o->store_bg_image = $request['store_bg_image'];
 
