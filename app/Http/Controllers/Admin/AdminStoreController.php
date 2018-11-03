@@ -3,7 +3,7 @@
  * \class	AdminStoreController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-22
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -27,7 +27,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 
 use Auth;
@@ -40,6 +40,7 @@ use App\Http\Requests\StoreRequest;
 use App\Http\Controllers\Controller;
 
 use App\Models\Store;
+use App\Models\Country;
 use App\Models\Customer;
 use App\Models\CustSource;
 use App\Models\CustomerAddress;
@@ -107,7 +108,10 @@ use Logger;
 	{
 		$this->LogFunction("ShowAddStorePage()");
 		$stores = Store::all();
-		return view('Admin.Stores.addstore',['stores'=>$stores]);
+		$countries = Country::get();
+		$tzdata = explode("/",date_default_timezone_get());
+
+		return view('Admin.Stores.addstore',['stores'=>$stores,'countries'=>$countries,'tzdata'=>$tzdata[0]]);
 	}
 
 
@@ -124,7 +128,8 @@ use Logger;
 	{
 		$this->LogFunction("ShowEditStorePage()");
 		$store = Store::find($id);
-		return view('Admin.Stores.editstore',['store'=>$store]);
+		$countries = Country::get();
+		return view('Admin.Stores.editstore',['store'=>$store,'countries'=>$countries]);
 	}
 
 

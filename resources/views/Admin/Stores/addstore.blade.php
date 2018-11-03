@@ -21,23 +21,35 @@
 				<input type="text" class="form-control" id='store_name' name="store_name" value=''>
 		 	</div>
 		</div>
+
 		<div class="form-group">
-			<label class="control-label col-xs-12 col-sm-2">URL:</label>
-			<div class="col-xs-7">
-				<input type="text" class="form-control" id='store_url' name="store_url" value='' style='text-transform:lowercase'>
+			<label class="control-label col-xs-12 col-sm-2">Address 1:</label>
+			<div class="col-xs-12 col-sm-8">
+				<input type="text" class="form-control" id='store_address' name="store_address" value='By Appointment Only'/>
 		 	</div>
 		</div>
 		<div class="form-group">
-			<label class="control-label col-xs-12 col-sm-2">Parent:</label>
-			<div class="col-xs-4">
-				<select class="form-control" id="store_parent_id" name="store_parent_id">
-					<option value="0" selected>Global - All Stores</option>
-					@foreach($stores as $s)
-						<option value="{{$s->id}}">{{$s->store_name}}</option>
-					@endforeach
-				</select>
+			<label class="control-label col-xs-12 col-sm-2">Address 2:</label>
+			<div class="col-xs-12 col-sm-8">
+				<input type="text" class="form-control" id='store_address2' name="store_address2" value=''/>
 		 	</div>
 		</div>
+
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-2">Country:</label>
+			<div class="col-xs-12 col-sm-4">
+			<select class="form-control" id="store_country_code" name="store_country_code">
+			@foreach($countries as $c)
+			@if($c->country_name == $tzdata)
+				<option value="{{$c->iso_code}}" selected>{{$c->country_name}}</option>
+			@else
+				<option value="{{$c->iso_code}}">{{$c->country_name}}</option>
+			@endif
+			@endforeach
+			</select>
+		 	</div>
+		</div>
+
 		<div class="form-group">
 			<label class="control-label col-xs-12 col-sm-2">Currency:</label>
 			<div class="col-xs-4">
@@ -52,6 +64,24 @@
 				<option value='CNY'>Chinese Yuan</option>
 				<option value='SGD'>Singapore dollar</option>
 				<option value='USD'>United States Dollar</option>
+				</select>
+		 	</div>
+		</div>
+
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-2">URL:</label>
+			<div class="col-xs-7">
+				<input type="text" class="form-control" id='store_url' name="store_url" value='' style='text-transform:lowercase'>
+		 	</div>
+		</div>
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-2">Parent:</label>
+			<div class="col-xs-4">
+				<select class="form-control" id="store_parent_id" name="store_parent_id">
+					<option value="0" selected>Global - All Stores</option>
+					@foreach($stores as $s)
+						<option value="{{$s->id}}">{{$s->store_name}}</option>
+					@endforeach
 				</select>
 		 	</div>
 		</div>
