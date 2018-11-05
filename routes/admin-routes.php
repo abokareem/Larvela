@@ -132,5 +132,7 @@ Route::get('/admin/seo/edit/{id}','SEOController@ShowEditPage');
 Route::post('/admin/seo/save','SEOController@SaveNewSEO');
 Route::post('/admin/seo/update/{id}','SEOController@UpdateSEO');
 	
+
+Route::get('/admin/attributes','Admin\Attributes@ShowAttributes');
 }); # end of route group
 
