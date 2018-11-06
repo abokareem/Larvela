@@ -18,6 +18,7 @@ use App\Models\ProdImageMap;
 
 use App\Jobs\ResizeImages;
 use Illuminate\Contracts\Bus\Dispatcher;
+use App\Http\Requests\ProductRequest;
 
 
 /**
@@ -30,29 +31,37 @@ protected $MEDIADIR= '/media';
 
 
 	/**
-	 * Save the image thats been uploaded for this product
+	 * Save the image(s) thats been uploaded for this product
 	 *
-	 * TODO - more work needed on this.
 	 *
 	 * @return void
 	 */
-	public function SaveUploadedImage($id)
+	public function SaveImages(ProductRequest $request, $id)
 	{
-		$this->LogFunction("SaveUploadedImage(".$id.")");
-
-		$file_data = Input::file('file');
-		if($file_data)
+		$this->LogFunction("SaveImages(".$id.")");
+		$good_extensions = array("png","jpg","jpeg");
+		$file_count = 0;
+		$file_name = "N/A";
+		$files = $request->file('images');
+		if($request->hasFile('images'))
 		{
 			$this->LogMsg("Processing File Data");
-			$file_type = explode("/",$file_data->getClientMimeType());
-			$text = "File Data ".print_r($file_type,true);
-			$this->LogMsg($text);
-			if($file_type[0]=="image")
+			$files = $request->file('images');
+			$file_count = sizeof($files);
+			foreach($files as $file)
 			{
-				$extension = $file_type[1];
-				$filename = $file_data->getClientOriginalName();
-				$subpath = $this->getStorageSubPath($id);
-				$filepath = $this->getStoragePath($id);
+				$this->LogMsg( print_r($file,1) );
+				$file_type = explode("/",$file->getClientMimeType());
+				$file_extension = strtolower($file_type[1]);	#image/jpeg
+				$file_name = $file->getClientOriginalName();
+				
+				$file_path = $this->getStoragePath($id);
+				$sub_path = $this->getStorageSubPath($id);
+
+				$this->LogMsg("Path: [".$file_path."]");
+				$this->LogMsg("File name [".$file_name."]");
+
+				#if($file_type[0]=="image")
 				#
 				# if no images mapped then parent image is "product_id"-"image_order"."extension"
 				#        otherwise, access prod_image_maps and determine the order of images, so increment image order.
@@ -90,20 +99,20 @@ protected $MEDIADIR= '/media';
 					}
 				}
 
-				$id_name = $id."-".$image_index.".".$extension;
-				$text = "New ID [".$id_name."]";
-				$this->LogMsg($text);
+				$id_name = $id."-".$image_index.".".$file_extension;
+				$this->LogMsg("New file ID [".$id_name."]");
+				$this->LogMsg("File Path   [".$file_path."]");
 
-				$file_data->move($filepath,$id_name);
-				$newname = $filepath."/".$id_name;
-				$text = "New File name [".$newname."]";
-				$this->LogMsg($text);
+				$file->move($file_path,$id_name);
+
+				$newname = $file_path."/".$id_name;
+				$this->LogMsg("New File name [".$newname."]");
 
 				list($width, $height, $type, $attr) = getimagesize($newname);
 				$size = filesize($newname);
 				$o = new Image;
 				$o->image_file_name = $id_name;
-				$o->image_folder_name = $subpath;
+				$o->image_folder_name = $sub_path;
 				$o->image_size = $size;
 				$o->image_height = $height;
 				$o->image_width = $width;
@@ -125,11 +134,11 @@ protected $MEDIADIR= '/media';
 				dispatch( new ResizeImages($id, $iid) );
 				$this->LogMsg("Back in Controller");
 			}
-			else
-			{
-				$this->LogError("Invalid file type.");
-				\Session::flash('flash_error',"ERROR - Only images are allowed!");
-			}
+		}
+		else
+		{
+			$this->LogError("No Images.");
+			\Session::flash('flash_error',"ERROR (image) - No images present!");
 		}
 		$this->LogMsg("function Done");
 	}
