@@ -37,7 +37,7 @@ Route::get('/admin/order/pdf/packingslip/{id}','Admin\AdminOrderController@Dispa
 #
 Route::get('/admin/images', 'ImageManagement@Show');
 Route::get('/admin/image/show/{pid}', 'ImageManagement@ShowByProduct');
-Route::get('/admin/image/delete/{id}/{pid}',['uses'=>'BasicProductController@DeleteImage','roles'=>'root']);
+Route::get('/admin/image/delete/{id}/{pid}',['uses'=>'Product\BasicProductController@DeleteImage','roles'=>'root']);
 #
 #
 Route::get( '/admin/settings','ConfigController@Show');
