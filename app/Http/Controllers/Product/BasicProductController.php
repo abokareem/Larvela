@@ -3,7 +3,7 @@
  * \class	BasicProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.6
+ * \version	1.0.8
  *
  * 
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -39,8 +39,8 @@ use Redirect;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductRequest;
+use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 use App\Helpers\StoreHelper;
@@ -94,6 +94,8 @@ use ProductImageHandling;
 		$this->LogStart();
 	}
 	
+
+
 	/**
 	 * Close log file
 	 *
@@ -103,12 +105,6 @@ use ProductImageHandling;
 	{
 		$this->LogEnd();
 	}
-
-
-
-
-
-
 
 
 
@@ -132,116 +128,6 @@ use ProductImageHandling;
 		dispatch(new DeleteImageJob($id));
 		return Redirect::to("/admin/products");
 	}
-
-
-
-
-
-	/**
-	 * Save the image thats been uploaded for this product
-	 *
-	 * TODO - more work needed on this.
-	 *
-	 * @return void
-	 */
-	public function SaveUploadedImage($id)
-	{
-		$this->LogFunction("SaveUploadedImage(".$id.")");
-
-		$file_data = Input::file('file');
-		if($file_data)
-		{
-			$this->LogMsg("Processing File Data");
-			$file_type = explode("/",$file_data->getClientMimeType());
-			$text = "File Data ".print_r($file_type,true);
-			$this->LogMsg($text);
-			if($file_type[0]=="image")
-			{
-				$extension = $file_type[1];
-				$filename = $file_data->getClientOriginalName();
-				$subpath = $this->getStorageSubPath($id+0);
-				$filepath = $this->getStoragePath($id+0);
-				#
-				# if no images mapped then parent image is "product_id"-"image_order"."extension"
-				#        otherwise, access prod_image_maps and determine the order of images, so increment image order.
-				#
-				$base_images = ProdImageMap::where('product_id',$id)->get();
-				$image_index = 1;
-				if(sizeof($base_images)>0)
-				{
-					#
-					# fetch all image db records and parse the names for the indexes already assigned.
-					#
-					# testing
-					$this->LogMsg("Process each image.");
-					foreach($base_images as $bi)
-					{
-						$text = "IDX [".$image_index."]";
-						$this->LogMsg($text);
-						$text = "DATA: ".print_r($bi,true);
-						$this->LogMsg($text);
-						$img = Image::where('id',$bi->image_id)->first();
-						$file_name = explode(".",$img->image_file_name);
-						$f_n_parts = explode("-",$file_name[0]);
-						$text = "DATA ".print_r($f_n_parts, true);
-						$this->LogMsg( $text );
-						if($f_n_parts[1] == $image_index)
-						{
-							$this->LogMsg("Increment image index!");
-							$image_index++;
-						}
-						if($f_n_parts[1] > $image_index)
-						{
-							$this->LogMsg("Increment image sequence!");
-							$image_index = $f_n_parts[1]+1;
-						}
-					}
-				}
-
-				$id_name = $id."-".$image_index.".".$extension;
-				$text = "New ID [".$id_name."]";
-				$this->LogMsg($text);
-
-				$file_data->move($filepath,$id_name);
-				$newname = $filepath."/".$id_name;
-				$text = "New File name [".$newname."]";
-				$this->LogMsg($text);
-
-				list($width, $height, $type, $attr) = getimagesize($newname);
-				$size = filesize($newname);
-				$o = new Image;
-				$o->image_file_name = $id_name;
-				$o->image_folder_name = $subpath;
-				$o->image_size = $size;
-				$o->image_height = $height;
-				$o->image_width = $width;
-				$o->image_parent_id = 0;
-				$o->image_order = 0;
-
-				$this->LogMsg("Create Image Entry");
-				$o->save();
-				$iid = $o->id;
-				$text = "New Image ID [".$iid."]";
-				$this->LogMsg($text);
-				#
-				# Use Eloquent to insert into Pivot table
-				#
-				$image = Image::find($iid);
-				$image->products()->attach($id);
-
-				$this->LogMsg("Dispatch resize job");
-				dispatch( new ResizeImages($id, $iid) );
-				$this->LogMsg("Back in Controller");
-			}
-			else
-			{
-				$this->LogError("Invalid file type.");
-				\Session::flash('flash_error',"ERROR - Only images are allowed!");
-			}
-		}
-		$this->LogMsg("function Done");
-	}
-
 
 
 
@@ -294,16 +180,17 @@ use ProductImageHandling;
 	 *
 	 * POST ROUTE: /admin/product/update/{id}
 	 *
-	 * @pre form must present all valid columns
-	 * @post new rows inserted into database table "category_products" 
+	 * @pre		Form must present all valid columns
+	 * @post	New rows inserted into database table "category_products" 
 	 * @param	mixed	$request - Validation request object
 	 * @param	integer	$id - Row id to be checked against before insert
 	 * @return	mixed
 	 */
-	public function Update(ProductRequest $request, $id)
+	public function Update(Request $request, $id)
 	{
 		$this->LogFunction("UpdateProduct(".$id.")");
-
+		
+		$this->SaveImages($request,$id);
 		CategoryProduct::where('product_id',$id)->delete();
 		$categories = $request->category;	/* array of category id's */
 		if(sizeof($categories)>0)
@@ -356,7 +243,6 @@ use ProductImageHandling;
 		}
 		$request['id'] = $id;
 		ProductService::update($request);
-		$this->SaveUploadedImage($id);
 		return Redirect::to("/admin/products");
 	}
 
@@ -374,13 +260,11 @@ use ProductImageHandling;
 	 * @param	ProductRequest	$request mixed Validation request object
 	 * @return	mixed 
 	 */
-	#public function SaveNewProduct(ProductRequest $request)
 	public function Save(ProductRequest $request)
 	{
 		$this->LogFunction("SaveNewProduct()");
 
 		$store=app('store');
-
 		$pid=0;
 		$categories = $request->categories;	/* array of category id's */
 		$pid = ProductService::insert($request);
@@ -404,7 +288,7 @@ use ProductImageHandling;
 			#
 			$this->LogMsg("No categories to assign (yet)");
 		}
-		$this->SaveUploadedImage($pid);
+		$this->SaveImages($request,$pid);
         $store_id = $store->id;
         $category_id = 0;
 		$this->LogMsg("Default store ID [".$store->id."]");
@@ -425,73 +309,6 @@ use ProductImageHandling;
 		$this->LogMsg("Required Category ID [".$category_id."]");
 		return Redirect::to("/admin/products?c=".$category_id."&s=".$store_id);
 	}
-
-
-
-	/**
-	 * Create the path needed to store product images and return the full filesystem path to place file.
-	 *
-	 * @pre		none
-	 * @post	creates directory structure as needed
-	 *
-	 * @param	integer	$id - the product ID
-	 * @return	string 
-	 */
-	private function getStoragePath( $id )
-	{
-		$this->LogFunction("getStoragePath(".$id.")");
-		$path="";
-		$length = strlen($id);
-		$id = "".$id."";
-		for($i=0 ; $i < $length ; $i++)
-		{
-			$path.="/".$id[$i];
-		}
-		$finalpath = public_path()."/media".$path;
-		if(is_dir($finalpath))
-		{
-			$this->LogMsg("PATH [".$finalpath."]");
-			return $finalpath;
-		}
-		else
-		{	
-			$this->LogMsg("Create Path [".$finalpath."]");
-			try { mkdir($finalpath,0775,true); }
-			catch(Exception $e)
-			{
-				$this->LogError("Failed to create Path [".$finalpath."]");
-			}
-		}
-		$this->LogMsg("PATH [".$finalpath."]");
-		return $finalpath;
-	}
-
-
-
-	/**
-	 * Create the subpath needed to store product images and return a partial filesystem path.
-	 *
-	 * @deprecated - use call in ImageService in future.
-	 *
-	 * @param	integer	$id - the product ID
-	 * @return	string
-	 */
-	private function getStorageSubPath($id)
-	{
-		$this->LogFunction("getStorageSubPath(".$id.")");
-
-		$path="media";
-		$length = strlen($id);
-		$id = "".$id."";
-		for($i=0 ; $i < $length ; $i++)
-		{
-			$path.="/".$id[$i];
-		}
-		$this->LogMsg("PATH [".$path."]");
-		return $path;
-	}
-
-
 
 
 
