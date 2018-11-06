@@ -169,7 +169,7 @@ use Logger;
 
 		$form = Input::all();
 		$type = $form['prod_type'];
-		$this->LogMsg("Build Product Factory");
+		$this->LogMsg("Build Product Factory for Type [".$type."]");
 		$controller = ProductFactory::build($type);
 		$controller->Update($request, $id);
 		return Redirect::to("/admin/products");

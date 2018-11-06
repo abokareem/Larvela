@@ -3,7 +3,7 @@
  * \class	ParentProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.6
+ * \version	1.0.7
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -133,6 +133,8 @@ use ProductImageHandling;
 
 		$pid = ProductService::insert($request);
 		$this->LogMsg("Insert New Product new ID [".$pid."]");
+		$this->SaveImages($request, $pid);
+
 		if(isset($attributes))
 		{
 			$order = 1;
@@ -162,7 +164,6 @@ use ProductImageHandling;
 			$this->LogMsg("No categories to assign (yet)");
 		}
 
-		$this->SaveUploadedImage($pid);
 		return Redirect::to("/admin/products");
 	}
 
@@ -184,6 +185,7 @@ use ProductImageHandling;
 	{
 		$this->LogFunction("Update(".$id.")");
 
+		$this->SaveImages($request, $id);
 		CategoryProduct::where('product_id',$id)->delete();
 		$categories = $request->category;	/* array of category id's */
 		if(sizeof($categories)>0)
@@ -232,11 +234,6 @@ use ProductImageHandling;
 		}
 		$request['id'] = $id;
 		ProductService::update($request);
-
-		#
-		# Move to ProductImage Trait ???
-		#
-		$this->SaveUploadedImage($id);
 		return Redirect::to("/admin/products");
 	}
 
@@ -251,7 +248,7 @@ use ProductImageHandling;
 	 * @param $id int row id to be checked against before insert
 	 * @return mixed - view object
 	 */
-	private function Edit($id)
+	public function Edit($id)
 	{
 		$this->LogFunction("Edit(".$id.")");
 
@@ -274,33 +271,28 @@ use ProductImageHandling;
 			$this->LogMsg("           Name[".$img->image_file_name."]");
 			array_push($images, $img);
 		}
-		$text = "There are ".sizeof($images)." images assembled.";
-		$this->LogMsg( $text );
+		$this->LogMsg("Image array size [".sizeof($images)."]");
 
 		return view('Admin.Products.edit_parent',[
-			'product'=>$product,
-			'attributes'=>$attributes,
-			'product_attributes'=>$product_attributes,
-			'product_types'=>$product_types,
-			'images'=>$images,
-			'categories'=>$categories,
 			'store'=>$store,
 			'stores'=>$stores,
-			'catmappings'=>$prod_categories]);
+			'images'=>$images,
+			'product'=>$product,
+			'categories'=>$categories,
+			'attributes'=>$attributes,
+			'catmappings'=>$prod_categories,
+			'product_types'=>$product_types,
+			'product_attributes'=>$product_attributes
+			]);
 	}
 
 
 
 	/**
-	 *------------------------------------------------------------
-	 *
-	 *                        DEVELOPMENT
-	 *
-	 *------------------------------------------------------------
-	 *
 	 * Delete parent product if there are no child products under it.
 	 *
-	 *
+	 * @param	Request	$request
+	 * @param	integer	$id
 	 * @return	void
 	 */
 	public function Delete(Request $request, $id)

@@ -365,8 +365,7 @@ use ProductImageHandling;
 			if($id == $form['id'])
 			{
 				$this->LogMsg("Dispatch Job.");
-				$cmd = new DeleteProductJob($store, $id);
-				$this->dispatch($cmd);
+				$s->dispatch(new DeleteProductJob($id));
 			}
 			else
 			{

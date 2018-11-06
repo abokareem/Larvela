@@ -90,7 +90,7 @@ use ProductImageHandling;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("larvela");
+		$this->setFileName("larvela-admin");
 		$this->setClassName("VirtualProductController");
 		$this->LogStart();
 	}
@@ -251,109 +251,6 @@ use ProductImageHandling;
 
 
 
-	/**
-	 * Save the image thats been uploaded for this product
-	 *
-	 * TODO - more work needed on this.
-	 *
-	 * @param	integer	$id		Product ID
-	 * @return	void
-	 */
-	public function SaveUploadedImage($id)
-	{
-		$this->LogFunction("SaveUploadedImage(".$id.")");
-
-		$file_data = Input::file('file');
-		if($file_data)
-		{
-			$this->LogMsg("Processing File Data");
-
-			$file_type = explode("/",$file_data->getClientMimeType());
-			$text = "File Data ".print_r($file_type,true);
-			$this->LogMsg($text);
-			if($file_type[0]=="image")
-			{
-				$extension = $file_type[1];
-				$filename = $file_data->getClientOriginalName();
-				$subpath = $this->getStorageSubPath($id+0);
-				$filepath = $this->getStoragePath($id+0);
-				#
-				# if no images mapped then parent image is "product_id"-"image_order"."extension"
-				#        otherwise, access prod_image_maps and determine the order of images, so increment image order.
-				#
-				$base_images = ProdImageMap::where('product_id',$id)->get();
-				$image_index = 1;
-				if(sizeof($base_images)>0)
-				{
-					#
-					# fetch all image db records and parse the names for the indexes already assigned.
-					#
-					# testing
-					$this->LogMsg("Process each image.");
-					foreach($base_images as $bi)
-					{
-						$text = "IDX [".$image_index."]";
-						$this->LogMsg($text);
-						$text = "DATA: ".print_r($bi,true);
-						$this->LogMsg($text);
-						$img = Image::where('id',$bi->image_id)->first();
-						$file_name = explode(".",$img->image_file_name);
-						$f_n_parts = explode("-",$file_name[0]);
-						$text = "DATA ".print_r($f_n_parts, true);
-						$this->LogMsg( $text );
-						if($f_n_parts[1] == $image_index)
-						{
-							$this->LogMsg("Increment image index!");
-							$image_index++;
-						}
-						if($f_n_parts[1] > $image_index)
-						{
-							$this->LogMsg("Increment image sequence!");
-							$image_index = $f_n_parts[1]+1;
-						}
-					}
-				}
-
-				$id_name = $id."-".$image_index.".".$extension;
-				$text = "New ID [".$id_name."]";
-				$this->LogMsg($text);
-
-				$file_data->move($filepath,$id_name);
-				$newname = $filepath."/".$id_name;
-				$text = "New File name [".$newname."]";
-				$this->LogMsg($text);
-
-				$this->LogMsg("Create Image Entry");
-				list($width, $height, $type, $attr) = getimagesize($newname);
-				$size = filesize($newname);
-				$o = new Image;
-				$o->image_file_name = $id_name;
-				$o->image_folder_name = $subpath;
-				$o->image_size = $size;
-				$o->image_height = $height;
-				$o->image_width = $width;
-				$o->image_parent_id = 0;
-				$o->image_order = 0;
-				$o->save();
-				$iid = $o->id;
-				$this->LogMsg("New Image ID [".$iid."]");
-				#
-				# Use Eloquent to insert into Pivot table
-				#
-				$image = Image::find($iid);
-				$image->products()->attach($id);
-
-				$this->LogMsg("Dispatch resize job");
-				dispatch( new ResizeImages($id, $iid) );
-			}
-			else
-			{
-				$this->LogError("Invalid file type.");
-				\Session::flash('flash_error',"ERROR - Only images are allowed!");
-			}
-		}
-		$this->LogMsg("function Done");
-	}
 
 
 
@@ -422,7 +319,7 @@ use ProductImageHandling;
 		}
 		$request['id'] = $id;
 		ProductService::update($request);
-		$this->SaveUploadedImage($id);
+		$this->SaveImages($request,$id);
 		$this->SaveUploadedFile($request, $id);
 		return Redirect::to("/admin/products");
 	}
