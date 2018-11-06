@@ -111,6 +111,11 @@ protected $product_id;
 		$this->LogMsg("Fetch product ID [".$this->product_id."]");
 		$product = Product::find($this->product_id);
 
+		if(is_null($product))
+		{
+			$this->LogMsg("Product ID is invalid");
+			return 0;
+		}
 		$this->LogMsg("Cleanup any customer notification requests");
 		Notification::where('product_code',$product->prod_sku)->delete();
 
