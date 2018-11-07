@@ -3,7 +3,7 @@
  * \class	CategoryService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-07-21
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -31,8 +31,10 @@ namespace App\Services;
 
 
 use App\Models\Category;
+use App\Models\CategoryProduct;
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\ProductRequest;
 
 
 /**
@@ -40,6 +42,33 @@ use App\Http\Requests\CategoryRequest;
  */
 class CategoryService
 {
+
+
+	/**
+	 * Given a list of categories, assign the product to them.
+	 *
+	 * @pre		Product should not already be assigned to category
+	 *
+	 * @param	Request	$request
+	 * @param	integer	$product_id
+	 * @return	void
+	 */
+	public static function AssignCategories($request, $product_id)
+	{
+		$categories = $request->category;	/* array of category id's */
+		if(sizeof($categories)>0)
+		{
+			foreach($categories as $c)
+			{
+				$o = new CategoryProduct;
+				$o->category_id = $c;
+				$o->product_id = $product_id;
+				$o->save();
+			}
+		}
+	}
+
+
 
 
 	/**
