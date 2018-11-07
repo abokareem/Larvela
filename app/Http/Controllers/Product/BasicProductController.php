@@ -45,6 +45,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 
 use App\Helpers\StoreHelper;
 use App\Services\ProductService;
+use App\Services\CategoryService;
 
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
@@ -191,30 +192,31 @@ use ProductImageHandling;
 		$this->LogFunction("UpdateProduct(".$id.")");
 		
 		$this->SaveImages($request,$id);
+		$product = Product::find($id);
 		CategoryProduct::where('product_id',$id)->delete();
-		$categories = $request->category;	/* array of category id's */
-		if(sizeof($categories)>0)
-		{
-			$this->LogMsg("Assign categories");
-			foreach($categories as $c)
-			{
-				$text = "Assign category ID [".$c."] with product ID [".$id."]";
-				$this->LogMsg( $text );
-				$o = new CategoryProduct;
-				$o->category_id = $c;
-				$o->product_id = $id;
-				$o->save();
-				$this->LogMsg("Insert ID [".$o->id."]");
-			}
-		}
-		else
-		{
-			$this->LogMsg("No categories to process!");
+		CategoryService::AssignCategories($request,$id);
+#		$categories = $request->category;	/* array of category id's */
+#		if(sizeof($categories)>0)
+#		{
+#			$this->LogMsg("Assign categories");
+#			foreach($categories as $c)
+#			{
+#				$text = "Assign category ID [".$c."] with product ID [".$id."]";
+#				$this->LogMsg( $text );
+#				$o = new CategoryProduct;
+#				$o->category_id = $c;
+#				$o->product_id = $id;
+#				$o->save();
+#				$this->LogMsg("Insert ID [".$o->id."]");
+#			}
+#		}
+#		else
+#		{
+#			$this->LogMsg("No categories to process!");
 		}
 		#
 		# get the product and if the qty was 0 and is now >0 then call Back In Stock
 		#
-		$product = Product::find($id);
 		$this->LogMsg("Check stock levels for Product [".$id."] - [".$product->prod_sku."]");
 		$store = app('store');
 		if($product->prod_qty == 0)
@@ -365,7 +367,7 @@ use ProductImageHandling;
 			if($id == $form['id'])
 			{
 				$this->LogMsg("Dispatch Job.");
-				$s->dispatch(new DeleteProductJob($id));
+				$this->dispatch(new DeleteProductJob($id));
 			}
 			else
 			{

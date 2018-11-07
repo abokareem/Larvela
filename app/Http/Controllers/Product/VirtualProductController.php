@@ -3,7 +3,7 @@
  * \class	VirtualProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-04-03
- * \version	1.0.8
+ * \version	1.0.9
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -44,6 +44,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 
 
 use App\Services\ProductService;
+use App\Services\CategoryService;
 
 
 use App\Jobs\BackInStock;
@@ -272,26 +273,27 @@ use ProductImageHandling;
 
 		$store = app('store');
 		CategoryProduct::where('product_id',$id)->delete();
-		$categories = $request->category;	/* array of category id's */
-
-		if(sizeof($categories)>0)
-		{
-			$this->LogMsg("Assign categories");
-			foreach($categories as $c)
-			{
-				$text = "Assign category ID [".$c."] with product ID [".$id."]";
-				$this->LogMsg( $text );
-				$o = new CategoryProduct;
-				$o->category_id = $c;
-				$o->product_id = $id;
-				$o->save();
-				$this->LogMsg("Insert ID [".$o->id."]");
-			}
-		}
-		else
-		{
-			$this->LogMsg("No categories to process!");
-		}
+		CategoryService::AssignCategories($request, $id);
+#
+#		$categories = $request->category;	/* array of category id's */
+#		if(sizeof($categories)>0)
+#		{
+#			$this->LogMsg("Assign categories");
+#			foreach($categories as $c)
+#			{
+#				$text = "Assign category ID [".$c."] with product ID [".$id."]";
+#				$this->LogMsg( $text );
+#				$o = new CategoryProduct;
+#				$o->category_id = $c;
+#				$o->product_id = $id;
+#				$o->save();
+#				$this->LogMsg("Insert ID [".$o->id."]");
+#			}
+#		}
+#		else
+#		{
+#			$this->LogMsg("No categories to process!");
+#		}
 		#
 		# get the product and if the qty was 0 and is now >0 then call Back In Stock
 		#
@@ -342,7 +344,6 @@ use ProductImageHandling;
 	{
 		$this->LogFunction("Save()");
 		$store = app('store');
-		$categories = $request->categories;	/* array of category id's */
 		$pid = ProductService::insert($request);
 		$this->LogMsg("Insert New Product new ID [".$pid."]");
 		$this->LogMsg("Process product assigned categories");
@@ -361,22 +362,24 @@ use ProductImageHandling;
 		}
 */
 
+		CategoryService::AssignCategories($request,$pid);
 
-		if(isset($categories))
-		{
-			foreach($categories as $c)
-			{
-				$o = new CategoryProduct;
-				$o->product_id = $pid;
-				$o->category_id = $c;
-				$o->save();
-				$this->LogMsg("Insert product ID [".$pid."] with Category ID [".$c."]");
-			}
-		}
-		else
-		{
-			$this->LogMsg("No categories to assign (yet)");
-		}
+#		$categories = $request->categories;	/* array of category id's */
+#		if(isset($categories))
+#		{
+#			foreach($categories as $c)
+#			{
+#				$o = new CategoryProduct;
+#				$o->product_id = $pid;
+#				$o->category_id = $c;
+#				$o->save();
+#				$this->LogMsg("Insert product ID [".$pid."] with Category ID [".$c."]");
+#			}
+#		}
+#		else
+#		{
+#			$this->LogMsg("No categories to assign (yet)");
+#		}
 		$filename = $this->SaveUploadedFile($pid);
 		$product->prod_combine_code = $filename;
 		$product->save();
