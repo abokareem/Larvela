@@ -133,6 +133,6 @@ Route::post('/admin/seo/save','SEOController@SaveNewSEO');
 Route::post('/admin/seo/update/{id}','SEOController@UpdateSEO');
 	
 
-Route::get('/admin/attributes','Admin\Attributes@ShowAttributes');
+Route::get('/admin/attributes','Admin\AttributesController@ShowAttributesPage');
 }); # end of route group
 
