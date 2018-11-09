@@ -53,7 +53,7 @@ class AttributeService
 		$order = 1;
 		if(sizeof($attributes)>0)
 		{
-			foreach($attributes as $c)
+			foreach($attributes as $a)
 			{
 				$o = new AttributeProduct;
 				$o->product_id = $product_id;
