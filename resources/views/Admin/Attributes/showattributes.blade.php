@@ -24,7 +24,11 @@
 				<tr onclick='select({{ $a->id }})'  style="cursor: pointer">
 				<td>{{ $a->id }}</td>
 				<td>{{ $a->attribute_name }}</td>
-				<td>{!! $stores[$a->store_id] !!}</td>
+				@foreach($stores as $s)
+					@if($s->id == $a->store_id)
+					<td>{{ $s->store_name }}</td>
+					@endif
+				@endforeach
 				<td><i class="fa fa-trash"></i> <a href="/admin/attribute/delete/{{ $a->id }}">Delete</a></td>
 				</tr>
 			@endforeach
@@ -34,8 +38,8 @@
 
 
 	<div class="row">
-		<a href='/admin/producttype/addnew'><button class="btn btn-success">
-			<i class="fa fa-user-plus"></i> Add New Type </button></a>
+		<a href='/admin/attribute/addnew'><button class="btn btn-success">
+			<i class="fa fa-user-plus"></i> Add New Attribute </button></a>
 	</div>
 </div>
 <script>
@@ -43,7 +47,7 @@
 
 function select(id)
 {
-var url = '/admin/producttype/edit/'+id;
+var url = '/admin/attribute/edit/'+id;
 window.location.href = url;
 }
 
