@@ -1,9 +1,44 @@
 <?php namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
+use App\Services\ProductService;
+use Illuminate\Foundation\Http\FormRequest;
 
-class ProductRequest extends Request
+
+
+class ProductRequest extends FormRequest
 {
+public function test() { dd($this);}
+
+
+
+
+
+	/**
+	 * Save the newly created product and return its ID
+	 *
+	 * @return	integer
+	 */
+	public function SaveProduct()
+	{
+		return ProductService::insert($this);
+	}
+
+
+	/**
+	 * Update our existing record
+	 *
+	 * @param	integer	$product_id
+	 * @return	integer
+	 */
+	public function UpdateProduct($product_id)
+	{
+		$this->request->add(['id', $product_id]);
+		return ProductService::update($this);
+	}
+
+
+
     /**
      * Determine if the user is authorized to make this request.
      *

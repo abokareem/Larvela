@@ -195,25 +195,6 @@ use ProductImageHandling;
 		$product = Product::find($id);
 		CategoryProduct::where('product_id',$id)->delete();
 		CategoryService::AssignCategories($request,$id);
-#		$categories = $request->category;	/* array of category id's */
-#		if(sizeof($categories)>0)
-#		{
-#			$this->LogMsg("Assign categories");
-#			foreach($categories as $c)
-#			{
-#				$text = "Assign category ID [".$c."] with product ID [".$id."]";
-#				$this->LogMsg( $text );
-#				$o = new CategoryProduct;
-#				$o->category_id = $c;
-#				$o->product_id = $id;
-#				$o->save();
-#				$this->LogMsg("Insert ID [".$o->id."]");
-#			}
-#		}
-#		else
-#		{
-#			$this->LogMsg("No categories to process!");
-		}
 		#
 		# get the product and if the qty was 0 and is now >0 then call Back In Stock
 		#
@@ -311,37 +292,6 @@ use ProductImageHandling;
 		$this->LogMsg("Required Category ID [".$category_id."]");
 		return Redirect::to("/admin/products?c=".$category_id."&s=".$store_id);
 	}
-
-
-
-
-	/**
-	 * Display the product attributes for this store.
-	 *
-	 * @return	mixed
-	 */
-	private function ShowAttributesPage()
-	{
-		$stores = Store::all();
-		$store_names = array();
-		$store_names[0]='All Stores';
-		$html = "<select class='form-control' id='store_id' name='store_id'>";
-		$html .= "<option value='0'>Global - All Stores</option>";
-		foreach($stores as $store)
-		{
-			$store_names[$store->id] = $store->store_name;
-			$html .= "<option value='".$store->id."'>".$store->store_name."</option>";
-		}
-		$html .="</select>";
-		$attributes = Attribute::all();
-
-		return view('Admin.Attributes.showattributes',[
-			'attributes'=>$attributes,
-			'stores'=>$store_names,
-			'store_select_list'=>$html
-			]);
-	}
-
 
 
 

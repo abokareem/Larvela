@@ -129,10 +129,11 @@ use ProductImageHandling;
 
 		$form = Input::all();
 		$attributes = $form['attributes'];
-		$pid = ProductService::insert($request);
-		$this->LogMsg("Insert New Product new ID [".$pid."]");
-		$this->SaveImages($request, $pid);
-		CategoryService($request, $pid);
+		$product_id = $request->SaveProduct();
+#		$product_id = ProductService::insert($request);
+		$this->LogMsg("Insert New Product new ID [".$product_id."]");
+		$this->SaveImages($request, $product_id);
+		CategoryService::AssignCategories($request, $product_id);
 
 		if(isset($attributes))
 		{
@@ -140,11 +141,11 @@ use ProductImageHandling;
 			foreach($attributes as $a)
 			{
 				$o= new AttributeProduct;
-				$o->product_id = $pid;
+				$o->product_id = $product_id;
 				$o->attribute_id = $a;
 				$o->combine_order = $order++;
 				$o->save();
-				$this->LogMsg("Insert Product - Attribute - Order P[".$pid."] A[".$a."] [".$order."]");
+				$this->LogMsg("Insert Product - Attribute - Order P[".$product_id."] A[".$a."] [".$order."]");
 			}
 		}
 		return Redirect::to("/admin/products");
@@ -167,10 +168,9 @@ use ProductImageHandling;
 	public function Update(ProductRequest $request, $id)
 	{
 		$this->LogFunction("Update(".$id.")");
-
 		$this->SaveImages($request, $id);
 		CategoryProduct::where('product_id',$id)->delete();
-		CategoryService($request, $pid);
+		CategoryService::AssignCategories($request, $id);
 		#
 		# get the product and if the qty was 0 and is now >0 then call Back In Stock
 		#
@@ -198,7 +198,7 @@ use ProductImageHandling;
 			}
 		}
 		$request['id'] = $id;
-		ProductService::update($request);
+		$request->UpdateProduct($id);	#ProductService::update($request);
 		return Redirect::to("/admin/products");
 	}
 
