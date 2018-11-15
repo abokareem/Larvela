@@ -3,7 +3,7 @@
  * \class	FilterProducts
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-11-13
- * \version	1.0.3
+ * \version	1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -66,14 +66,6 @@ class FilterProducts
 {
 use Logger;
 
-private $state = 0;
-private $in_stock_only = 0;
-private $required_categories = array();
-private $excluded_categories = array();
-private $return_max_count = 0;
-private $return_random = 1;
-private $return_lowest_price_first = 0;
-
 
 
 	/**
@@ -100,233 +92,88 @@ private $return_lowest_price_first = 0;
 		$this->LogEnd();
 	}
 
+
+
+
+
+
 	/**
-	 * Set the flag during PRE-PROCESSING state.
-	 *
-	 * @param	integer	$state
-	 * @param	mixed	$setting
-	 * @param	array	$results
+	 * Find all classes that implement the filter interface
+	 * Returned in array as: "App\Services\ProductFilters\RandomOrder"
 	 * @return	array
 	 */
-	protected function in_stock_only($state, $setting, $results)
+	public function getFilters()
 	{
-		if($state ==0)
+		$this->LogFunction("getFilters()");
+
+		$classes = get_declared_classes();
+		$implements_interface = array();
+		foreach($classes as $c)
 		{
-			$this->in_stock_only = $setting->setting_value;
-		}
-		return $results;
-	}
-
-
-
-	/**
-	 * Save the required category in an array.
-	 * - can have multiple entries in final array.
-	 *
-	 * @param	integer	$state
-	 * @param	mixed	$setting
-	 * @param	array	$results
-	 * @return	array
-	 */
-	protected function display_category($state, $setting, $results)
-	{
-		if($state!=0) return $results;
-		array_push($this->required_categories, $setting->setting_value);
-		return $results;
-	}
-
-
-
-	/**
-	 * Categories to exclude in PROCESSING state.
-	 *
-	 * @param	integer	$state
-	 * @param	mixed	$setting
-	 * @param	array	$results
-	 * @return	array
-	 */
-	protected function exclude_category($state, $setting, $results)
-	{
-		if($state!=0) return $results;
-		array_push($this->excluded_categories, $setting->setting_value);
-		return $results;
-	}
-
-
-	
-
-
-
-
-
-
-	/**
-	 * Find a class method with the same name and call it.
-	 * - Pass in the state and variables so it can decide what to do.
-	 *
-	 * @param	integer	$state
-	 * @param	mixed	$setting
-	 * @param	array	$results
-	 * @return	array
-	 */
-	protected function ProcessState($state, $setting, $results)
-	{
-		$this->LogFunction("ProcessState()");
-		$methods = get_class_methods($this);
-		foreach($methods as $m)
-		{
-			if($m == strtolower($setting->setting_name))
+			$reflect = new \ReflectionClass($c);
+			if($reflect->implementsInterface('App\Services\ProductFilters\IProductOptions'))
 			{
-				$this->LogMsg("Process [".$m."]");
-				$results = $this->{$m}($state, $setting, $results);
+				$implements_interface[] = $c;
 			}
 		}
-		return $results;
+		return $implements_interface;
 	}
-
-
-
-	protected function Process($state,$setting,$result)
-	{
-	}
-
 
 
 
 
 	/**
-	 * Generate a range of random products for the current
-	 * store that meet the following (selectable) criterior:
-	 * - In Stock
-	 * - New (within X days), 0 = disabled (any)
-	 * - Specific Category, 0 = disabled (any category that is active)
+	 * Generate a range of products for the current
+	 * store that meet the required (selectable) criterior.
 	 *
-	 * @param	integer	$MAX_PRODUCTS	Count of products to show on the home page
-	 * @return	mixed	View object with data
+	 * @return	array
 	 */
-	public function ReturnProducts(
-		$IN_STOCK=1,
-		$RANDOMIZE=1,
-		$NEW_PRODUCT_DAYS=0,
-		$IN_CATEGORY=0,
-		$MAX_PRODUCTS = 90)
+	public function ReturnProducts()
 	{
 		$this->LogFunction("ReturnProducts()");
+
+		$filters = $this->getFilters();
+			# 
+			# create new class for each module and add to list of filters
+			# 
 
 		$result = array();
 		$store = app('store');
 		$s = new StoreSetting;
-		$s->setting_name = "Process";
+		$s->setting_name = "FinalProcessing";
 		$s->setting_value=1;
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$settings->push($s);
-		for($state = 0; $state<= 2; $state++)
-		{
-			foreach($settings as $setting)
-			{
-				$result = $this->ProcessState($state,$setting,$result);
-			}
-		}
-	}
 
-
-
-	public function XXXX()
-	{
-
-
-		$categories = array();
-		$product_rows = array();
-		$product_id_list = array();
-		$pids = array();
-
-		$Category = new Category;
-		$Product = new Product;
-		$CategoryProduct = new CategoryProduct;
 		#
-		# Need to get a sample of products relevant to this store
-		# and limit them so the visitor can drill down by category.
-		#
-		$this->LogMsg("Current Store: ".$store->store_name );
-		$this->LogMsg("There are [".sizeof($settings)."] settings specific to this Store.");
-		$this->LogMsg("Flags: IN_STOCK [".$IN_STOCK."]");
-		$this->LogMsg("Flags: NEW_PRODUCT_DAYS [".$NEW_PRODUCT_DAYS."]");
-		$this->LogMsg("Flags: IN_CATEGORY [".$IN_CATEGORY."]");
-		$this->LogMsg("Flags: MAX_PRODUCTS [".$MAX_PRODUCTS."]");
-		$this->LogMsg("Flags: RANDOMIZE [".$RANDOMIZE."]");
-		if($store != NULL)
-		{
-			if($IN_CATEGORY==0)
-			{
-				$this->LogMsg("Load categories for store");
-				$categories = Category::where('category_store_id',$store->id)->get();
-			}
-			else
-			{
-				$this->LogMsg("Load category [".$IN_CATEGORY."]");
-				$categories = Category::where('id',$IN_CATEGORY)->get();
-			}
-		}
-		else
-		{
-			$this->LogError("Store data not loaded - no categories available");
-			return array();
-		}
-
-
-		/*
-		 * Build a list of all products for this store.
-		 * NOTE: A product may be in more than 1 category so avoid duplicates.
-		 */
-		$product_count = 0;
-		foreach($categories as $category)
-		{
-			$this->LogMsg("Loading Products for Category [".$category->id."]");
-			$cat_prod_rows = CategoryProduct::where('category_id',$category->id)->get();
-
-			foreach($cat_prod_rows as $cat_prod_row)
-			{
-				$product = Product::find($cat_prod_row->product_id);
-				if(($product->prod_visible == "Y")&&($product->prod_qty>0))
-				{
-					#
-					# @todo - check prod_date_valid_from and prod_date_valid_to columns in later version
-					#
-					$product_id_list[$product_count++] = $cat_prod_row->product_id;
-					array_push( $product_rows, $product );
-				}
-			}
-			sort($product_id_list);
-			$product_id_list = array_unique($product_id_list);
-			if(sizeof($product_id_list) > $MAX_PRODUCTS) break;
-		}
-		$product_count = 0;
-		foreach($product_id_list as $v)
-		{
-			$pids[$product_count++] = $v;
-		}
-		$list = array_reduce($product_id_list, function($list, $item) { $list .= " $item "; return $list; });
-		$this->LogMsg("Available numbers are: $list ");
+		# Pass each setting to all filters, in case they can use them
+		# @todo Create a DTO to replace results and set "results" and "flags"
+		$this->PreProcessing($filters, $settings, $results);
+		$this->Processing($filters, $results);
+		$this->PostProcessing($filters, $results);
 	}
 
 
 
-
-
-
-	/**
-	 * Find the product in the array of product rows.
-	 *
-	 * @param	array	$products 	The array of retrieved products from the DB
-	 * @param	integer	$id	The ID to find 
-	 * @return	mixed
-	 */
-	protected function ProductFinder($products, $id)
+	public function PreProcessing($filters, $settings, $results)
 	{
-		$product = array_filter($products, function($p) use ($id) { if($p['id'] == $id) { return $p;} });
-		return reset($product);
+		foreach($filters as $m)
+		{
+		}
 	}
 
 
+	public function Processing($filters, $results)
+	{
+		foreach($filters as $m)
+		{
+		}
+	}
 
+	public function PostProcessing($filters,$results)
+	{
+		foreach($filters as $m)
+		{
+		}
+	}
 }
