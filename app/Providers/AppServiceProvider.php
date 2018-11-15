@@ -105,6 +105,10 @@ class AppServiceProvider extends ServiceProvider
 		{
 			require_once($filename);
 		}
+		foreach(glob(app_path().'/Services/ProductFilters/*.php') as $filename)
+		{
+			require_once($filename);
+		}
 
     }
 }
