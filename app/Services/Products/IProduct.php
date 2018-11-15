@@ -25,7 +25,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-namespace App\Services;
+namespace App\Services\Products;
 
 /**
  * \brief Interface for the Product Services.

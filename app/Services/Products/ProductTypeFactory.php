@@ -1,7 +1,7 @@
 <?php
 /**
- * \class	ProductFactory
- * \date	2018-09-22
+ * \class	ProductTypeFactory
+ * \date	2018-08-22
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \version	1.0.1
  *
@@ -27,45 +27,29 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-namespace App\Services;
+namespace App\Services\Products;
 
-use App\Exceptions\Handler;
 use App\Models\ProductType;
 
-
 /**
- * \brief Return a suitable Object from the factory to send our data to.
+ * \brief Return a suitable Product Type Object
  */
-class ProductFactory 
+class ProductTypeFactory 
 {
 
 	/**
-	 * Instanciate a new Product Object used in the ProductController.
+	 * Craft a route string and return it.
 	 *
-	 * @param	integer	$prod_type
+	 * @param	string	$type
 	 * @return	mixed
 	 */
-	public static function build($prod_type)
+	public static function BuildRoute($type)
 	{
-		$type = ProductType::find($prod_type);
-		if(!is_null($type))
-		{
-			$parts = explode(" ",$type->product_type);
-			$object_name = trim(ucwords($parts[0]))."ProductController";
-			$class_name = "App\\Http\\Controllers\\Product\\".$object_name;
-			require_once base_path()."/app/Http/Controllers/Product/".$object_name.'.php';
-			if(class_exists($class_name))
-			{
-				return new $class_name();
-			}
-			else
-			{
-				throw new \Exception("Product Controller class not found.");
-			}
-		}
-		else
-		{
-			throw new \Exception("Invalid type given.");
-		}
+		$product_type = ProductType::find($type);
+		$t1_name = strtolower($product_type->product_type);
+		$t2_name = trim(str_replace([' product',')'],"",$t1_name));
+		$t3_name = trim(str_replace(" (","_",$t2_name));
+		$t4_name = trim(str_replace(" ","",$t3_name));
+		return "add_".$t4_name;
 	}
 }

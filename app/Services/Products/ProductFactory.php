@@ -1,9 +1,9 @@
 <?php
 /**
- * \class	ProductPageFactory
- * \date	2018-09-17
+ * \class	ProductFactory
+ * \date	2018-09-22
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -27,7 +27,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-namespace App\Services;
+namespace App\Services\Products;
 
 use App\Exceptions\Handler;
 use App\Models\ProductType;
@@ -36,31 +36,31 @@ use App\Models\ProductType;
 /**
  * \brief Return a suitable Object from the factory to send our data to.
  */
-class ProductPageFactory 
+class ProductFactory 
 {
 
 	/**
-	 * Instanciate a new Product Object used in the ProductPageController.
+	 * Instanciate a new Product Object used in the ProductController.
 	 *
-	 * @param	App\Models\Product	$product
+	 * @param	integer	$prod_type
 	 * @return	mixed
 	 */
-	public static function build($product)
+	public static function build($prod_type)
 	{
-		$type = ProductType::find($product->prod_type);
+		$type = ProductType::find($prod_type);
 		if(!is_null($type))
 		{
 			$parts = explode(" ",$type->product_type);
-			$object_name = trim(ucwords($parts[0]))."ProductService";
-			$class_name = "App\\Services\\".$object_name;
-			require_once $object_name.'.php';
+			$object_name = trim(ucwords($parts[0]))."ProductController";
+			$class_name = "App\\Http\\Controllers\\Product\\".$object_name;
+			require_once base_path()."/app/Http/Controllers/Product/".$object_name.'.php';
 			if(class_exists($class_name))
 			{
-				return new $class_name($product);
+				return new $class_name();
 			}
 			else
 			{
-				throw new \Exception("Product class not found.");
+				throw new \Exception("Product Controller class not found.");
 			}
 		}
 		else
