@@ -3,7 +3,7 @@
  * \class	StoreFrontController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.5
+ * \version	1.0.6
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -29,35 +29,36 @@
  */
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Routing\Route;
 use App\Http\Requests;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Request;
 
 use Auth;
 use Input;
 use Cookie;
-use Session;
 use Config;
+use Session;
 
 use App\User;
-
-use App\Models\Advert;
-use App\Models\Attribute;
-use App\Models\AttributeProduct;
-use App\Models\AttributeValue;
-use App\Models\Category;
-use App\Models\CategoryProduct;
 use App\Models\Cart;
-use App\Models\Customer;
-use App\Models\CustSource;
-use App\Models\Product;
-use App\Models\ProductType;
 use App\Models\Image;
 use App\Models\Store;
+use App\Models\Advert;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Customer;
+use App\Models\Attribute;
+use App\Models\CustSource;
+use App\Models\ProductType;
 use App\Models\StoreSetting;
 use App\Models\ProdImageMap;
+use App\Models\AttributeValue;
+use App\Models\CategoryProduct;
+use App\Models\AttributeProduct;
 use App\Jobs\ConfirmSubscription;
+
+use App\Services\ProductFilters\FilterProducts;
 
 use App\Traits\Logger;
 
@@ -137,184 +138,13 @@ use Logger;
 
 		$store = app('store');
 
-		$Image = new Image;
-		$Category = new Category;
-		$Product = new Product;
-		$CategoryProduct = new CategoryProduct;
-		/*
-		 * Need to get a sample of products relevant to this store
-		 * and limit them so the visitor can drill down by category.
-		 */
-		$current_store = app('store');
+		$filter = new FilterProducts;
+		$products = $filter->ReturnProducts();
+		$categories = Category::where('category_store_id',$store->id)->get();
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-		$this->LogMsg("Current Store: ".$current_store->store_name );
-		/*
-		 * Categories relevant to this shop
-		 */	
-		$categories = array();
-		/*
-		 * DB rows from
-		 */	
-		$product_rows = array();
-		/*
-		 * $product_id_list contains all product id's includes duplicates. We need to remove duplicates later and sort list.
-		 */	
-		$product_id_list = array();
-		if($current_store != NULL)
-		{
-			$this->LogMsg("Load categories for store");
-			$categories = Category::where('category_store_id',$current_store->id)->get();
-		}
-		else
-		{
-			$this->LogError("Store data not loaded - no categories available");
-		}
-		/*
-		 * Build a list of all products for this store.
-		 * NOTE: A product may be in more than 1 category so avoid duplicates.
-		 */
-		$product_count = 0;
-		foreach($categories as $category)
-		{
-			$this->LogMsg("Loading Products for Category [".$category->id."]");
-			$cat_prod_rows = CategoryProduct::where('category_id',$category->id)->get();
-
-			foreach($cat_prod_rows as $cat_prod_row)
-			{
-				$product = Product::find($cat_prod_row->product_id);
-				if(($product->prod_visible == "Y")&&($product->prod_qty>0))
-				{
-					#
-					# @todo - check prod_date_valid_from and prod_date_valid_to columns in later version
-					#
-					$product_id_list[$product_count++] = $cat_prod_row->product_id;
-					array_push( $product_rows, $product );
-				}
-			}
-			sort($product_id_list);
-			$product_id_list = array_unique($product_id_list);
-			if(sizeof($product_id_list) > $MAXPRODUCTS) break;
-		}
-		$product_count = 0;
-		$pids = array();
-		foreach($product_id_list as $v)
-		{
-			$pids[$product_count++] = $v;
-		}
-		$list = array_reduce($product_id_list, function($list, $item) { $list .= " $item "; return $list; });
-		$this->LogMsg("Available numbers are: $list ");
-
-		/*
-		 * Select products in random order using the product_id_list as our range.
-		 * Scan through product_rows to find item by ID as its NOT in order.
-		 */
-
-		/*
-		 * Use "selected" to keep check of a product we have already picked out of the list
-		 */
-		$selected = array();
-
 		$attributes = Attribute::where('store_id',$store->id)->get()->toArray();
 		$attribute_values = AttributeValue::get();
-		/*
-		 * Return "products" to view.
-		 */
-		$products = array();
-		if(sizeof($product_rows)>0)
-		{
-			$this->LogMsg("Picking products at random");
-			$low_id = 0;
-			$high_id = sizeof($pids)-1;
-
-			if(sizeof($product_rows) < $MAXPRODUCTS)
-			{
-				$MAXPRODUCTS = sizeof($product_rows);
-			}
-
-			/*
-			 * get products in random order and display
-			 */
-			do
-			{
-				$rand_idx = mt_rand($low_id, $high_id);
-				$pid = $pids[ $rand_idx ];
-				if(!in_array($pid, $selected))
-				{
-					$this->LogMsg("Product ID selected [ $pid ]");
-					$row = $this->FindProduct( $product_rows, $pid );
-					$image = '/media/product-image-missing.jpeg';
-					$imagefile = $image;
-					$path = $this->getStoragePath($pid);
-					$found = 0;
-					/*
-					 * Find all images mapped to the product and select the one we can use on the store front
-					 * This image was generated by our ResizeImage Job when the image was uplaoded.
-					 */
-					$product_images = ProdImageMap::where('product_id',$row->id)->get();
-					foreach($product_images as $img)
-					{
-						$this->LogMsg("Found $img->id  IMG $img->image_id  -- PROD $img->product_id ");
-						$image_data = Image::find($img->image_id);
-						$thumbs = Image::where('image_parent_id',$img->image_id)->get();
-						foreach($thumbs as $ti)
-						{
-							if($ti->image_width == 310 )
-							{
-								$found++;
-								$imagefile = "/".$ti->image_folder_name."/".$ti->image_file_name;
-								$row->image = $imagefile;
-								break;
-							}
-						}
-						if($found) break;
-					}
-					if($found==0)
-					{
-						$row->image = $imagefile;
-					}
-	
-					$cat_ids = CategoryProduct::where('product_id',$pid)->get();
-	
-					if(sizeof($cat_ids)>0) 
-					{
-						$row->category = Category::find($cat_ids[0]->category_id)->category_title;
-					}
-					else
-						$row->category = "unknown";
-					array_push($selected, $pid);
-					array_push($products, $row);
-				}
-			} while (sizeof($selected) != sizeof($product_id_list));
-
-
-			/*
-			 * REFACTOR required, colour and size should not be assigned here
-			 * pass in the attributes and values and let the theme work out what it needs.
-			 */
-	#		$size_attribute = Attribute::where('attribute_name','Size')->where('store_id',$store->id)->first();
-	#		$sizes = AttributeValue::where('attr_id',$size_attribute->id)->get();
-	#		$colour_attribute = Attribute::where('attribute_name','Colour')->where('store_id',$store->id)->first();
-	#		$colours = AttributeValue::where('attr_id',$colour_attribute->id)->get();
-			/*
-			 * END
-			 */
-
-			$theme_path = \Config::get('THEME_HOME')."storefront";
-			$this->LogMsg("Render View storefront from [".$theme_path."]");
-
-			return view($theme_path,[
-				'store'=>$store,
-				'adverts'=>$this->getAdverts(),
-				'categories'=>$categories,
-				'settings'=>$settings,
-				'products'=>$products,
-				'attributes'=>$attributes,
-				'attribute_values'=>$attribute_values,
-			#	'sizes'=>$sizes,
-			#	'colours'=>$colours
-				]);
-		}
-		else
+		if(sizeof($products)==0)
 		{
 			$sizes = array();
 			$colours = array();
@@ -342,6 +172,64 @@ use Logger;
 				'colours'=>$colours
 				]);
 		}
+		$display_products = array();
+		foreach($products as $product)
+		{
+			$image = '/media/product-image-missing.jpeg';
+			$image_path = $this->getStoragePath($product->id);
+			$found=0;
+
+			$displayable_product = new \stdClass;
+			$displayable_product->id = $product->id;
+			$displayable_product->prod_title = $product->prod_title;
+			$displayable_product->prod_type = $product->prod_type;
+			$displayable_product->prod_qty = $product->prod_qty;
+			$displayable_product->prod_short_desc = $product->prod_short_desc;
+			$displayable_product->prod_retail_cost = $product->prod_retail_cost;
+			$displayable_product->product = $product;
+			$displayable_product->image = '/media/product-image-missing.jpeg';
+
+			$product_images = ProdImageMap::where('product_id',$product->id)->get();
+			foreach($product_images as $img)
+			{
+				$this->LogMsg("Found $img->id  IMG $img->image_id  -- PROD $img->product_id ");
+				$image_data = Image::find($img->image_id);
+				$thumbs = Image::where('image_parent_id',$img->image_id)->get();
+				foreach($thumbs as $ti)
+				{
+					if($ti->image_width == 310 )
+					{
+						$found++;
+						$imagefile = "/".$ti->image_folder_name."/".$ti->image_file_name;
+						$displayable_product->image = $imagefile;
+						break;
+					}
+				}
+				if($found) break;
+			}
+			$cat_ids = CategoryProduct::where('product_id',$product->id)->get();
+			if(sizeof($cat_ids)>0) 
+			{
+				$displayable_product->category = Category::find($cat_ids[0]->category_id)->category_title;
+			}
+			else
+			{
+				$displayable_product->category = "unknown";
+			}
+			array_push($display_products, $displayable_product);
+		}
+		$theme_path = \Config::get('THEME_HOME')."storefront";
+		$this->LogMsg("Render View storefront from [".$theme_path."]");
+
+		return view($theme_path,[
+			'store'=>$store,
+			'adverts'=>$this->getAdverts(),
+			'categories'=>$categories,
+			'settings'=>$settings,
+			'products'=>$display_products,
+			'attributes'=>$attributes,
+			'attribute_values'=>$attribute_values,
+			]);
 	}	
 
 
@@ -731,7 +619,4 @@ use Logger;
 		$product = array_filter($products, function($p) use ($id) { if($p['id'] == $id) { return $p;} });
 		return reset($product);
 	}
-
-
-
 }
