@@ -248,33 +248,15 @@ use ProductImageHandling;
 		$this->LogFunction("SaveNewProduct()");
 
 		$store=app('store');
-		$pid=0;
-		$categories = $request->categories;	/* array of category id's */
-		$pid = ProductService::insert($request);
+		$pid = $request->SaveProduct();
 		$this->LogMsg("Insert New Product new ID [".$pid."]");
-		$this->LogMsg("Process product assigned categories");
-		if(isset($categories))
-		{
-			foreach($categories as $c)
-			{
-				$o = new CategoryProduct;
-				$o->product_id = $pid;
-				$o->category_id = $c;
-				$o->save();
-				$this->LogMsg("Insert product ID [".$pid."] with Category ID [".$c."]");
-			}
-		}
-		else
-		{
-			#
-			# @todo Need to assign to somethign or else product will not show up in list!
-			#
-			$this->LogMsg("No categories to assign (yet)");
-		}
 		$this->SaveImages($request,$pid);
         $store_id = $store->id;
         $category_id = 0;
 		$this->LogMsg("Default store ID [".$store->id."]");
+		#
+		# @todo Replace with QueryFilter class
+		#
 		$query = $request->input();
 		foreach($query as $n=>$v)
 		{

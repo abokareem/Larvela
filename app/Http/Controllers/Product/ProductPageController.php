@@ -56,7 +56,7 @@ use App\Models\AttributeProduct;
 
 
 use App\Services\ImageService;
-use App\Services\ProductPageFactory;
+use App\Services\Products\ProductPageFactory;
 
 
 use App\Traits\Logger;

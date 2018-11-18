@@ -3,7 +3,7 @@
  * \class	ParentProductController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.8
+ * \version	1.0.9
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -127,27 +127,10 @@ use ProductImageHandling;
 	{
 		$this->LogFunction("Save()");
 
-		$form = Input::all();
-		$attributes = $form['attributes'];
 		$product_id = $request->SaveProduct();
-#		$product_id = ProductService::insert($request);
 		$this->LogMsg("Insert New Product new ID [".$product_id."]");
 		$this->SaveImages($request, $product_id);
-		CategoryService::AssignCategories($request, $product_id);
-
-		if(isset($attributes))
-		{
-			$order = 1;
-			foreach($attributes as $a)
-			{
-				$o= new AttributeProduct;
-				$o->product_id = $product_id;
-				$o->attribute_id = $a;
-				$o->combine_order = $order++;
-				$o->save();
-				$this->LogMsg("Insert Product - Attribute - Order P[".$product_id."] A[".$a."] [".$order."]");
-			}
-		}
+		$request->SaveProductAttributes($product_id);
 		return Redirect::to("/admin/products");
 	}
 
@@ -170,35 +153,22 @@ use ProductImageHandling;
 		$this->LogFunction("Update(".$id.")");
 		$this->SaveImages($request, $id);
 		CategoryProduct::where('product_id',$id)->delete();
-		CategoryService::AssignCategories($request, $id);
 		#
 		# get the product and if the qty was 0 and is now >0 then call Back In Stock
 		#
 		$product = Product::find($id);
 		$this->LogMsg("Check stock levels for Product [".$id."] - [".$product->prod_sku."]");
-		$store = app('store');
 		if($product->prod_qty == 0)
 		{
 			$this->LogMsg("Existing stock level is 0");
 			if($request['prod_qty'] > 0)
 			{
 				$this->LogMsg("Stock Level increased to [".$request['prod_qty']."]");
-				$notify_list = Notification::where('product_code',$product->prod_sku)->get();
-				$this->LogMsg("Count of notifications to send is [".sizeof($notify_list)."]");
-				foreach($notify_list as $n)
-				{
-					if(strlen($n->email_address)>3)
-					{
-						$this->LogMsg("Send notify to [".$n->email_address."]");
-						dispatch(new BackInStock($store, $n->email_address, $product));
-						Mail::to($n->email_address)->send(new BackInStockEmail($store, $n->email_address, $product));
-					}
-					$n->delete();
-				}
+				$this->NotifyCustomers($product);
 			}
 		}
-		$request['id'] = $id;
-		$request->UpdateProduct($id);	#ProductService::update($request);
+		$request->UpdateProduct($id);
+		$request->SaveProductAttributes($id);
 		return Redirect::to("/admin/products");
 	}
 
@@ -308,9 +278,34 @@ use ProductImageHandling;
 				}
 			}
 		}
-		if(sizeof($child_products)>0) return;
+		if(sizeof($child_products)>0)
+		{
+			\Session::flash('flash_error','Remove child products first!');
+			return;
+		}
 		dispatch(new DeleteProductJob($id));
 	}
+
+
+
+	public function NotifyCustomers($product)
+	{
+		$store = app('store');
+		$notify_list = Notification::where('product_code',$product->prod_sku)->get();
+		$this->LogMsg("Count of notifications to send is [".sizeof($notify_list)."]");
+		if(sizeof($notify_list)==0) return;
+		foreach($notify_list as $n)
+		{
+			if(strlen($n->email_address)>3)
+			{
+				$this->LogMsg("Send notify to [".$n->email_address."]");
+				dispatch(new BackInStock($store, $n->email_address, $product));
+				Mail::to($n->email_address)->send(new BackInStockEmail($store, $n->email_address, $product));
+			}
+			$n->delete();
+		}
+	}
+
 
 
 

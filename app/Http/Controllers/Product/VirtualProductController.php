@@ -273,31 +273,12 @@ use ProductImageHandling;
 
 		$store = app('store');
 		CategoryProduct::where('product_id',$id)->delete();
-		CategoryService::AssignCategories($request, $id);
-#
-#		$categories = $request->category;	/* array of category id's */
-#		if(sizeof($categories)>0)
-#		{
-#			$this->LogMsg("Assign categories");
-#			foreach($categories as $c)
-#			{
-#				$text = "Assign category ID [".$c."] with product ID [".$id."]";
-#				$this->LogMsg( $text );
-#				$o = new CategoryProduct;
-#				$o->category_id = $c;
-#				$o->product_id = $id;
-#				$o->save();
-#				$this->LogMsg("Insert ID [".$o->id."]");
-#			}
-#		}
-#		else
-#		{
-#			$this->LogMsg("No categories to process!");
-#		}
+		$product = Product::find($id);
+		$request->UpdateProduct($id);
+		$this->SaveImages($request,$id);
 		#
 		# get the product and if the qty was 0 and is now >0 then call Back In Stock
 		#
-		$product = Product::find($id);
 		$this->LogMsg("Check stock levels for Product [".$id."] - [".$product->prod_sku."]");
 		if($product->prod_qty == 0)
 		{
@@ -319,9 +300,6 @@ use ProductImageHandling;
 				}
 			}
 		}
-		$request['id'] = $id;
-		ProductService::update($request);
-		$this->SaveImages($request,$id);
 		$this->SaveUploadedFile($request, $id);
 		return Redirect::to("/admin/products");
 	}
@@ -344,42 +322,9 @@ use ProductImageHandling;
 	{
 		$this->LogFunction("Save()");
 		$store = app('store');
-		$pid = ProductService::insert($request);
+		$pid = $request->SaveProduct();
 		$this->LogMsg("Insert New Product new ID [".$pid."]");
-		$this->LogMsg("Process product assigned categories");
 		$product = Product::find($pid);
-
-		$form = Input::all();
-/*		$saveactions = $form['saveactions'];
-		$afteractions = $form['afteractions'];
-		if(isset($saveactions))
-		{
-			dd($saveactions);
-		}
-		if(isset($afteractions))
-		{
-			dd($afteractions);
-		}
-*/
-
-		CategoryService::AssignCategories($request,$pid);
-
-#		$categories = $request->categories;	/* array of category id's */
-#		if(isset($categories))
-#		{
-#			foreach($categories as $c)
-#			{
-#				$o = new CategoryProduct;
-#				$o->product_id = $pid;
-#				$o->category_id = $c;
-#				$o->save();
-#				$this->LogMsg("Insert product ID [".$pid."] with Category ID [".$c."]");
-#			}
-#		}
-#		else
-#		{
-#			$this->LogMsg("No categories to assign (yet)");
-#		}
 		$filename = $this->SaveUploadedFile($pid);
 		$product->prod_combine_code = $filename;
 		$product->save();
