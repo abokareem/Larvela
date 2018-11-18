@@ -1,6 +1,6 @@
 <?php
 /**
- * \class	InStockOnly
+ * \class	ExcludeCategory
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-11-15
  * \version	1.0.0
@@ -34,9 +34,9 @@ use App\Traits\Logger;
 
 
 /**
- * \brief If set, returns only product that are in stock.
+ * \brief If EXCLUDE_CATEGORY is set in store settings, add this to the flags.
  */
-class InStockOnly implements IProductOptions
+class ExcludeCategory implements IProductOptions
 {
 use Logger;
 
@@ -56,7 +56,7 @@ private $in_stock_only = 0;
 	public function __construct()
 	{
 		$this->setFileName("larvela");
-		$this->setClassName("InStockOnly");
+		$this->setClassName("ExcludeCategory");
 		$this->LogStart();
 	}
 
@@ -74,11 +74,9 @@ private $in_stock_only = 0;
 
 
 	/**
+	 * Record all the excluded categories for this store.
 	 *
-	 *
-	 * @param	integer	$state
-	 * @param	App/Models/StoreSetting	$setting
-	 * @param	array	$results
+	 * @param	mixed	$dto
 	 * @return	array
 	 */
 	public function PreProcessor($dto, Closure $next)
@@ -86,27 +84,20 @@ private $in_stock_only = 0;
 		$this->LogFunction("PreProcessor(0)");
 		if($dto->state==0)
 		{
-			$this->in_stock_only = 1;		
-			$values = array_filter($dto->settings->toArray(),
+			$excluded_categories = array_filter($dto->settings->toArray(),
 				function($setting)
 				{
-					if($setting['setting_name'] == "IN_STOCK_ONLY") return true;
+					if($setting['setting_name'] == "EXCLUDE_CATEGORY") return true;
 				});
-			if(sizeof($values)>0)
-			{
-				$this->in_stock_only = reset($values)['setting_value'];
-				array_push($dto->flags, ["IN_STOCK_ONLY"=>$this->in_stock_only]);
-			}
+			array_push($dto->flags, ['exclude_categories'=>$excluded_categories]);
 		}
-
 		return $next($dto);
 	}
 
 
 
 	/**
-	 * Select products in random order using the product_id_list as our range.
-	 * Scan through product_rows to find item by ID as its NOT in order.
+	 * Do nothing in Processing stage
 	 *
 	 * @param	mixed	$dto
 	 * @return	array
@@ -120,8 +111,7 @@ private $in_stock_only = 0;
 	
 	
 	/**
-	 * Filter the results so only in stock products are returned.
-	 * - Depends on if flagged.
+	 * Do nothing in post processing
 	 *
 	 * @param	mixed	$dto
 	 * @return	array
@@ -129,16 +119,6 @@ private $in_stock_only = 0;
 	public function PostProcessor($dto, Closure $next)
 	{
 		$this->LogFunction("PostProcessor(".$dto->state.")");
-		if($this->in_stock_only	!= 1) return $next($dto);
-		
-		$this->LogFunction("Before filtering [".sizeof($dto->results)."]");
-		$products = array();
-		foreach($dto->results as $product)
-		{
-			if($product->prod_qty > 0) array_push($products, $product);
-		}
-		$dto->results =  $products;
-		$this->LogFunction("After filtering [".sizeof($dto->results)."]");
 		return $next($dto);
 	}
 }

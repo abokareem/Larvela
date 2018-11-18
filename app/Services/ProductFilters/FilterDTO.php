@@ -1,8 +1,10 @@
 <?php
 /**
- * \date	2018-11-13
+ * \class	FilterDTO
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version
+ * \date	2018-11-17
+ * \version	1.0.0
+ *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -27,14 +29,30 @@
  */
 namespace App\Services\ProductFilters;
 
-use Closure;
+use App\Models\StoreSetting;
+
 
 /**
- * \brief Interface for the Product Selection Services.
+ * \brief  DTO object for passing into and out of each filter
  */
-interface IProductOptions
+class FilterDTO
 {
-	function PreProcessor($dto, Closure $next);
-	function Processor($dto, Closure $next);
-	function PostProcessor($dto, Closure $next);
+public $state;
+
+public $results;
+
+public $flags;
+
+public $settings;
+
+
+
+	public function __construct()
+	{
+		$store = app('store');
+		$this->results = array();
+		$this->flags = array();
+		$this->settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		$this->state = 0;
+	}
 }

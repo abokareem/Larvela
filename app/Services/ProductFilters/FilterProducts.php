@@ -32,26 +32,9 @@ namespace App\Services\ProductFilters;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\Pipeline;
 use App\Http\Requests;
 
-use Auth;
-use Input;
-use Cookie;
-use Session;
-use Config;
-
-use App\User;
-
-use App\Models\Category;
-use App\Models\CategoryProduct;
-use App\Models\Cart;
-use App\Models\CartItem;
-use App\Models\Customer;
-use App\Models\CustSource;
-use App\Models\Product;
-use App\Models\ProductType;
-use App\Models\Store;
-use App\Models\StoreSetting;
 
 
 use App\Traits\Logger;
@@ -75,7 +58,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("FilterProducts");
 		$this->LogStart();
 	}
@@ -100,6 +83,7 @@ use Logger;
 	/**
 	 * Find all classes that implement the filter interface
 	 * Returned in array as: "App\Services\ProductFilters\RandomOrder"
+	 *
 	 * @return	array
 	 */
 	public function getFilters()
@@ -113,7 +97,7 @@ use Logger;
 			$reflect = new \ReflectionClass($c);
 			if($reflect->implementsInterface('App\Services\ProductFilters\IProductOptions'))
 			{
-				$implements_interface[] = $c;
+				$implements_interface[] = new $c;
 			}
 		}
 		return $implements_interface;
@@ -133,47 +117,24 @@ use Logger;
 		$this->LogFunction("ReturnProducts()");
 
 		$filters = $this->getFilters();
-			# 
-			# create new class for each module and add to list of filters
-			# 
-
-		$result = array();
-		$store = app('store');
-		$s = new StoreSetting;
-		$s->setting_name = "FinalProcessing";
-		$s->setting_value=1;
-		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-		$settings->push($s);
-
-		#
-		# Pass each setting to all filters, in case they can use them
-		# @todo Create a DTO to replace results and set "results" and "flags"
-		$this->PreProcessing($filters, $settings, $results);
-		$this->Processing($filters, $results);
-		$this->PostProcessing($filters, $results);
-	}
-
-
-
-	public function PreProcessing($filters, $settings, $results)
-	{
-		foreach($filters as $m)
-		{
-		}
-	}
-
-
-	public function Processing($filters, $results)
-	{
-		foreach($filters as $m)
-		{
-		}
-	}
-
-	public function PostProcessing($filters,$results)
-	{
-		foreach($filters as $m)
-		{
-		}
+		$dto = new FilterDTO;
+		$preprocessing = app(Pipeline::class)
+			->send($dto)
+			->through($filters)
+			->via("PreProcessor")
+			->then(function($dto){$this->LogMsg("State 0 done");});
+		$dto->state++;
+		$preprocessing = app(Pipeline::class)
+			->send($dto)
+			->through($filters)
+			->via("Processor")
+			->then(function($dto) { $this->LogMsg("State 1 done"); });
+		$dto->state++;
+		$preprocessing = app(Pipeline::class)
+			->send($dto)
+			->through($filters)
+			->via("PostProcessor")
+			->then(function($dto) { $this->LogMsg("State 2 done"); });
+		return $dto->results;
 	}
 }

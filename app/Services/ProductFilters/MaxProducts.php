@@ -29,6 +29,7 @@
  */
 namespace App\Services\ProductFilters;
 
+use Closure;
 use App\Traits\Logger;
 
 
@@ -43,7 +44,7 @@ use Logger;
 /**
  * @var integer	$return_max_count
  */
-private $return_max_count = 0;
+private $max_count = 0;
 
 
 
@@ -73,20 +74,35 @@ private $return_max_count = 0;
 
 
 	/**
+	 * Extract out the specific store settings and save in flags and class variable
 	 *
-	 *
-	 * @param	integer	$state
-	 * @param	App/Models/StoreSetting	$setting
-	 * @param	array	$results
+	 * @param	mixed	$dto
 	 * @return	array
 	 */
-	public function PreProcessor($state,$setting,$results)
+	public function PreProcessor($dto, Closure $next)
 	{
-		if($state==0)
+		$this->LogFunction("PreProcessor(".$dto->state.")");
+		if($dto->state==0)
 		{
-			$this->return_max_count = $setting->setting_value;
+			$this->max_count = 0;
+			$values = array_filter($dto->settings->toArray(),
+				function($setting)
+				{
+					if($setting['setting_name'] == "MAX_PRODUCT_FETCH")
+					{
+						if($setting['setting_value'] > 0)
+						{
+							return true;
+						}
+					}
+				});
+			if(sizeof($values)>0)
+			{
+				$this->max_count = reset($values)['setting_value'];
+				array_push($dto->flags, ["MAX_PRODUCTS"=>$this->max_count]);
+			}
 		}
-		return $results;
+		return $next($dto);
 	}
 
 
@@ -94,14 +110,13 @@ private $return_max_count = 0;
 	/**
 	 * Do nothing during the process stage.
 	 *
-	 * @param	integer	$state
-	 * @param	App/Models/StoreSetting	$setting
-	 * @param	array	$results
+	 * @param	mixed	$dto
 	 * @return	array
 	 */
-	public function Processor($state,$setting,$results)
+	public function Processor($dto, Closure $next)
 	{
-		return $results;
+		$this->LogFunction("Processor(".$dto->state.")");
+		return $next($dto);
 	}
 	
 	
@@ -110,17 +125,17 @@ private $return_max_count = 0;
 	 * Set the number of products we want to return in POST Processing
 	 *
 	 *
-	 * @param	integer	$state
-	 * @param	App/Models/StoreSetting	$setting
-	 * @param	array	$results
+	 * @param	mixed	$dto
 	 * @return	array
 	 */
-	public function PostProcessor($state,$setting,$results)
+	public function PostProcessor($dto, Closure $next)
 	{
-		if(($state==2)&&($this->return_max_count>0))
+		$this->LogFunction("PostProcessor(".$dto->state.")");
+		if(($dto->state==2)&&($this->max_count>0))
 		{
-			do{ array_pop($results); } while(sizeof($results)>$this->return_max_count); # now filter the results
+			$this->LogMsg("Reducing results to max count of [".$this->max_count."]");
+			do{ array_pop($dto->results); } while(sizeof($dto->results)>$this->max_count);
 		}
-		return $results;
+		return $next($dto);
 	}
 }

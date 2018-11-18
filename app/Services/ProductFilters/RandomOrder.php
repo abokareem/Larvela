@@ -29,6 +29,7 @@
  */
 namespace App\Services\ProductFilters;
 
+use Closure;
 use App\Traits\Logger;
 
 
@@ -75,18 +76,26 @@ private $return_random = 0;
 	/**
 	 *
 	 *
-	 * @param	integer	$state
 	 * @param	App/Models/StoreSetting	$setting
-	 * @param	array	$results
 	 * @return	array
 	 */
-	public function PreProcessor($state,$setting,$results)
+	public function PreProcessor($dto, Closure $next)
 	{
-		if($state==0)
+		$this->LogFunction("PreProcessor(".$dto->state.")");
+		if($dto->state==0)
 		{
-			$this->return_random = $setting->setting_value;
+			$this->return_random = array_filter($dto->settings->toArray(),
+				function($setting)
+				{
+					if($setting['setting_name'] == "RANDOM_ORDER")
+					{
+						if($setting['setting_value']==1)
+							return true;
+					}
+				});
+			array_push($dto->flags,["RANDOM_ORDER"=>1]);
 		}
-		return $results;
+		return $next($dto);
 	}
 
 
@@ -100,10 +109,10 @@ private $return_random = 0;
 	 * @param	array	$results
 	 * @return	array
 	 */
-	public function Processor($state,$setting,$results)
+	public function Processor($dto, Closure $next)
 	{
-		if($this->return_random	!= 1) return $results;
-		if(sizeof($results) == 0) return $results;
+		if($this->return_random	!= 1) return $next($dto);
+		if(sizeof($dto->results) == 0) return $next($dto);
 		$pids = array_map(function($product) {return $product['id'];}, $results);
 
 		$selected = array();
@@ -126,8 +135,8 @@ private $return_random = 0;
 				array_push($products, $row);
 			}
 		} while (sizeof($selected) != sizeof($product_id_list));
-		return $saved;
-	}	
+		return $next($dto);
+	}
 	
 	
 	
@@ -140,8 +149,8 @@ private $return_random = 0;
 	 * @param	array	$results
 	 * @return	array
 	 */
-	public function PostProcessor($state,$setting,$results)
+	public function PostProcessor($dto, Closure $next)
 	{
-		return $results;
+		return $next($dto);
 	}
 }
