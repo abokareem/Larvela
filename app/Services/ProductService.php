@@ -89,7 +89,6 @@ class ProductService
 	 */
 	public static function insert(ProductRequest $request)
 	{
-		$rv = 0;
 		$o = new Product;
 		$o->prod_sku = $request['prod_sku'];
 		$o->prod_title = $request['prod_title'];
@@ -113,13 +112,12 @@ class ProductService
 		if($o->save() > 0)
 		{
 			\Session::flash('flash_message','Product Saved!');
-			return $o->id;
 		}
 		else
 		{
 			\Session::flash('flash_error','Product failed to Save!');
 		}
-		return 0;
+		return $o->id;
 	}
 
 

@@ -3,7 +3,7 @@
  * \class	CategoryService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-07-21
- * \version	1.0.2
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -33,8 +33,8 @@ namespace App\Services;
 use App\Models\Category;
 use App\Models\CategoryProduct;
 
-use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\CategoryRequest;
 
 
 /**
@@ -53,9 +53,10 @@ class CategoryService
 	 * @param	integer	$product_id
 	 * @return	void
 	 */
-	public static function AssignCategories($request, $product_id)
+	public static function AssignCategories(ProductRequest $request, $product_id)
 	{
-		$categories = $request->category;	/* array of category id's */
+		$empty = array(1);
+		$categories = $request->input('categories',$empty);
 		if(sizeof($categories)>0)
 		{
 			foreach($categories as $c)
@@ -64,6 +65,7 @@ class CategoryService
 				$o->category_id = $c;
 				$o->product_id = $product_id;
 				$o->save();
+				echo "<h1> C=".$c." P=".$product_id."</h1>";
 			}
 		}
 	}

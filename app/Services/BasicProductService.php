@@ -3,7 +3,7 @@
  * \class	BasicProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -37,7 +37,7 @@ use App\Models\Store;
 use App\Models\StoreSetting;
 use App\Services\ImageService;
 use App\Traits\Logger;
-
+use App\Services\Products\IProduct;
 
 
 /**

@@ -53,7 +53,7 @@ class ProductPageFactory
 			$parts = explode(" ",$type->product_type);
 			$object_name = trim(ucwords($parts[0]))."ProductService";
 			$class_name = "App\\Services\\".$object_name;
-			require_once $object_name.'.php';
+			require_once app_path()."/Services/". $object_name.'.php';
 			if(class_exists($class_name))
 			{
 				return new $class_name($product);

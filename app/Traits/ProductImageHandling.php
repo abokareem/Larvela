@@ -1,9 +1,27 @@
 <?php
 /**
- * Larvela
- * Copyright (C) 2017
- * by Present & Future Holdings Pty Ltd Trading as Off Grid Engineering
- * https://off-grid-engineering.com
+ * \version	1.0.5
+ *
+ *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  *
  * \addtogroup Internal
@@ -142,4 +160,69 @@ protected $MEDIADIR= '/media';
 		}
 		$this->LogMsg("function Done");
 	}
+
+
+	
+
+	/**
+	 * Create the path needed to store product images and return the full filesystem path to place file.
+	 *
+	 * @pre		none
+	 * @post	creates directory structure as needed
+	 *
+	 * @param	integer	$id - the product ID
+	 * @return	string 
+	 */
+	public function XXXgetStoragePath( $id )
+	{
+		$this->LogFunction("getStoragePath(".$id.")");
+		$path="";
+		$length = strlen($id);
+		$id = "".$id."";
+		for($i=0 ; $i < $length ; $i++)
+		{
+			$path.="/".$id[$i];
+		}
+		$finalpath = public_path()."/media".$path;
+		if(is_dir($finalpath))
+		{
+			$this->LogMsg("PATH [".$finalpath."]");
+			return $finalpath;
+		}
+		else
+		{	
+			$this->LogMsg("Create Path [".$finalpath."]");
+			try { mkdir($finalpath,0775,true); }
+			catch(Exception $e)
+			{
+				$this->LogError("Failed to create Path [".$finalpath."]");
+			}
+		}
+		$this->LogMsg("PATH [".$finalpath."]");
+		return $finalpath;
+	}
+
+
+
+	/**
+	 * Create the subpath needed to store product images and return a partial filesystem path.
+	 *
+	 * @param	integer	$id - the product ID
+	 * @return	string
+	 */
+	public function XXXgetStorageSubPath($id)
+	{
+		$this->LogFunction("getStorageSubPath(".$id.")");
+
+		$path="media";
+		$length = strlen($id);
+		$id = "".$id."";
+		for($i=0 ; $i < $length ; $i++)
+		{
+			$path.="/".$id[$i];
+		}
+		$this->LogMsg("PATH [".$path."]");
+		return $path;
+	}
+
 }
