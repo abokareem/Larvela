@@ -3,7 +3,7 @@
  * \class	CategoryService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-07-21
- * \version	1.0.3
+ * \version	1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,6 +42,116 @@ use App\Http\Requests\CategoryRequest;
  */
 class CategoryService
 {
+
+
+	/**
+	 * Return a HTML string of UL/LI elements representing
+	 * the category menu for the site.
+	 * This allows for CSS to customize the menu structure.
+	 *
+	 *
+	 * @return	string
+	 */
+	public static function ReturnMenuHTML()
+	{
+		$store = app('store');
+		$categories = Category::where('category_status','A')
+			->where('category_store_id',$store->id)
+			->where('category_visible','Y')->orderBy('id')->get();
+		$data = array();
+		foreach($categories as $row)
+		{
+			$d = array('id'=>$row->id,'title'=>$row->category_title,'parent'=>$row->category_parent_id);
+			array_push($data, $d);
+		}
+		$data = self::BuildTree($data);
+		return self::BuildHtmlMenu($data);
+	}
+
+
+	/**
+	 * Return the category menu structure as a set of parent child array objects
+	 *
+	 *
+	 * @return	string
+	 */
+	public static function ReturnMenuData()
+	{
+		$store = app('store');
+		$categories = Category::where('category_status','A')
+			->where('category_store_id',$store->id)
+			->where('category_visible','Y')->orderBy('id')->get();
+		$data = array();
+		foreach($categories as $row)
+		{
+			$d = array('id'=>$row->id,'title'=>$row->category_title,'parent'=>$row->category_parent_id);
+			array_push($data, $d);
+		}
+		return self::BuildTree($data);
+	}
+
+
+
+	/**
+	 * Builds an array of branches for a top level and second level menu.
+	 *
+	 *
+	 * @param	array	$elements
+	 * @param	integer	$parentId
+	 * @return	array
+	 */
+	public static function BuildTree(array $elements, $parentId = 0)
+	{
+		$branch = array();
+		foreach ($elements as $element)
+		{
+			if ($element['parent'] == $parentId)
+			{
+				$children = self::BuildTree($elements, $element['id']);
+				if($children)
+				{
+					$element['children'] = $children;
+				}
+				$branch[] = $element;
+			}
+		}
+		return $branch;
+	}
+
+
+	/**
+	 * Return an unordered list with an ID of "menu-bar"
+	 *
+	 * @param	array	$data
+	 * @return	string
+	 */
+	public static function BuildHtmlMenu($data)
+	{
+		$html = "<ul id='menu-bar'>\n";
+		foreach($data as $key => $value)
+		{
+			if(array_key_exists('children', $value))
+			{
+				$html .= "<li class='menu-item'><a href='/category/".$value['id']."'>".$value['title']."</a>";
+				$html .= "<ul class='dropdown-menu'>";
+				foreach($value['children'] as $cv)
+				{
+					$html .= "<li class='menu-item'><a href='/category/".$cv['id']."'>".$cv['title']."</a></li>\n";
+				}
+				$html .= "</ul>\n";
+			}
+			else
+			{
+				$html .= "<li class='menu-item'><a href='/category/".$value['id']."'>".$value['title']."</a>";
+			}
+			$html .= "</li>\n";
+		}
+		$html .= "</ul>\n";
+		return $html;
+
+	}
+
+
 
 
 	/**
