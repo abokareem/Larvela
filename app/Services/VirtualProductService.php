@@ -31,14 +31,14 @@
  */
 namespace App\Services;
 
-use App\Models\Attribute;
-use App\Models\AttributeValue;
 use App\Models\Product;
+use App\Models\Attribute;
+use App\Models\Category;
 use App\Models\ProductType;
 use App\Models\StoreSetting;
-use App\Models\Category;
 use App\Services\ImageService;
-
+use App\Models\AttributeValue;
+use App\Services\Products\IProduct;
 
 use App\Traits\Logger;
 
