@@ -39,7 +39,7 @@ use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 use App\Services\ProductService;
-use App\Services\ProductPageFactory;
+use App\Services\Products\ProductPageFactory;
 
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
@@ -230,7 +230,7 @@ use Logger;
 		$categories = Category::get();
 		$attributes = Attribute::where('store_id',$store->id)->get();
 
-		$ProductType = \App\Services\ProductTypeFactory::BuildRoute($product_type->id);
+		$ProductType = \App\Services\Products\ProductTypeFactory::BuildRoute($product_type->id);
 		$route = "Admin.Products.".$ProductType;
 		$this->LogMsg("Routing to [".$ProductType."]");
 		return view($route,[

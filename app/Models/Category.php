@@ -68,38 +68,6 @@ protected $fillable = array('id','category_title','category_description','catego
 protected $data = array();
 
 
-	/**
-	 * Constructor to build the tree on creation
-	 *
-	 * @pre Categories should be defined
-	 * @post internal data array created
-	 * @return void
-	 */
-#	function __construct()
-#	{
-#		$this->BuildData();
-#	}
-
-
-
-
-
-	/**
-	 * Get ALL category ordered by status and parent ID
-	 *
-	 * @pre none
-	 * @post none
-	 * @return	mixed	Collection of rows from the category table
-	 */
-#	protected function getAllCategories()
-#	{
-#		return \DB::table('category')->orderBy('category_store_id')->orderBy('category_parent_id')->get();
-#	}
-
-
-
-
-
 
 
 	/**
@@ -109,11 +77,14 @@ protected $data = array();
 	 * @post none
 	 * @return Collection of rows from the category table
 	 */
-	protected function getCategory()
+	private function getCategory()
 	{
 		return \DB::table('category')->where(['category_status'=>'A'])->orderBy('category_title')->get();
 	}
-	public function getCategories()
+
+
+
+	private function getCategories()
 	{
 		return $this->getCategory();
 	}
@@ -125,7 +96,7 @@ protected $data = array();
 	 *
 	 * @return	array
 	 */
-	protected function getArray()
+	private  function getArray()
 	{
 		$all_categories = \DB::table('category')->orderBy('category_title')->get();
 		$category_list = array();
@@ -147,7 +118,7 @@ protected $data = array();
 	 * @post	array is filled with items
 	 * @return	void
 	 */
-	public function BuildData()
+	private  function BuildData()
 	{
 		$rows = \DB::table('category')
 			->where(['category_status'=>'A'])
@@ -159,7 +130,7 @@ protected $data = array();
 
 
 
-	public function BuildStoreData($store_id)
+	private  function BuildStoreData($store_id)
 	{
 		$rows = \DB::table('category')
 			->where(['category_store_id'=>$store_id])
@@ -171,7 +142,7 @@ protected $data = array();
 
 
 
-	protected function AssembleData($rows)
+	private function AssembleData($rows)
 	{
 		$this->data = array();
 		foreach($rows as $row)
@@ -196,7 +167,7 @@ protected $data = array();
 	 * @post	none
 	 * @return	array
 	 */
-	public function getData() { return $this->data; }
+#	public function getData() { return $this->data; }
 
 
 
@@ -211,7 +182,7 @@ protected $data = array();
 	 * @param	integer	$parentId integer row ID of parent category.
 	 * @return array
 	 */
-	public function buildTree(array $elements, $parentId = 0)
+	private function buildTree(array $elements, $parentId = 0)
 	{
 		$branch = array();
 		foreach ($elements as $element)
@@ -272,7 +243,7 @@ protected $data = array();
 	 * @post	None
 	 * @return	string HTML un-ordered list
 	 */
-	public function getHTML()
+	private function getHTML()
 	{
 		$array =  $this->data;
 		$html = "<ul id='menu-bar'>\n";
