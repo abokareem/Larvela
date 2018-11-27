@@ -3,7 +3,7 @@
  * \class	StoreFrontController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-18
- * \version	1.0.6
+ * \version	1.0.7
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -61,7 +61,8 @@ use App\Jobs\ConfirmSubscription;
 use App\Services\ProductFilters\FilterProducts;
 
 use App\Traits\Logger;
-
+use App\Traits\PathManagementTrait;
+use App\Traits\ProductImageHandling;
 
 /**
  * \brief Manages generating the Storefront and Category page views and some minor related tasks.
@@ -79,6 +80,7 @@ use App\Traits\Logger;
 class StoreFrontController extends Controller
 {
 use Logger;
+use PathManagementTrait;
 
 
 
@@ -162,7 +164,7 @@ use Logger;
 			$theme_path = \Config::get('THEME_HOME')."storefront";
 			return view($theme_path,[
 				'store'=>$store,
-				'adverts'=>$this->getAdverts(),
+				'adverts'=>array(),
 				'categories'=>$categories,
 				'settings'=>$settings,
 				'products'=>array(),
@@ -223,7 +225,7 @@ use Logger;
 
 		return view($theme_path,[
 			'store'=>$store,
-			'adverts'=>$this->getAdverts(),
+			'adverts'=>array(),
 			'categories'=>$categories,
 			'settings'=>$settings,
 			'products'=>$display_products,
@@ -397,14 +399,18 @@ use Logger;
 		$v = 0;
 		if(Request::ajax())
 		{
+			$this->LogMsg("AJAX request OK");
 			if(Auth::check())
 			{
+				$this->LogMsg("Auth check OK");
 				$cart = Cart::where('user_id',Auth::user()->id)->first();
 				if($cart)
 				{
-					$items = $cart->cartItems;
+					$this->LogMsg("cart oK");
+					$items = $cart->items;
 					if(!is_null($items))
 					{
+						$this->LogMsg("cart has [".sizeof($items)."] items");
 						foreach($items as $item)
 						{
 							$product = Product::find($item->product_id);
@@ -419,204 +425,5 @@ use Logger;
 		}
 		$data = array('c'=>0,'v'=>0);
 		return json_encode($data);
-	}
-
-
-
-
-	/**
-	 * AJAX REQUEST - Capture the data from the pop up email/name capture form,
-	 * save valid data in DB and return a JSON status code.
-	 *
-	 * @todo Customer Insert has been disabled while testing
-	 *
-	 * @return	string	JSON data
-	 */
-	public function CaptureForm()
-	{
-		$this->LogFunction("CaptureForm()");
-		$store = app('store');
-		if(Request::ajax())
-		{
-			$data_in = Input::all();
-			$name = $data_in['na'];
-			$emailaddress = $data_in['ea'];
-			$this->LogMsg("Captured [".$name."]");
-			$this->LogMsg("Captured [".$emailaddress."]");
-			if((strlen($name)>1) && (strlen($emailaddress)>4))
-			{
-				$this->LogMsg("Get Customer Source Data");
-				$source = CustSource::where('cs_name',"WEBSTORE")->first();
-
-				$o = new Customer;
-				$o->customer_name = $name;
-				$o->customer_mobile = '';
-				$o->customer_email = $emailaddress;
-				$o->customer_source_id = $source->id;
-				$o->customer_store_id = $store->id;
-				$o->customer_status = 'A';
-				$o->customer_date_created = date("Y-m-d");
-				$o->customer_date_updated = date("Y-m-d");
-				$o->save();
-				$cid = $o->id;
-				$this->LogMsg("Saved new customer  ID [".$o->id."]");
-				$cmd = new ConfirmSubscription($store, $emailaddress );
-				if(is_object($cmd))
-				{
-					dispatch($cmd);
-				}
-				Cookie::queue('capture','done',9999999);
-				Cookie::queue('cid',"$cid",9999999);
-				$data = array('status'=>'You have been subscribed!','CID'=>$cid);
-				return json_encode($data);
-			}
-			else
-			{
-				$this->LogMsg("FAIL - AJAX call failed Name or Email address length failure");
-				$data = array('status'=>'FAIL');
-				return json_encode($data);
-			}
-		}
-		else
-		{
-			$data = array('status'=>'Not AJAX Call');
-			return json_encode($data);
-		}
-	}
-
-
-
-	/**
-	 *============================================================
-	 *
-	 *                        DEVELOPMENT
-	 *
-	 *============================================================
-	 *
-	 * Return a collection of rows that are current adverts from the adverts table.
-	 *
-	 * @return	mixed
-	 */
-	protected function GetAdverts()
-	{
-		$this->LogFunction("GetAdverts()");
-		return Advert::where('advert_status','A')->get();
-	}
-
-
-
-
-
-	/**
-	 * Return an array of formatted category objects, only the parent items.
-	 *
-	 * @return	array
-	 */
-	protected function GetStoreCategories($store_id = 0)
-	{
-		$this->LogFunction("GetStoreCategories(".$store_id.")");
-		$category_data = Category::where('category_store_id',$store_id)->get();
-		return $category_data;
-	}
-
-
-
-
-	/**
-	 * Return the string represention of the category HTML unordered list
-	 *
-	 * @return	string
-	 */
-	protected function GetStoreCategoriesHTML()
-	{
-		$this->LogFunction("GetStoreCategoriesHTML()");
-
-		$Category = new Category;
-		return $Category->getHTML();
-	}
-
-
-
-
-	/**
-	 * Construct path from ID and return
-	 *
-	 * @param	string	$str_id	String holding the ID value as a number
-	 * @return	string
-	 */
-	protected function getStoragePath($str_id)
-	{
-		$this->LogFunction("getStoragePath()");
-
-		$id = "$str_id";
-		$path="/media";
-		for($i=0;$i<strlen($id);$i++)
-		{
-			$path.="/".$id[$i];
-			$this->LogMsg($path);
-		}
-		$this->LogMsg("Path is [ $path ] ");
-		return $path;
-	}
-
-	
-
-
-
-	/**
-	 * Remove all site cookies - primarily used for testing
-	 *
-	 * @return	string
-	 */
-	public function ClearCookies()
-	{
-		Cookie::queue( Cookie::forget('cid') );
-		Cookie::queue( Cookie::forget('capture') );
-		Session::forget('cid');
-		Session::forget('capture');
-		return ['ok'=>true];
-	}
-
-	/**
-	 * Set capture done cookie and CID
-	 *
-	 * @return	string
-	 */
-	public function SetCookies(Request $request)
-	{
-		$cid = 0;
-		$query = $request->input();
-		foreach($query as $n=>$v)
-		{
-			if(is_string($n)== true)
-			{
-				if(is_string($v)== true)
-				{
-					if($n=="CID") $cid = $v;
-				}
-			}
-		}
-		if($cid > 0)
-		{
-			Cookie::queue('cid',$cid, 9999999);
-			Cookie::queue('capture','done',9999999);
-			return ['ok'=>true];
-		}
-		return ['ok'=>false];
-	}
-
-
-
-	/**
-	 * Find the product in the array of product rows.
-	 *
-	 * @param	array	$products 	The array of retrieved products from the DB
-	 * @param	integer	$id	The ID to find 
-	 * @return	mixed
-	 */
-	protected function FindProduct($products, $id)
-	{
-		$product = array_filter($products, function($p) use ($id) { if($p['id'] == $id) { return $p;} });
-		return reset($product);
 	}
 }

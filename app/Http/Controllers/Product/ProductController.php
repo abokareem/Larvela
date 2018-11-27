@@ -40,7 +40,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 
 use App\Helpers\StoreHelper;
 use App\Services\ProductService;
-use App\Services\ProductFactory;
+use App\Services\Products\ProductFactory;
 
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;
@@ -108,9 +108,9 @@ use Logger;
 		$this->LogFunction("Save()");
 
 		$store = app('store');
-		$store_id = $store->id;
-		$category_id = 0;
-		$query = $request->input();
+		$store_id = $request->query('s',$store->id);
+		$category_id = $request->query('c',0);
+/*		$query = $request->input();
 		foreach($query as $n=>$v)
 		{
 			if(is_string($n)== true)
@@ -125,7 +125,7 @@ use Logger;
 		}
 		$this->LogMsg("Required store ID [".$store_id."]");
 		$this->LogMsg("Required Category ID [".$category_id."]");
-
+*/
 		$form = Input::all();
 		$type = $form['prod_type'];
 		$this->LogMsg("Build Product Factory");
@@ -149,6 +149,9 @@ use Logger;
 		$this->LogFunction("Update()");
 
 		$store = app('store');
+		$store_id = $request->query('s',$store->id);
+		$category_id = $request->query('c',0);
+/*
 		$store_id = $store->id;
 		$category_id = 0;
 		$query = $request->input();
@@ -166,7 +169,7 @@ use Logger;
 		}
 		$this->LogMsg("Required store ID [".$store_id."]");
 		$this->LogMsg("Required Category ID [".$category_id."]");
-
+*/
 		$form = Input::all();
 		$type = $form['prod_type'];
 		$this->LogMsg("Build Product Factory for Type [".$type."]");
@@ -190,6 +193,9 @@ use Logger;
 		$this->LogFunction("Delete()");
 
 		$store = app('store');
+		$store_id = $request->query('s',$store->id);
+		$category_id = $request->query('c',0);
+/*
 		$store_id = $store->id;
 		$category_id = 0;
 		$query = $request->input();
@@ -207,7 +213,7 @@ use Logger;
 		}
 		$this->LogMsg("Required store ID [".$store_id."]");
 		$this->LogMsg("Required Category ID [".$category_id."]");
-
+*/
 		$form = Input::all();
 		$type = $form['prod_type'];
 		$this->LogMsg("Build Product Factory");
