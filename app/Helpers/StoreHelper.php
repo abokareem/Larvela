@@ -36,6 +36,7 @@ namespace App\Helpers;
 
 use App\Models\Store;
 use App\Models\Category;
+use App\Services\CategoryService;
 
 
 
@@ -54,10 +55,13 @@ class StoreHelper
 	 */
 	public static function CategoryMenu()
 	{
+		return CategoryService::ReturnMenuHTML();
+
 		$Category = new Category;
 		$store = app('store');
-		$Category->BuildStoreData($store->id);
-		return $Category->getHTML();
+		#$Category->BuildStoreData($store->id);
+		#return $Category->getHTML();
+		return "<!-- was category menu in StoreHelper -->";
 	}
 
 
