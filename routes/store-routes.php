@@ -36,13 +36,6 @@ $this->post('logout', 'Auth\LoginController@logout')->name('logout');
 $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
 $this->post('register', 'Auth\RegisterController@register');
 
-// Password Reset Routes...
-#$this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm');
-#$this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail');
-#$this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm');
-#$this->post('password/reset', 'Auth\ResetPasswordController@reset');
-
-
 Route::post('/ajax/payment','AjaxController@dumpajax');
 Route::get('/ajax/payment','AjaxController@dumpajax');
 
@@ -52,8 +45,8 @@ Route::get('/ajax/payment','AjaxController@dumpajax');
 Route::get('/home','StoreFrontController@ShowStoreFront');
 Route::post('/home','StoreFrontController@ShowStoreFront');
 
-Route::post('/capture','StoreFrontController@CaptureForm');
-Route::post('/cart/getcartdata','StoreFrontController@GetCartData');
+Route::post('/capture','CaptureController@CaptureForm');
+Route::post('/cart/getcartdata','Ajax\CartData@GetCartData');
 #
 # 2018-09-18 Added new route
 #
@@ -79,37 +72,49 @@ Route::get('/privacy','SupportController@privacy');
 Route::get('/contact','SupportController@contact');
 
 #
+#
+#
+#
 # Cart/account related
 #
 Route::get('/cart', 'Cart\CartController@ShowCart');
 Route::get('/cart/incqty/{cid}/{iid}','Cart\CartController@incCartQty');
 Route::get('/cart/decqty/{cid}/{iid}','Cart\CartController@decCartQty');
-Route::get('/signup', 'StoreController@ShowSignUpForm');
+
 #
 # 2018-09-19 Split from CartController
 #
+Route::get('/checkout','CheckoutController@Checkout');
+Route::get('/shipping','CheckoutController@Shipping');
+Route::get('/confirm', 'CheckoutController@Confirm');
+Route::post('/confirm', 'CheckoutController@Confirm');
 Route::get('/cart/shipping','CheckoutController@ShowShipping');
-Route::get('/cart/checkout','CheckoutController@Checkout');
+
 #
 # Moved to Cart\CartLocking
 #
 Route::post('/ajax/updatelocks/{id}','Cart\CartLocking@UpdateLocks');
 Route::post('/cart/updatelocks/{id}','Cart\CartLocking@UpdateLocks');
+
 #
 # Error Trapping
 #
 Route::get('/cart/error/cart-timeout','Cart\CartController@CartTimeoutError');
 
-
-Route::post('/myaccount/update/{id}', 'CustomerController@UpdateMyAccount');
+#
+#
+#
+Route::get('/signup', 'StoreController@ShowSignUpForm');
 Route::get('/myaccount', 'StoreController@ShowMyAccount');
+Route::post('/myaccount/update/{id}', 'CustomerController@UpdateMyAccount');
+
 #
 # 2016-09-05 Cart Logic
 #
+##Route::post('/confirm','Cart\CartConfirm@Confirm');
+##Route::get('/shipping','Cart\CartController@ShowShipping');
 Route::get('/addtocart/{id}', 'Cart\CartController@addItem');
 Route::get('/removeItem/{productId}', 'Cart\CartController@removeItem');
-Route::get('/shipping','Cart\CartController@ShowShipping');
-Route::post('/confirm','Cart\CartController@Confirm');
 
 #
 # From footer
