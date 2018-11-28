@@ -32,13 +32,14 @@ namespace App\Http\Controllers\Ajax;
 
 use Auth;
 use Input;
+use App\Http\Requests;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Request;
 
 use App\User;
 use App\Models\Cart;
 use App\Models\Store;
 use App\Models\Product;
-use App\Http\Requests;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 use App\Traits\Logger;
