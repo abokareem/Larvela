@@ -1,7 +1,7 @@
 @extends( $THEME_HOME.'master-storefront')
 <?php
 #
-# This is the main store front entry page called fromt he StoreFrontController class.
+# This is the main store front entry page called from the StoreFrontController class.
 #
 # Variables passed in:
 #

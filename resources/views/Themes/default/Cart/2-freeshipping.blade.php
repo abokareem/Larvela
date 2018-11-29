@@ -115,4 +115,6 @@ $('#capture').attr('action','/confirm');
 $('#capture').submit();
 });
 </script>
+
+<!-- {{ $THEME_HOME }}.Cart.2-freeshipping.blade.php -->
 @endsection

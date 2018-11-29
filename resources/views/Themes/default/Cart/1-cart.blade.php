@@ -98,7 +98,7 @@
 		<div class="text-center">
 			<a href="/"><button type="button" class="btn btn-default"><span class="fa fa-shopping-cart"></span> Continue Shopping </button></a></td>&nbsp;&nbsp;
 			@if(sizeof($products)>0)
-			<button type="button" class="btn btn-success" id='btnshipping'> Shipping <span class="fa fa-play"></span></button>
+			<button type="button" class="btn btn-success" id='btncheckout'> Checkout <span class="fa fa-play"></span></button>
 			@endif
 		</div>
 	</div>
@@ -114,7 +114,7 @@
 
 
 <script>
-$('#btnshipping').click(function(){ var url = '/shipping'; window.location.href = url; });
+$('#btncheckout').click(function(){ var url = '/checkout'; window.location.href = url; });
 
 $(document).on('click', '.number-spinner button',function()
 {
@@ -131,4 +131,5 @@ $(document).on('click', '.number-spinner button',function()
 		btn.closest('.number-spinner').find('input').val(newVal);
 });
 </script>
+<!-- 1-cart.blade.php -->
 @endsection

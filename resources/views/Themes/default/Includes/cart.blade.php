@@ -10,16 +10,15 @@
 	<?php $min_spend =  $s->setting_value; ?>
 @endif
 @endforeach
-
-		<div class="cart-wrapper">
-			<div class="cart pull-right" style="padding-right:75px;padding-bottom:25px;">
-				@if($min_spend > 0)
-					<script>var min_spend = {{ number_format($min_spend,2) }}; </script>
-					Minimum Spend is <b style="color:green;">${{ number_format($min_spend,2) }}</b><br>
-				@endif
-				<a href="/cart"><span id='cartitemcount'> $0.00 (0) Items in Cart</span> <i class="fa fa-shopping-cart"></i></a>
-			</div>
+	<div>
+		<div class="relative text-2xl text-blue font-medium hover:text-red pull-right pr-8 pb-8">
+			@if($min_spend > 0)
+			<script>var min_spend = {{ number_format($min_spend,2) }}; </script>
+			Minimum Spend is <b style="color:green;">${{ number_format($min_spend,2) }}</b><br>
+			@endif
+			<a href="/cart" text-2xl class="hover:text-pink hover:no-underline"><span id='cartitemcount'> $0.00 (0) Items in Cart</span> <i class="fa fa-shopping-cart"></i></a>
 		</div>
+	</div>
 	<form name='cartstatus' method='post' id='cartstatus'>
 	<input type="hidden" name="_token" id="csrf-token" value="{{ Session::token() }}" />
 	</form>

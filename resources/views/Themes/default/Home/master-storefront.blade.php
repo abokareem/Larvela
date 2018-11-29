@@ -4,18 +4,25 @@
 <title>Welcome to {{ $store->store_name }}!</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="description" content="Buy Rockabilly, Retro PinUp, Vintage Inspired, Alternative and 50s Style Clothing in Sizes from 10 to 18 online at {{ $store->store_name}}" />
+<meta name="description" content="{{ $store->store_name}}" />
 <meta name="robots" content="index">
 <meta name="robots" content="follow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+@yield('css')
+<!-- link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
 <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+-->
+<link href="https://fonts.googleapis.com/css?family=Dancing+Script" rel="stylesheet"> 
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"  type='text/css'>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css">
 <link href="/css/store.css" rel="stylesheet" type='text/css'>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-<script src='//www.google.com/recaptcha/api.js'></script>
+
+<!-- script src='//www.google.com/recaptcha/api.js'></script -->
+@yield('header-css')
 </head>
 <body>
 @if (view()->exists( $THEME_HEADER.'header') )
@@ -31,7 +38,6 @@
 @endif
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
 
 <script>
 $(document).ready(function()
