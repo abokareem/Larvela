@@ -44,15 +44,15 @@ use App\Events\Larvela\AddToCartMessage;
 
 
 use App\Models\Cart;
+use App\Models\Product;
+use App\Models\Image;
 use App\Models\CartData;
 use App\Models\CartItem;
-use App\Models\Product;
 use App\Models\Customer;
-use App\Models\ProdImageMap;
 use App\Models\ProductLock;
-use App\Models\CustomerAddress;
-use App\Models\Image;
+use App\Models\ProdImageMap;
 use App\Models\StoreSetting;
+use App\Models\CustomerAddress;
 
 
 use App\Services\CartItemService;
@@ -458,40 +458,26 @@ private $user;
 				$this->LogMsg($pp->prod_sku." - ".$pp->prod_short_desc);
 			}
 		}
-		$this->LogMsg("Done processing cart - now render view");
-
 		if($free_shipping == 0)
 		{
 			$theme_path = \Config::get('THEME_CART')."2-shipping";
-			$this->LogMsg("View will be [".$theme_path."]");
-			return view($theme_path,[
-				'store'=>$store,
-				'settings'=>$settings,
-				'cart'=>$cart,
-				'cart_data'=>$cart_data,
-				'items'=>$items,
-				'user'=>$user,
-				'customer'=>$customer,
-				'address'=>$address,
-				'postal_options'=>$postal_options
-				]);
 		}
 		else
 		{
 			$theme_path = \Config::get('THEME_CART')."2-freeshipping";
-			$this->LogMsg("View will be [".$theme_path."]");
-			return view($theme_path,[
-				'store'=>$store,
-				'settings'=>$settings,
-				'cart'=>$cart,
-				'cart_data'=>$cart_data,
-				'items'=>$items,
-				'user'=>$user,
-				'customer'=>$customer,
-				'address'=>$address,
-				'postal_options'=>$postal_options
-				]);
 		}
+		$this->LogMsg("View will be [".$theme_path."]");
+		return view($theme_path,[
+			'store'=>$store,
+			'settings'=>$settings,
+			'cart'=>$cart,
+			'cart_data'=>$cart_data,
+			'items'=>$items,
+			'user'=>$user,
+			'customer'=>$customer,
+			'address'=>$address,
+			'postal_options'=>$postal_options
+			]);
 	}
 
 
