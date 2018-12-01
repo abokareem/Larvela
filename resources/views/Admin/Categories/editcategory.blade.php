@@ -49,6 +49,7 @@
 			<label class="control-label col-xs-2">Parent:</label>
 			<div class="col-xs-5">
 				<select id="category_parent_id" name="category_parent_id" class="form-control">
+					<option value="0">None (Is a Parent)</option>
 				@foreach($categories as $c)
 					@if($c->id == $category->category_parent_id)
 					<option value="{{ $c->id}}" selected>{{$c->category_title}}</option>
@@ -78,7 +79,6 @@
 			</div>
 		</div>
 
-		<input type="hidden" name="id" value="{{ $category->id }}">
 	</div>
 
 	<div class="row">
@@ -91,6 +91,9 @@
 		 	</div>
 		</div>
 	</div>
+
+	<input type="hidden" name="category_store_id" value="{{ $store->id }}">
+	<input type="hidden" name="id" value="{{ $category->id }}">
 	{!! Form::token() !!}
 	{!! Form::close() !!}
 </div>

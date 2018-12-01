@@ -5,25 +5,42 @@
  * @date	2016-09-05
  *
  *
- * [CC]
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 namespace App\Http\Controllers;
 
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use Session;
 use Input;
-
-
+use Session;
+use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\CategoryRequest;
 
-use App\Services\CategoryService;
-use App\Helpers\StoreHelper;
 
 use App\Models\Store;
 use App\Models\Category;
+use App\Helpers\StoreHelper;
 use App\Models\CategoryProduct;
+use App\Services\CategoryService;
 
 
 use App\Traits\Logger;
@@ -32,7 +49,7 @@ use App\Traits\Logger;
 /**
  * \brief Controller code for all aspects of Category Handling
  *
- * 2016-09-22 Cahnge table from categories to category
+ * 2016-09-22 Change table from categories to category
  */
 class CategoryController extends Controller
 {
@@ -127,19 +144,14 @@ use Logger;
 	public function ShowCategoriesPage(Request $request)
 	{
 		$store = app('store');
-		$store_id = $store->id;
-
-		$query = $request->input();
-		foreach($query as $n=>$v)
-		{
-			if($n=="s") $store_id = $v;
-		}
+		$store_id =  $request->query('s',$store->id);
 		$stores = Store::all();
-		$cats = Category::where('category_store_id',$store_id)->get();
+		$categories = Category::where('category_store_id',$store_id)->get();
 		return view('Admin.Categories.showcategories',[
-			'categories'=>$cats,
+			'store'=>$store,
 			'stores'=>$stores,
-			'store_id'=>$store_id
+			'store_id'=>$store_id,
+			'categories'=>$categories
 			]);
 	}
 
@@ -153,12 +165,14 @@ use Logger;
 	 */
 	public function ShowCategories()
 	{
+		$store = app('store');
 		$stores = Store::all();
 		$categories = Category::all();
 		return view('Admin.Categories.showcategories',[
-			'categories'=>$categories,
+			'store'=>$store,
 			'stores'=>$stores,
-			'store_id'=>0
+			'store_id'=>0,
+			'categories'=>$categories
 			]);
 	}
 
