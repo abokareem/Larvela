@@ -1,7 +1,7 @@
 <?php
 /**
  * \class	CheckRole
- *
+ * \version	1.0.0
  *
  *
  *
@@ -18,16 +18,19 @@ class CheckRole
 
 
 	/**
-	 * Handle an incoming request.
+	 * Determine if the incoming request is a user of sufficient authority.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \Closure  $next
+	 * @param  array	$roles
 	 * @return mixed
 	 */
-	public function handle($request, Closure $next)
+	public function handle($request, Closure $next, ...$roles)
 	{
-		// Get the required roles from the route
-		$roles = $this->getRequiredRole($request->route());
+		#
+		# Get the required roles from the route - returns an array or NULL
+		#
+		#$roles = $this->getRequiredRole($request->route());
 		// Check if a role is required for the route, and
 		// if so, ensure that the user has that role.
 		if($request->user()->hasRole($roles) || !$roles)
@@ -51,7 +54,7 @@ class CheckRole
 	 * @return	mixed	array or null
 	 */
 	private function getRequiredRole($route)
-	{
+{
 		$actions = $route->getAction();
 		return isset($actions['roles']) ? $actions['roles'] : null;
 	}
