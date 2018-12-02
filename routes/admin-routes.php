@@ -7,20 +7,12 @@
 # Route::get('/path',['uses'=>'Controller@function','roles'=>'ADMIN']);
 # Route::get('/path',['uses'=>'Controller@function','roles'=>['ADMIN','USER'] ]);
 #
+# 2018
 #
-#
-Route::group(['middleware'=>['auth','roles']], function()
+Route::group(['middleware'=>['auth','roles:ADMIN,ORDERS']], function()
 {
-Route::get('/admin/mailrun/control','MailRunController@ShowPanel');
-Route::post('/admin/mailrun/control','MailRunController@StartMailRun');
-
-
-Route::get('/admin','Admin\AdminController@ShowDashboard');
-Route::get('/dashboard','Admin\AdminController@ShowDashboard');
-#
 Route::get('/admin/orders','Admin\AdminOrderController@ShowCurrentOrders');
 Route::get('/admin/order/view/{id}','Admin\AdminOrderController@ShowOrder');
-#
 #
 # TO ADD TO PROD
 Route::get('/admin/order/boitem/{id}','Admin\AdminOrderController@BackOrderAnItem');
@@ -33,6 +25,40 @@ Route::get('/admin/order/update/onhold/{id}','Admin\AdminOrderController@MarkOrd
 Route::get('/admin/order/update/waiting/{id}','Admin\AdminOrderController@MarkOrderAsWaiting');
 Route::get('/admin/order/pdf/shopinvoice/{id}','Admin\AdminOrderController@DispayPDFShopInvoice');
 Route::get('/admin/order/pdf/packingslip/{id}','Admin\AdminOrderController@DispayPDFPackingSlip');
+});
+
+
+Route::group(['middleware'=>['auth','roles:ADMIN,PRODUCTADMIN']], function()
+{
+#
+Route::get('/admin/products/select/type','Admin\AdminProductController@SelectType');
+Route::get('/admin/select/type/{id}','Admin\AdminProductController@RouteToPage');
+#
+#
+#
+Route::get('/admin/products','Admin\AdminProductController@ShowProductsPage');
+Route::get('/admin/product/addnew','Admin\AdminProductController@ShowAddProductPage');
+Route::get('/admin/product/edit/{id}','Admin\AdminProductController@ShowEditProductPage');
+#
+# 2018-09-22 use factory object in product controller to route to product
+#
+Route::post('/admin/product/save','Product\ProductController@Save');
+Route::post('/admin/product/update/{id}','Product\ProductController@Update');
+Route::post('/admin/product/delete/{id}','Product\ProductController@Delete');
+Route::get( '/admin/product/copy/{id}','Admin\AdminProductController@ShowCopyProductPage');
+Route::post('/admin/product/copy/{id}','Admin\AdminProductController@CopyProductPage');
+});
+
+
+
+Route::group(['middleware'=>['auth','roles:ADMIN']], function()
+{
+Route::get('/admin/mailrun/control','MailRunController@ShowPanel');
+Route::post('/admin/mailrun/control','MailRunController@StartMailRun');
+
+
+Route::get('/admin','Admin\AdminController@ShowDashboard');
+Route::get('/dashboard','Admin\AdminController@ShowDashboard');
 #
 #
 Route::get('/admin/images', 'ImageManagement@Show');
@@ -96,27 +122,6 @@ Route::post('/admin/category/deletecat/{id}','CategoryController@DoDeleteCategor
 #
 #
 #
-Route::get('/admin/products/select/type','Admin\AdminProductController@SelectType');
-Route::get('/admin/select/type/{id}','Admin\AdminProductController@RouteToPage');
-#
-#
-#
-Route::get('/admin/products','Admin\AdminProductController@ShowProductsPage');
-Route::get('/admin/product/addnew','Admin\AdminProductController@ShowAddProductPage');
-Route::get('/admin/product/edit/{id}','Admin\AdminProductController@ShowEditProductPage');
-#
-# 2018-09-22 use factory object in product controller to route to product
-#
-Route::post('/admin/product/save','Product\ProductController@Save');
-Route::post('/admin/product/update/{id}','Product\ProductController@Update');
-Route::post('/admin/product/delete/{id}','Product\ProductController@Delete');
-#
-#
-#
-Route::get( '/admin/product/copy/{id}','Admin\AdminProductController@ShowCopyProductPage');
-Route::post('/admin/product/copy/{id}','Admin\AdminProductController@CopyProductPage');
-#
-#
 #
 Route::get('/admin/producttypes','Product\ProductTypeController@Show');
 Route::get('/admin/producttype/edit/{id}','Product\ProductTypeController@Edit');
@@ -136,7 +141,7 @@ Route::post('/admin/seo/update/{id}','SEOController@UpdateSEO');
 Route::get('/admin/attributes','Admin\AttributesController@ShowAttributesPage');
 Route::get('/admin/attribute/addnew','Admin\AttributesController@AddNew');
 Route::get('/admin/attribute/edit/{id}','Admin\AttributesController@Edit');
-Route::get('/admin/attribute/delete','Admin\AttributesController@Delete');
+Route::get('/admin/attribute/delete/{id}','Admin\AttributesController@Delete');
 Route::post('/admin/attribute/save','Admin\AttributesController@Save');
 Route::post('/admin/attribute/update/{id}','Admin\AttributesController@Update');
 }); # end of route group
