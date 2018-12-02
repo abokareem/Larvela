@@ -55,14 +55,14 @@ protected $fillable = ['name','email','password','role_id'];
 protected $hidden = [ 'password', 'remember_token', ];
 
 
-protected $have_roles;
 
 
 	/**
-	 * Called from Middleware and passed in an array of suitable roles.
-	 *
 	 * Check if the user is an admin/root user, return true
-	 * Otherwise check if user has the role assigned.
+	 *
+	 * Called from Middleware and passed in an array of suitable roles.
+	 * Get a Collection of Role objects for the user and iterate through them.
+	 * - Otherwise check if user has the role assigned.
 	 *
 	 * @param	array	$roles
 	 * @return	boolean
@@ -74,12 +74,11 @@ protected $have_roles;
 		$assigned_roles = $this->roles;
 		foreach($assigned_roles as $ar)
 		{
-			$assigned_role = strtolower($ar->role_name);
 			if(is_array($roles))
 			{
 				foreach($roles as $role_needed)
 				{
-					if(strtolower($role_needed) == $assigned_role)
+					if(strtoupper($role_needed) == strtoupper($ar->role_name))
 					{
 						return true;
 					}
@@ -87,12 +86,7 @@ protected $have_roles;
 			}
 			else
 			{
-				if(($this->have_role->role_name == 'ADMIN')||
-					($this->have_role->role_name == 'root'))
-				{
-					return true;
-				}
-				if($assigned_role == strtolower($roles))
+				if($ar->role_name == strtoupper($roles))
 				{
 					return true;
 				}
@@ -104,7 +98,7 @@ protected $have_roles;
 
 
 	/**
-	 * User can have lots of roles
+	 * User can have lots of roles, this returns a collection of Role objects the user has.
 	 *
 	 * @return	mixed
 	 */
