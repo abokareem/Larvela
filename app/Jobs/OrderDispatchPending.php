@@ -17,9 +17,8 @@ use App\Helpers\SEOHelper;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
-use App\Models\Customer;
 use App\Models\Store;
-
+use App\Models\Customer;
 use App\Jobs\EmailUserJob;
 use App\Traits\TemplateTrait;
 
@@ -79,10 +78,10 @@ protected $order;
      */
     public function handle()
     {
-		$subject = "[LARVELA] Order Dispatch Pending email sent to [".$this->to."]a;
+		$subject = "[LARVELA] Order Dispatch Pending email sent to [".$this->email."]";
 		$text = "Notice Order Dispatch Pending email sent to [".$this->email."]";
 		$from = $this->store->store_sales_email;
 		$admin_user = Customer::find(1);
-		dispatch(new EmailUserJob($admin_user->customer_email, $from, $subject, $text);
+		dispatch(new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
     }
 }
