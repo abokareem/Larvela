@@ -50,7 +50,7 @@ Route::post('/cart/getcartdata','Ajax\CartData@GetCartData');
 #
 # 2018-09-18 Added new route
 #
-Route::post('/notify/outofstock','NotificationController@OutOfStockNotify');
+Route::post('/notify/outofstock','Ajax\OutOfStockNotify@OutOfStockNotify');
 #
 # Routes for Pages
 #
@@ -78,17 +78,15 @@ Route::get('/contact','SupportController@contact');
 # Cart/account related
 #
 Route::get('/cart', 'Cart\CartController@ShowCart');
-Route::get('/cart/incqty/{cid}/{iid}','Cart\CartController@incCartQty');
-Route::get('/cart/decqty/{cid}/{iid}','Cart\CartController@decCartQty');
 
 #
 # 2018-09-19 Split from CartController
 #
-Route::get('/checkout','CheckoutController@Checkout');
-Route::get('/shipping','CheckoutController@Shipping');
-Route::get('/confirm', 'CheckoutController@Confirm');
-Route::post('/confirm', 'CheckoutController@Confirm');
-Route::get('/cart/shipping','CheckoutController@ShowShipping');
+Route::get('/checkout','Cart\CheckoutController@Checkout');
+Route::get('/shipping','Cart\CheckoutController@Shipping');
+Route::get('/confirm', 'Cart\CartConfirm@Confirm');
+Route::post('/confirm','Cart\CartConfirm@Confirm');
+Route::get('/cart/shipping','Cart\CheckoutController@ShowShipping');
 
 #
 # Moved to Cart\CartLocking
@@ -109,12 +107,12 @@ Route::get('/myaccount', 'StoreController@ShowMyAccount');
 Route::post('/myaccount/update/{id}', 'CustomerController@UpdateMyAccount');
 
 #
-# 2016-09-05 Cart Logic
+# Cart Logic
 #
-##Route::post('/confirm','Cart\CartConfirm@Confirm');
-##Route::get('/shipping','Cart\CartController@ShowShipping');
-Route::get('/addtocart/{id}', 'Cart\CartController@addItem');
-Route::get('/removeItem/{productId}', 'Cart\CartController@removeItem');
+Route::get('/addtocart/{id}', 'Cart\CartOperations@addItem');
+Route::get('/removeItem/{productId}', 'Cart\CartOperations@removeItem');
+Route::get('/cart/incqty/{cid}/{iid}','Cart\CartOperations@incCartQty');
+Route::get('/cart/decqty/{cid}/{iid}','Cart\CartOperations@decCartQty');
 
 #
 # From footer

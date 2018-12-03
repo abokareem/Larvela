@@ -3,7 +3,7 @@
  * \class	CheckoutController
  * \date	2018-09-19
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.2
+ * \version 1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -275,53 +275,35 @@ private $user;
 	 *
 	 * @return	mixed
 	 */
-	public function Confirm()
+	public function xxConfirm()
 	{
 		$this->LogFunction("Confirm()");
-		$Product = new Product;
-		$Customer = new Customer;
-		$User = new User;
-		$CustomerAddress = new CustomerAddress;
-
-		$THEME_CART = \Config::get('THEME_CART');
-		$THEME_ERRORS = \Config::get('THEME_ERRORS');
 
 		$store = app('store');
-		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-		$this->LogMsg("Get Form Data.");
 		$form = \Input::all();
-
-		$payment_method = $form['p'];
-		$shipping_method= $form['s'];	# product ID of shipping method.. use to get cost
 		$customer_id = $form['cid'];
-
-		$this->LogMsg("Payment Method [".$payment_method."]");
-		$this->LogMsg("Shipping Method [".$shipping_method."]");
-		$this->LogMsg("CID [".$customer_id."]");
-		
 		$customer = Customer::find($customer_id);
-		$address = CustomerAddress::where('customer_cid',$customer->id)->first();
+		$this->LogMsg("Customer ID [".$customer_id."]");
 		$user = User::where('email', $customer->customer_email)->first();
-		#
-		# Cart, cart items and cart data
-		#
+		$address = CustomerAddress::where('customer_cid',$customer->id)->first();
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
 		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
 		$items = $cart->items;
-		#
-		# Build an array of products so we can pass descriptions to the required payment method if needed.
-		#
-		$products = array();	
-		$products_out_of_stock = array();
-		foreach($items as $item)
+		$products = array_map(function($item) {return( Product::find($item['product_id']) );}, $items->toArray());
+		$products_out_of_stock = array_filter( $products, function($product){if($product['prod_qty'] == 0) return $product;});
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		if(sizeof($products_out_of_stock) > 0)
 		{
-			$product = Product::find($item->product_id);
-			if($product->prod_qty == 0)
-			{
-				array_push($products_out_of_stock, $product);
-			}
-			array_push($products, $product);
+			$THEME_ERRORS = \Config::get('THEME_ERRORS');
+			$theme_path = $THEME_ERRORS."cart-item-out-of-stock";
+			return view($theme_path,[ 'store'=>$store, 'setttings'=>$settings, 'products'=>$products_out_of_stock,'user'=>$user]);
 		}
+
+		$payment_method = $form['p'];
+		$shipping_method= $form['s'];	# product ID of shipping method.. use to get cost
+		$this->LogMsg("Payment Method [".$payment_method."]");
+		$this->LogMsg("Shipping Method [".$shipping_method."]");
+		
 		$s_route = "-ship";
 		$route = "";
 
@@ -374,20 +356,21 @@ private $user;
 		$order = new \stdClass;
 		$order->order_number = substr(Session::getId(),0,8);
 
-		$theme_path = $THEME_CART.$route.$s_route;
 		#
 		# {FIX_2017-09-12} Return an error page if product is now out of stock
 		#
-		if(sizeof($products_out_of_stock) > 0)
-		{
-			$theme_path = $THEME_ERRORS."cart-item-out-of-stock";
-			return view($theme_path,[ 'store'=>$store, 'products'=>$products_out_of_stock,'user'=>$user]);
-		}
+#		if(sizeof($products_out_of_stock) > 0)
+#		{
+#			$theme_path = $THEME_ERRORS."cart-item-out-of-stock";
+#			return view($theme_path,[ 'store'=>$store, 'products'=>$products_out_of_stock,'user'=>$user]);
+#		}
 		$this->LogMsg("Call LockProducts for cart ID [".$cart->id."]");
 		
 		$cartlocking = new CartLocking;
 		$cartlocking->LockProducts($cart->id);
 
+		$THEME_CART = \Config::get('THEME_CART');
+		$theme_path = $THEME_CART.$route.$s_route;
 		$this->LogMsg("exit OK");
 
 		return view($theme_path,[

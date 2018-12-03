@@ -107,18 +107,16 @@ use Logger;
 	public function Confirm()
 	{
 		$this->LogFunction("Confirm()");
-		$Customer = new Customer;
-		$User = new User;
-		$CustomerAddress = new CustomerAddress;
 
 		$THEME_CART = \Config::get('THEME_CART');
 		$THEME_ERRORS = \Config::get('THEME_ERRORS');
 
 		$store = app('store');
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+
 		$this->LogMsg("Get Form Data.");
 		$form = \Input::all();
-
+dd($form);
 		$payment_method = $form['p'];
 		$shipping_method= $form['s'];	# product ID of shipping method.. use to get cost
 		$customer_id = $form['cid'];
@@ -210,7 +208,7 @@ use Logger;
 		if(sizeof($products_out_of_stock) > 0)
 		{
 			$theme_path = $THEME_ERRORS."cart-item-out-of-stock";
-			return view($theme_path,[ 'store'=>$store, 'products'=>$products_out_of_stock,'user'=>$user]);
+			return view($theme_path,[ 'store'=>$store, 'products'=>$products_out_of_stock,'user'=>$user,'settings'=>$settings]);
 		}
 		$this->LogMsg("Call LockProducts for cart ID [".$cart->id."]");
 		
