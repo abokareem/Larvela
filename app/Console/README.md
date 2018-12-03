@@ -1,8 +1,8 @@
 # Larvela Scheduled Tasks
 
-In order to implement the Business Automarion Features in Larvela, scheduled tasks are called using the native Laravel Framework scheduling system. This is done inside the Kernel.php file.
+In order to implement the Business Automation Features in Larvela, scheduled tasks are called using the native Laravel Framework scheduling system. This is done inside the Kernel.php file which is called every minute thanks to the CRON entry..
 
-In order to get scheduling working you need to add a Linux OS cronatab entry to call the artisan schedule:run command every minute.
+In order to get scheduling working you need to add a Linux OS crontab entry to call the artisan **schedule:run** command every minute.
 
 
 ##CRONTAB File Entry
