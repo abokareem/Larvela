@@ -44,8 +44,9 @@ use App\Http\Requests\AttributeRequest;
 
 use App\User;
 use App\Models\Store;
-use App\Models\Attribute;
 use App\Models\Customer;
+use App\Models\Attribute;
+use App\Models\AttributeValue;
 
 
 
@@ -65,6 +66,7 @@ use Logger;
 	 */
 	public function __construct()
 	{
+		$this->middleware('auth');
 		$this->setFileName("larvela-admin");
 		$this->setClassName("AttributesController");
 		$this->LogStart();
@@ -95,26 +97,22 @@ use Logger;
 		$store = app('store');
 		$stores = Store::get();
 		$attributes = Attribute::get();
-
-		return view('Admin.Attributes.showattributes',[
-			'store'=>$store,
-			'stores'=>$stores,
-			'attributes'=>$attributes
-			]);
+		return view('Admin.Attributes.showattributes',[ 'store'=>$store, 'stores'=>$stores, 'attributes'=>$attributes ]);
 	}
 
 
+	/**
+	 *
+	 * GET ROUTE: /admin/attribute/add
+	 *
+	 * @return	mixed
+	 */
 	public function AddNew()
 	{
 		$this->LogFunction("addNew()");
 		$store = app('store');
 		$stores = Store::get();
-		$attributes = Attribute::get();
-
-		return view('Admin.Attributes.add_attribute',[
-			'store'=>$store,
-			'stores'=>$stores
-			]);
+		return view('Admin.Attributes.add_attribute',[ 'store'=>$store, 'stores'=>$stores ]);
 	}
 
 
@@ -160,7 +158,6 @@ use Logger;
 
 
 	/**
-	 *
 	 * POST ROUTE:	/admin/attribute/udpate/{id}
 	 *
 	 * @param	App\Https\Requests\AttributeRequest	$request
@@ -181,9 +178,31 @@ use Logger;
 
 
 
-	public function Delete(AttributeRequest $request, $id)
+	/**
+	 * GET ROUTE:	/admin/attribute/update/{id}
+	 *
+	 * @param	integer	$id
+	 * @return	mixed
+	 */
+	public function Delete(Request $request)
 	{
-		dd($this);
+		$form = Input::all();
+		$id = $request->input('attribute_id');
+		$attribute = Attribute::find($id);
+		if(is_null($attribute))
+		{
+			\Session::flash('flash_error','Error - invalid Attribute!');
+			return redirect('/admin/attributes');
+		}
+		$count = AttributeValue::where('attr_id',$id)->count();
+		if($count != 0)
+		{
+			\Session::flash('flash_error','Unable to delete Attribute - in use!');
+			return redirect('/admin/attributes');
+		}
+		$attribute->delete();
+		\Session::flash('flash_message','Attribute deleted!');
+		return redirect('/admin/attributes');
 	}
 }
 

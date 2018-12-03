@@ -141,7 +141,7 @@ Route::post('/admin/seo/update/{id}','SEOController@UpdateSEO');
 Route::get('/admin/attributes','Admin\AttributesController@ShowAttributesPage');
 Route::get('/admin/attribute/addnew','Admin\AttributesController@AddNew');
 Route::get('/admin/attribute/edit/{id}','Admin\AttributesController@Edit');
-Route::get('/admin/attribute/delete/{id}','Admin\AttributesController@Delete');
+Route::post('/admin/attribute/delete','Admin\AttributesController@Delete');
 Route::post('/admin/attribute/save','Admin\AttributesController@Save');
 Route::post('/admin/attribute/update/{id}','Admin\AttributesController@Update');
 }); # end of route group
