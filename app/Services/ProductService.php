@@ -3,7 +3,7 @@
  * \class	ProductService
  * \date	2016-08-01
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.2
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -105,6 +105,9 @@ class ProductService
 		$o->prod_has_free_shipping = $request['prod_has_free_shipping'];
 		$o->prod_status = "A";
 		
+# $o->prod_is_taxable = $request['prod_is_taxable'];
+# $o->prod_tax_rate = $request['prod_tax_rate'];
+
 		$o->prod_date_created = date("Y-m-d");
 		$o->prod_time_created = date("H:i:s");
 		$o->prod_date_valid_from = date("Y-m-d");
@@ -146,6 +149,9 @@ class ProductService
 		$o->prod_combine_code = $request['prod_combine_code'];
 		$o->prod_type = $request['prod_type'];
 		$o->prod_has_free_shipping = $request['prod_has_free_shipping'];
+
+# $o->prod_is_taxable = $request['prod_is_taxable'];
+# $o->prod_tax_rate = $request['prod_tax_rate'];
 
 		$o->prod_date_updated = date("Y-m-d");
 		$o->prod_time_updated = date("H:i:s");
