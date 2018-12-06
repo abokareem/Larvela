@@ -110,7 +110,8 @@ use Logger;
 						foreach($items as $item)
 						{
 							$product = Product::find($item->product_id);
-							$v += $product->prod_retail_cost;
+							$this->LogMsg("Item [".$item->id."]  PID [".$item->product_id."]  QTY [".$item->qty."] SKU [".$product->prod_sku."]  Price [".$product->prod_retail_cost."]");
+							$v += $product->prod_retail_cost*$item->qty;
 							$c += $item->qty;
 						}
 						$data = array('c'=>$c,'v'=>number_format($v,2));
