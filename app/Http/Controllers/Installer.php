@@ -114,7 +114,7 @@ class Installer extends Controller
 		$hash = hash('SHA512',$app_key);
 		if($form['key_hash'] == $hash)
 		{
-			$user = User::find(1);
+			$user = User::first();
 			
 			#
 			# save Store now.
@@ -134,12 +134,12 @@ class Installer extends Controller
 			#save "Admin" Customer and connect to store...
 			#
 			$c = new Customer;
-			$c->customer_name = $user ->name;
+			$c->customer_name = $user->name;
 			$c->customer_email= $user->email;
 			$c->customer_mobile = "";
 			$c->customer_status = "A";
 			$c->customer_source_id = 1;
-			$c->customer_store_id = 1;
+			$c->customer_store_id = $s->id;
 			$c->customer_date_created = date("Y-m-d");
 			$c->save();
 			#
