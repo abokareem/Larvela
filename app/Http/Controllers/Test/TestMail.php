@@ -2,7 +2,7 @@
 /**
  * \class	TestMail
  * \date	2018-10-08
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * \addtogroup Testing
@@ -58,19 +58,17 @@ use App\Mail\OrderDispatchedEmail;
 use App\Mail\AbandonedCartEmail;
 use App\Mail\AbandonedWeekOldCartEmail;
 
-use App\Models\Customer;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Store;
-use App\Models\Product;
+use App\User;
 use App\Models\Cart;
-use App\Models\CartItem;
-use App\Models\Notification;
-use App\Models\User;
-
-
+use App\Models\Order;
+use App\Models\Store;
 use App\Models\Image;
+use App\Models\Product;
+use App\Models\CartItem;
 use App\Models\Category;
+use App\Models\Customer;
+use App\Models\OrderItem;
+use App\Models\Notification;
 use App\Models\CategoryImage;
 
 use App\Events\Larvela\AddToCartMessage;
@@ -80,7 +78,6 @@ use App\Events\Larvela\DispatcherFactory;
 
 class TestMail extends Controller
 {
-
 
 
 /*============================================================

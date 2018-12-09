@@ -27,7 +27,7 @@ use App\Jobs\AbandonedCart;
 use App\Jobs\AbandonedWeekOldCart;
 
 
-use App\Models\User;
+use App\User;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Store;

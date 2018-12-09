@@ -61,32 +61,52 @@ use App\Mail\AbandonedCartEmail;
 use App\Mail\AbandonedWeekOldCartEmail;
 use App\Mail\SendWelcomeEmail;
 
-use App\Models\Customer;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Store;
-use App\Models\Product;
+use App\User;
 use App\Models\Cart;
-use App\Models\CartItem;
-use App\Models\Notification;
-use App\Models\User;
-
-use App\Models\Attribute;
-use App\Models\AttributeProduct;
-use App\Models\AttributeValue;
-
-
-use App\Models\Category;
 use App\Models\Image;
+use App\Models\Store;
+use App\Models\Order;
+use App\Models\Product;
+use App\Models\Customer;
+use App\Models\Category;
+use App\Models\CartItem;
+use App\Models\Attribute;
+use App\Models\OrderItem;
+use App\Models\Notification;
 use App\Models\CategoryImage;
+use App\Models\AttributeValue;
+use App\Models\AttributeProduct;
+
 
 use App\Events\Larvela\AddToCartMessage;
 use App\Events\Larvela\DispatcherFactory;
 
 
+use App\Services\ProductFilters\FilterProducts;
 
+/**
+ * \brief Manually initiated test framework. Crude but effective.
+ */
 class TestController extends Controller
 {
+
+	public function test_filter_get()
+	{
+		$o = new FilterProducts;
+		echo json_encode($o->getFilters());
+	}
+
+
+	public function test_filter_products()
+	{
+		$o = new FilterProducts;
+		echo json_encode($o->ReturnProducts());
+	}
+
+
+
+
+
 
 	public function test_product_packs()
 	{

@@ -23,16 +23,16 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use App\Jobs\EmailUserJob;
 
 
-use App\Models\Customer;
-use App\Models\User;
+use App\User;
 use App\Models\Cart;
-use App\Models\CartItem;
-use App\Models\Product;
 use App\Models\Store;
+use App\Models\Product;
+use App\Models\CartItem;
+use App\Models\Customer;
 
 
-use App\Traits\TemplateTrait;
 use App\Traits\Logger;
+use App\Traits\TemplateTrait;
 
 
 /**

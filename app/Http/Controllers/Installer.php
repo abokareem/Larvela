@@ -3,7 +3,7 @@
  * \class	Installer
  * \date	2018-08-14
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.2
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -29,25 +29,38 @@
  */
 namespace App\Http\Controllers;
 
+
+use Input;
+use Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Config;
-use Input;
-
-use App\Models\Customer;
-use App\Models\Country;
-use App\Models\Store;
-use App\Models\User;
-
 use App\Http\Requests\AdminDetailsRequest;
+
+
+use App\User;
+use App\Models\Store;
+use App\Models\Country;
+use App\Models\Customer;
+
 
 
 
 /**
- * \brief Process the install views.
+ * \brief Larvela installed Business Logic, handles processing the returned data  from the installer views.
  */
 class Installer extends Controller
 {
+
+	/**
+	 * Process the  configuration data to get the ENV data for the APP_KEY
+	 * Works in 5.5 using $_ENV['APP_KEY'] but not in later versions???
+	 *
+	 * @return array
+	 */
+	public function getAppKey()
+	{
+		return $_ENV['APP_KEY'];
+	}
 
 
 	/**
@@ -64,7 +77,7 @@ class Installer extends Controller
 	{
 		$form = \Input::all();
 		$countries = Country::get();
-		$parts = explode(":",$_ENV['APP_KEY']);
+		$parts = explode(":", $this->getAppKey());
 		$app_key = substr($parts[1],0,8);
 		if($form['app_key'] == $app_key)
 		{
@@ -96,7 +109,7 @@ class Installer extends Controller
 	public function SaveStoreBasic()
 	{
 		$form = \Input::all();
-		$parts = explode(":",$_ENV['APP_KEY']);
+		$parts = explode(":", $this->getAppKey());
 		$app_key = substr($parts[1],0,8);
 		$hash = hash('SHA512',$app_key);
 		if($form['key_hash'] == $hash)
@@ -153,7 +166,7 @@ class Installer extends Controller
 	public function SaveStoreDetails()
 	{
 		$form = \Input::all();
-		$parts = explode(":",$_ENV['APP_KEY']);
+		$parts = explode(":", $this->getAppKey());
 		$app_key = substr($parts[1],0,8);
 		$hash = hash('SHA512',$app_key);
 		if($form['key_hash'] == $hash)
@@ -192,7 +205,7 @@ class Installer extends Controller
 	public function ShowStorePage()
 	{
 		$form = \Input::all();
-		$parts = explode(":",$_ENV['APP_KEY']);
+		$parts = explode(":", $this->getAppKey());
 		$app_key = substr($parts[1],0,8);
 		$hash = hash('SHA512',$app_key);
 		if($form['key_hash'] == $hash)
