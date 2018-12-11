@@ -68,4 +68,12 @@ class RegisterController extends Controller
             'password' => bcrypt($data['password']),
         ]);
     }
+
+
+	protected function showRegistrationForm(array $data)
+	{
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		return view('auth.register',['store'=>$store,'settings'=>$settings]);
+	}
 }
