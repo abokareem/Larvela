@@ -3,7 +3,7 @@
  * \class	ThemeServiceProvider
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2017-08-28
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -99,7 +99,7 @@ class ThemeServiceProvider extends ServiceProvider
 		#
 		# 3. Build Paths, test and set path, if dir does not exist then set the default path.
 		#
-		$theme_directories = array("Home","Header","Footer","Support","Includes","Errors","Product","Category","Cart");
+		$theme_directories = array("Home","Header","Footer","Support","Includes","Errors","Product","Category","Cart","Auth");
 		foreach($theme_directories as $theme_dir)
 		{
 			$theme_u_dir = "THEME_".strtoupper($theme_dir);
