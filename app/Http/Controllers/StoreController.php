@@ -3,7 +3,7 @@
  * \class	StoreController
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-09-15
- * \version	1.0.3
+ * \version	1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -184,9 +184,11 @@ use Logger;
 	 */
 	public function ShowSignUpForm()
 	{
-		$store = app('store');
 		$this->LogFunction("ShowSignUpForm()");
-		return view('auth.register',['store'=>$store]);
+
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		return view('auth.register',['store'=>$store,'settings'=>$settings]);
 	}
 }
 
