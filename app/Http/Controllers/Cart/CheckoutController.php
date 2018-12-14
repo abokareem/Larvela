@@ -3,7 +3,7 @@
  * \class	CheckoutController
  * \date	2018-09-19
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.3
+ * \version 1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -27,7 +27,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Cart;
 
 
 use Request;
@@ -39,6 +39,7 @@ use Session;
 
 use App\Services\CartLocking;
 use App\Services\ShippingFactory;
+use App\Http\Controllers\Controller;
 use App\Events\Larvela\ShowCartMessage;
 use App\Events\Larvela\AddToCartMessage;
 
@@ -97,14 +98,11 @@ private $user;
 	/**
 	 * Calculate the total weight of our cart items and the shipping options.
 	 *
-	 * @todo - Change shipping logic to possibly use Chain Of Responsilility pattern 
-	 * to ask each shipping module for the shipping options, cost and displayable description and a form id value to pass back.
+	 * /cart->/checkout->(Calc Shipping/Payment Options)
+	 * Display Options ->/confirm
+	 * Make Payment -> AJAX PlaceOrder
 	 *
-	 * cart ->SHIPPING -> confirm/payment -> purchased
-	 *        --------
-	 *
-	 * NEED TO USE A SHIPPING FACTORY TO GET AND CALCULATE SHIPPING See: app\Services\Shipping
-	 *
+	 * SHIPPING FACTORY, CALCULATE SHIPPING See: app\Services\Shipping
 	 *
 	 *
 	 * Need to: Get user's details and return them, plus shipping options
@@ -139,8 +137,9 @@ private $user;
 				$options = $free_shipping_module->Calculate($store, $user, $products, $address);
 			}
 			#
-			# $options will be NULL if there is no free shipping, in this case go and get
-			# all modules and give each a chance at returning shipping options.
+			# $options will be NULL if there is no free shipping,
+			# in this case go and get all modules and 
+			# give each a chance at returning shipping options.
 			#
 			if(sizeof($options)==0)
 			{
@@ -173,8 +172,6 @@ private $user;
 				array_push( $quantities, $item->product_id);
 			}
 		}
-		#$this->LogMsg("QTY Mappings ".print_r($qtymap,true));
-		#
 		# on exit from above qtymap[] has our unique product id's and the quantity of each.
 		#
 		$combine_codes = array();
@@ -253,141 +250,6 @@ private $user;
 			'customer'=>$customer,
 			'address'=>$address,
 			'postal_options'=>$options
-			]);
-	}
-
-
-
-	/**
-	 * Route to the appropriate payment page to collect payment at/after this view renders.
-	 * Confirm stage is after the shipping has been selected and the payment method, 
-	 *
-	 * Check and Lock products at this point... 5 minute time in CRON will ensure the products remain locked.
-	 * If QTY is zero on a product, divert to an ERROR page.
-	 *
-	 * For COD and Bank payment, show an "Accept" page.
-	 * For CC and PP payment, display text and request them to press the button.
-	 *
-	 *
-	 *
-	 * cart ->shipping -> CONFIRM/PAYMENT -> purchased
-	 *                    ---------------
-	 *
-	 * @return	mixed
-	 */
-	public function xxConfirm()
-	{
-		$this->LogFunction("Confirm()");
-
-		$store = app('store');
-		$form = \Input::all();
-		$customer_id = $form['cid'];
-		$customer = Customer::find($customer_id);
-		$this->LogMsg("Customer ID [".$customer_id."]");
-		$user = User::where('email', $customer->customer_email)->first();
-		$address = CustomerAddress::where('customer_cid',$customer->id)->first();
-		$cart = Cart::where('user_id',Auth::user()->id)->first();
-		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
-		$items = $cart->items;
-		$products = array_map(function($item) {return( Product::find($item['product_id']) );}, $items->toArray());
-		$products_out_of_stock = array_filter( $products, function($product){if($product['prod_qty'] == 0) return $product;});
-		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-		if(sizeof($products_out_of_stock) > 0)
-		{
-			$THEME_ERRORS = \Config::get('THEME_ERRORS');
-			$theme_path = $THEME_ERRORS."cart-item-out-of-stock";
-			return view($theme_path,[ 'store'=>$store, 'setttings'=>$settings, 'products'=>$products_out_of_stock,'user'=>$user]);
-		}
-
-		$payment_method = $form['p'];
-		$shipping_method= $form['s'];	# product ID of shipping method.. use to get cost
-		$this->LogMsg("Payment Method [".$payment_method."]");
-		$this->LogMsg("Shipping Method [".$shipping_method."]");
-		
-		$s_route = "-ship";
-		$route = "";
-
-		$this->LogMsg("Work out Payment Method - Route");
-
-		#
-		#  @todo Redesign to use route factory or call payment gateways to get the route for each gateway
-		#
-		switch($payment_method)
-		{
-			case "0":
-				$this->LogMsg("pay by COD");
-				$route = "3-pay-by-cod";
-				break;
-			case "BD":
-				$this->LogMsg("pay by EFT");
-				$route = "3-pay-by-eft";
-				break;
-			case "PP":
-				$this->LogMsg("pay by paypal selected");
-				$route = "3-pay-by-pp";
-				break;
-			case "CC":
-				$this->LogMsg("pay by Credit Card");
-				$route = "3-pay-by-cc";
-				break;
-		}
-		$cart_data->cd_payment_method = $payment_method;
-		$cart_data->cd_shipping_method = $shipping_method;
-
-		$product = Product::find($shipping_method);
-		$shipping_cost = 0;
-		if(!is_null($product))
-		{
-			$this->LogMsg("Found shipping product");
-			$shipping_cost = $product->prod_retail_cost;
-		}
-		else
-		{
-			$this->LogMsg("Default to Pickup");
-			$s_route="-pickup";	# no product so must be local pickup
-		}
-		$cart_data->cd_shipping = $shipping_cost;
-		$cart_data->cd_total = $cart_data->cd_sub_total+$shipping_cost;
-		$cart_data->save();
-
-		#
-		# temp order object
-		#
-		$order = new \stdClass;
-		$order->order_number = substr(Session::getId(),0,8);
-
-		#
-		# {FIX_2017-09-12} Return an error page if product is now out of stock
-		#
-#		if(sizeof($products_out_of_stock) > 0)
-#		{
-#			$theme_path = $THEME_ERRORS."cart-item-out-of-stock";
-#			return view($theme_path,[ 'store'=>$store, 'products'=>$products_out_of_stock,'user'=>$user]);
-#		}
-		$this->LogMsg("Call LockProducts for cart ID [".$cart->id."]");
-		
-		$cartlocking = new CartLocking;
-		$cartlocking->LockProducts($cart->id);
-
-		$THEME_CART = \Config::get('THEME_CART');
-		$theme_path = $THEME_CART.$route.$s_route;
-		$this->LogMsg("exit OK");
-
-		return view($theme_path,[
-			'store'=>$store,
-			'setttings'=>$settings,
-			'cart'=>$cart,
-			'cart_data'=>$cart_data,
-			'items'=>$items,
-			'products'=>$products,
-			'user'=>$user,
-			'customer'=>$customer,
-			'address'=>$address,
-			'shipping'=>$product,	# the postage product being used.
-			# @todo - add bank code when built
-			#'bank_details'=>$bank_details,
-			#
-			'order'=>$order
 			]);
 	}
 }
