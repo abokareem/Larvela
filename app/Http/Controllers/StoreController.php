@@ -37,15 +37,14 @@ use Input;
 use Session;
 
 
+use App\Models\Store;
+use App\Models\Customer;
+use App\Models\CustSource;
+use App\Models\StoreSetting;
+use App\Services\StoreService;
+use App\Models\CustomerAddress;
 use App\Http\Requests\StoreRequest;
 
-use App\Services\StoreService;
-
-use App\Models\Store;
-use App\Models\StoreSetting;
-use App\Models\Customer;
-use App\Models\CustomerAddress;
-use App\Models\CustSource;
 
 use App\Traits\Logger;
 /**

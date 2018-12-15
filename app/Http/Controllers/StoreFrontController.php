@@ -56,7 +56,6 @@ use App\Models\ProdImageMap;
 use App\Models\AttributeValue;
 use App\Models\CategoryProduct;
 use App\Models\AttributeProduct;
-use App\Jobs\ConfirmSubscription;
 
 use App\Services\ProductFilters\FilterProducts;
 
@@ -76,6 +75,7 @@ use App\Traits\ProductImageHandling;
  * {INFO_2017-10-28} "StoreFrontController.php" - Refactored to use new classes.
  * {INFO_2018-01-13} "StoreFrontController.php" - Added support for attributes such as size on front page.
  * {INFO_2018-09-12} "StoreFrontController.php" - Removed ShowProductPage into its own controller.
+ * {INFO_2018-11-28} "StoreFrontController.php" - Moved AJAX code to separate controller.
  */
 class StoreFrontController extends Controller
 {
@@ -137,12 +137,10 @@ use PathManagementTrait;
 				return view('Install.install-1');
 			}
 		}
-
 		$store = app('store');
-
 		$filter = new FilterProducts;
 		$products = $filter->ReturnProducts();
-		$categories = Category::where('category_store_id',$store->id)->get();
+		$categories = Category::where('category_store_id',$store->id)->where('category_status','A')->get();
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$attributes = Attribute::where('store_id',$store->id)->get()->toArray();
 		$attribute_values = AttributeValue::get();
@@ -378,52 +376,5 @@ use PathManagementTrait;
 				'current_store'=>$current_store,
 				'settings'=>$settings ]);
 		}
-	}
-
-
-
-
-
-	/**
-	 * AJAX REQUEST -  Count number of items in cart and totalize the cost, return it as JSON data.
-	 *
-	 * Returns "C" for count of items in cart and "V" for the value of the items (Formatted)
-	 *
-	 * @return string JSON data with status code
-	 */
-	public function GetCartData()
-	{
-		$this->LogFunction("GetCartData()");
-
-		$c = 0;
-		$v = 0;
-		if(Request::ajax())
-		{
-			$this->LogMsg("AJAX request OK");
-			if(Auth::check())
-			{
-				$this->LogMsg("Auth check OK");
-				$cart = Cart::where('user_id',Auth::user()->id)->first();
-				if($cart)
-				{
-					$this->LogMsg("cart oK");
-					$items = $cart->items;
-					if(!is_null($items))
-					{
-						$this->LogMsg("cart has [".sizeof($items)."] items");
-						foreach($items as $item)
-						{
-							$product = Product::find($item->product_id);
-							$v += $product->prod_retail_cost;
-							$c += $item->qty;
-						}
-						$data = array('c'=>$c,'v'=>number_format($v,2));
-						return json_encode($data);
-					}
-				}
-			}
-		}
-		$data = array('c'=>0,'v'=>0);
-		return json_encode($data);
 	}
 }
