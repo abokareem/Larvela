@@ -1,41 +1,59 @@
 <?php
 
+#======================================================================
+#
+# REFACTOR ALL CALLS FROM Cart to be 1 call, PurchaseController@Purchase
+# this needs to raise an order from the given cart->id and then,
+# determine the payment chosen from the cart data
+#
+# 2018-12-06 New Checkout-Confirm-Purchase-Order
+#
+Route::post('/ajax/placeorder/{id}', 'Ajax\PlaceOrder@PlaceOrder');
+#
 #
 # Purchase done - now save an order
 #
-Route::get( '/payment/etf/{id}', 'OrderController@DelayedPurchase');
-Route::post('/payment/etf/{id}', 'OrderController@DelayedPurchase');
-Route::post('/purchased', "OrderController@Purchase");
+Route::get( '/payment/etf/{id}', 'Order\OrderController@DelayedPurchase');
+Route::post('/payment/etf/{id}', 'Order\OrderController@DelayedPurchase');
+#
+#
+#
+Route::post('/purchased', "Order\OrderController@Purchase");
 #
 # Paypal payment, could be instant or from item(s) in cart
 # AJAX calls
 #
-Route::post('/instant/order/{id}',  'OrderController@InstantPaypalPurchase');
-Route::post('/cart/order/{id}',  'OrderController@CartPaypalPurchase');
+Route::post('/instant/order/{id}',  'Order\OrderController@InstantPaypalPurchase');
+Route::post('/cart/order/{id}',  'Order\OrderController@CartPaypalPurchase');
 #
 #
 #
-Route::post('/order/save/{id}',  'OrderController@PurchaseMadeSaveOrder');
-Route::post('/payment/pp/{id}',  'OrderController@PaypalPurchase');
-Route::post('/payment/cc/{id}',  'OrderController@CCPurchase');
-Route::post('/payment/cod/{id}', 'OrderController@DelayedPurchase');
+Route::post('/order/save/{id}',  'Order\OrderController@PurchaseMadeSaveOrder');
+Route::post('/payment/pp/{id}',  'Order\OrderController@PaypalPurchase');
+Route::post('/payment/cc/{id}',  'Order\OrderController@CCPurchase');
+Route::post('/payment/cod/{id}', 'Order\OrderController@DelayedPurchase');
 #
 #
 #
-/**
- * Laravel routes files for a 5.3.x installation
- */
- // Authentication Routes...
+#
+# Laravel routes files for a 5.3.x installation
+#Notes: Test ing v5.7 show cluse causes issues... need to refactor this block.
+#
 $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
 $this->get('auth/login', 'Auth\LoginController@showLoginForm')->name('login');
 $this->post('login', 'Auth\LoginController@login');
 $this->post('auth/login', 'Auth\LoginController@login');
 $this->post('logout', 'Auth\LoginController@logout')->name('logout');
 
+Route::get('/auth/logout', function(){ Auth::logout(); return Redirect::to('/');});
+
 // Registration Routes...
 $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name('register');
 $this->post('register', 'Auth\RegisterController@register');
 
+#
+# @todo Move these to Ajax\DumpPaymentData.php
+#
 Route::post('/ajax/payment','AjaxController@dumpajax');
 Route::get('/ajax/payment','AjaxController@dumpajax');
 
@@ -89,10 +107,9 @@ Route::post('/confirm','Cart\CartConfirm@Confirm');
 Route::get('/cart/shipping','Cart\CheckoutController@ShowShipping');
 
 #
-# Moved to Cart\CartLocking
 #
-Route::post('/ajax/updatelocks/{id}','Cart\CartLocking@UpdateLocks');
-Route::post('/cart/updatelocks/{id}','Cart\CartLocking@UpdateLocks');
+Route::post('/ajax/updatelocks/{id}','Ajax\UpdateLock@UpdateLock');
+Route::post('/cart/updatelocks/{id}','Ajax\UpdateLock@UpdateLock');
 
 #
 # Error Trapping
@@ -106,25 +123,30 @@ Route::get('/signup', 'StoreController@ShowSignUpForm');
 Route::get('/myaccount', 'StoreController@ShowMyAccount');
 Route::post('/myaccount/update/{id}', 'CustomerController@UpdateMyAccount');
 
+
+
+#======================================================================
 #
-# Cart Logic
+# Cart Basic Operations
 #
 Route::get('/addtocart/{id}', 'Cart\CartOperations@addItem');
 Route::get('/removeItem/{productId}', 'Cart\CartOperations@removeItem');
 Route::get('/cart/incqty/{cid}/{iid}','Cart\CartOperations@incCartQty');
 Route::get('/cart/decqty/{cid}/{iid}','Cart\CartOperations@decCartQty');
 
+
+#======================================================================
 #
 # From footer
 #
-Route::post('/subscribe','SubscriptionController@AddNewSubscription');
+Route::post('/subscribe','Subscription\SubscriptionController@AddNewSubscription');
 #
 # Called via links in email
 #
-Route::get( '/confirmed/{hash}', 'SubscriptionController@ProcessConfirmed');
-Route::get( '/unsubscribe/{hash}','SubscriptionController@UnSubscribe');
+Route::get( '/confirmed/{hash}', 'Subscription\SubscriptionController@ProcessConfirmed');
+Route::get( '/unsubscribe/{hash}','Subscription\SubscriptionController@UnSubscribe');
+#
 
-Route::get('/auth/logout', function(){ Auth::logout(); return Redirect::to('/');});
 #
 # End of file
 #
