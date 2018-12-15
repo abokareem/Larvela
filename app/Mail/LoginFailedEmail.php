@@ -90,7 +90,14 @@ private $ACTION="login_failed";
 		$this->email = $email;
 		$this->customer = Customer::where('customer_email', $email)->first();
 		$this->template = "Mail.".$this->store->store_env_code.".".$this->ACTION;
-		$this->hash = $this->customer->id."-".hash('ripemd160', $email.$store->store_env_code);
+		if(!is_null($this->customer))
+		{
+			$this->hash = $this->customer->id."-".hash('ripemd160', $email.$store->store_env_code);
+		}
+		else
+		{
+			$this->hash = "-".hash('ripemd160', $email.$store->store_env_code);
+		}
     }
 
 
