@@ -3,7 +3,7 @@
  * \class	CartData
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-11-28
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -114,13 +114,11 @@ use Logger;
 							$v += $product->prod_retail_cost*$item->qty;
 							$c += $item->qty;
 						}
-						$data = array('c'=>$c,'v'=>number_format($v,2));
-						return json_encode($data);
+						return json_encode(array('c'=>$c,'v'=>number_format($v,2)));
 					}
 				}
 			}
 		}
-		$data = array('c'=>0,'v'=>0);
-		return json_encode($data);
+		return json_encode(array('c'=>0,'v'=>0));
 	}
 }
