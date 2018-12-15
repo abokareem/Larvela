@@ -7,6 +7,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
 
+use App\Models\Role;
+
+
+
 class RegisterController extends Controller
 {
     /*
@@ -62,18 +66,20 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+		$customer_role = Role::where('role_name',"CUSTOMER")->first();
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => bcrypt($data['password']),
+			'role_id'=>$customer_role->id,
         ]);
     }
 
 
-	protected function showRegistrationForm(array $data)
-	{
-		$store = app('store');
-		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-		return view('auth.register',['store'=>$store,'settings'=>$settings]);
-	}
+#	protected function showRegistrationForm(array $data)
+#	{
+#		$store = app('store');
+#		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+#		return view('auth.register',['store'=>$store,'settings'=>$settings]);
+#	}
 }
