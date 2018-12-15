@@ -137,7 +137,6 @@ use Logger;
 			}
 		}
 		$this->LogMsg("return FAIL response.");
-		$data = array('S'=>'FAIL', 'status'=>'FAIL');
-		return json_encode($data);
+		return json_encode(array('S'=>'FAIL', 'status'=>'FAIL'));
 	}
 }

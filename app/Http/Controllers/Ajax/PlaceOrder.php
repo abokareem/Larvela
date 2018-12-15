@@ -36,16 +36,19 @@ use App\Http\Requests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 #use Illuminate\Support\Facades\Request;
+use App\Events\Larvela\PlaceOrderMessage;
 
 
 use App\User;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Jobs\OrderPaid;
 use App\Models\Customer;
 use App\Models\CartData;
 use App\Models\CartItem;
 use App\Models\OrderItem;
 use App\Jobs\OrderPlaced;
+use App\Mail\OrderPaidEmail;
 use App\Mail\OrderPlacedEmail;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
@@ -122,20 +125,23 @@ use Logger;
 			$order = $this->CreateOrder($customer,$cartdata,$cartitems,$payment_ref);
 			dispatch(new OrderPlaced($store,$customer->customer_email, $order));
 			Mail::to($customer->customer_email)->send(new OrderPlacedEmail($store, $customer->customer_email, $order));
-			$data = array("S"=>"OK","C"=>$id,"CD"=>$cartdata->id,"CI"=>sizeof($cartitems),"Order"=>$order->id);
-	        return json_encode($data);
+			if(sizeof($payment_ref)>0)
+			{
+				dispatch(new OrderPaid($store, $customer->customer_email, $order));
+				Mail::to($customer->customer_email)->send(new OrderPaidEmail($store,$customer->customer_email,$order));
+			}
+	        return json_encode(array("S"=>"OK","C"=>$id,"CD"=>$cartdata->id,"CI"=>sizeof($cartitems),"Order"=>$order->id));
 		}
 		else
 		{
-			$data = array("S"=>"ERROR", "C"=>0);
-	        return json_encode($data);
+	        return json_encode(array("S"=>"ERROR", "C"=>0));
 		}
 	}
 
 
 
 	/**
-	 *
+	 * Call by AJAX method to Create an Order which may be paid or not.
 	 *
 	 * @param	App\Models\Customer	$customer
 	 * @param	App\Models\CartData	$crtdata

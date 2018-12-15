@@ -27,13 +27,18 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-namespace App\Http\Controllers\Cart;
+namespace App\Http\Controllers\Ajax;
 
 
+use Auth;
+use Input;
+use App\Http\Requests;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Request;
 
-use App\Http\Controllers\Controller;
-use App\Models\ProductLock;
 use App\Traits\Logger;
+use App\Models\ProductLock;
+use App\Http\Controllers\Controller;
 
 
 /** 
@@ -89,13 +94,11 @@ use Logger;
 			$o->product_lock_utime = $time;
 			$cnt = $o->save();
 			$this->LogMsg("Count -> ".$cnt);
-			$data = array("S"=>"OK","C"=>$cnt);
-	        return json_encode($data);
+	        return json_encode(array("S"=>"OK","C"=>$cnt));
 		}
 		else
 		{
-			$data = array("S"=>"ERROR", "C"=>0);
-	        return json_encode($data);
+	        return json_encode(array("S"=>"ERROR", "C"=>0));
 		}
 	}
 }
