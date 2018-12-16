@@ -25,8 +25,8 @@
 
 # sandbox: 'AZDxjDScFpQtjWTOUtWKbyN_bDt4OgqaF4eYXlewfBP4-8aqX3PiV8e1GWU6liB2CUXlkA59kJXE7M6R'
 $token = csrf_token();
-$shipping = "0.00";
-if($product->prod_has_free_shipping == 0) $shipping = "8.40";
+$shipping = 0;
+if($product->prod_has_free_shipping == 0) $shipping = 840;
 ?>
 
 <style>
@@ -258,7 +258,7 @@ paypal.Button.render({
 		payment:
 		{
 			transactions:[{ 
-				amount: { total:'{{ number_format($product->prod_retail_cost,2)+$shipping }}', currency:'AUD',
+				amount: { total:'{{ number_format(($product->prod_retail_cost+$shipping),2) }}', currency:'AUD',
 					details:{
 						'subtotal':'{{ number_format($product->prod_retail_cost,2)}}',
 						'tax':'0.00',
