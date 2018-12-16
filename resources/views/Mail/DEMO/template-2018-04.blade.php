@@ -5,9 +5,9 @@
 <body bgcolor='white'>
 <div align="center">
 	@yield('pre-header')
-	@include('Mail.RD.header')
+	@include('Mail.DEMO.header')
 	@yield('content')
-	@include('Mail.RD.footer')
+	@include('Mail.DEMO.footer')
 </div>
 </body>
 </html>

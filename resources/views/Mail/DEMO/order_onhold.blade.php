@@ -1,4 +1,4 @@
-@extends('Mail.{{ $store->store_code }}.template-2018-04')
+@extends('Mail.{{ $store->store_code }}.template')
 
 @section("content")
 

@@ -1,4 +1,4 @@
-@extends('Mail.RD.template-2018-04')
+@extends('Mail.DEMO.template')
 @section("content")
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
@@ -18,7 +18,7 @@ If you have any inquiries don't hesitate to contact me on <b>{{$store->store_con
 If you want to email me then add {{ $store->store_sales_email}} to your contact list and I will respond promptly!<br/>
 <br/>
 <br/>
-@IncludeIf('Mail.RD.block-cart-items-table')
+@IncludeIf('Mail.DEMO.block-cart-items-table')
 <br/>
 <br/>
 Hopefully you will be back so I will keep the items in the cart for you for the next few weeks.<br/>

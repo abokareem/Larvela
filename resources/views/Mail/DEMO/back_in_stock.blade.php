@@ -1,4 +1,4 @@
-@extends('Mail.RD.template-2018-04')
+@extends('Mail.DEMO.template')
 @section("pre-header")
 	<link href='http://fonts.googleapis.com/css?family=Courgette' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>

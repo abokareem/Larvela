@@ -1,4 +1,4 @@
-@extends('Mail.RD.template-2018-04')
+@extends('Mail.DEMO.template')
 @section("content")
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
 <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
@@ -15,13 +15,13 @@ We will aim to dispatch it promptly! keep an eye out for more status emails lett
 <p style="text-align:center;font-family: 'Open+Sans', sans-serif;font-size:18px;">
 <table>
 	<tr valign="top">
-		<td valign="top" width="33%">@IncludeIf('Mail.RD.block-customer-details')</td>
+		<td valign="top" width="33%">@IncludeIf('Mail.DEMO.block-customer-details')</td>
 		<td valign="top" width="34%"> </td>
-		<td valign="top" width="33%">@IncludeIf('Mail.RD.block-order-details')</td>
+		<td valign="top" width="33%">@IncludeIf('Mail.DEMO.block-order-details')</td>
 	</tr>
 </table>
 
-@IncludeIf('Mail.RD.block-order-items-table')
+@IncludeIf('Mail.DEMO.block-order-items-table')
 <br/>
 <br/>
 <br/>

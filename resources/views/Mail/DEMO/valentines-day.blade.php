@@ -1,4 +1,4 @@
-@extends('Mail.RD.template-2018-04')
+@extends('Mail.DEMO.template')
 
 @section('pre-header')
 <div align="center">
