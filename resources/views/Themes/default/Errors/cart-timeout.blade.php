@@ -4,13 +4,15 @@
 <div class="container">
 
 	<div class="row">
-		<div class="col-xs-12" style="padding:20px;" align="center">
-			<h3 style="color:red;">Cart Timeout Alert!</h3>
+		<div class="col-xs-12 text-center p-3">
+			<h3 class="text-red">Cart Timeout Alert!</h3>
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-xs-12" align="center">
-			<p style="font-size:18px; font-family:'Open Sans';">Once you have gone through the majority of the checkout process you need to Accept payment. If you sit on the final stage and do not complete a payment action then the products you have in your cart remain locked from purchase. To prevent this, you are given a reasonable amount of time to complete payment. To arrive at this page you have exceeded that time span and the cart items are being released back so someone else can purchase them.</p><br/>
+		<div class="col-xs-12 text-left p-3">
+			<p class="text-black text-2xl">Once you have gone through the majority of the checkout process you need to <b>Accept payment</b>.<br>
+			If you sit on the final stage and do not complete a payment action then the products you have in your cart remain locked from purchase.<br>
+			To prevent this, you are given a reasonable amount of time to complete payment. To arrive at this page <b class="text-red">you have exceeded the time allowed</b> and the cart items are being released back so someone else can purchase them.</p>
 		</div>
 	</div>
 

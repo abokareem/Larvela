@@ -2,15 +2,15 @@
 @section("content")
 
 <div class="container">
-
 	<div class="row">
-		<div class="col-xs-12" style="padding:20px;" align="center">
-			<h3 style="color:red;">Out of stock Alert!</h3>
+		<div class="col-xs-12 p-3 text-center">
+			<h1 class="text-red">Out of stock Alert!</h1>
 		</div>
 	</div>
 	<div class="row">
-		<div class="col-xs-12" align="center">
-			<p style="font-size:18px; font-family:'Open Sans';">Someone has beaten you and purchased one or more items that you have selected.<br/>Please select another item or variation or you can elect to be notified when its back in stock.</p><br/>
+		<div class="col-xs-12 p-3">
+			<p class="text-black 3xl">Someone has beaten you and purchased one or more items that you have selected.<br/>
+			Please select another item or variation or you can elect to be notified when its back in stock.</p>
 		</div>
 	</div>
 

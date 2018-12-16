@@ -2,17 +2,17 @@
 @section("content")
 
 
-<div class="container prodpage-block">
-
+<div class="container">
 	<div class="row">
-		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-			<h1 style="color:red;">hmmmm.....</h1>
+		<div class="col-xs-12">
+			<h1 class="text-red">Page or Route not Found!</h1>
 		</div>
 	</div>
 
 	<div class="row">
-		<div class="col-xs-12" style="padding:50px;">
-			<h3 style="color:red;">That page does not exist, click the logo to get back to the Home Page.</h3>
+		<div class="col-xs-12 p-3">
+			<p class="text-black text-3xl">The requested page does not exist.<br>
+			You either typed it in wrong or we have a malfunction..... :(</p>
 		</div>
 	</div>
 </div>

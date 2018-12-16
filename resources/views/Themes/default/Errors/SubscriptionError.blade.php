@@ -2,21 +2,21 @@
 @section("content")
 
 
-<div class="container prodpage-block">
+<div class="container">
 
 	<div class="row">
-		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-			<h1 style="color:red;">hmmmm.....</h1>
+		<div class="col-xs-12">
+			<h1 class="text-red">Subscription Routing Error</h1>
 		</div>
 	</div>
 
 	<div class="row">
-		<div class="col-xs-12" style="padding:50px;">
-			<h3 style="color:red;">There appears to be an error!</h3>
+		<div class="col-xs-12 p-3">
+			<p class="text-black text-3xl">There appears to be an error with the subscription record or the route used to retrieve it..... :(</p>
 		</div>
 	</div>
 </div>
 
-<script>setTimeout(function(){window.location.href="/"},5000);</script>
+<script>setTimeout(function(){window.location.href="/"},6000);</script>
 
 @stop
