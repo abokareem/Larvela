@@ -17,7 +17,7 @@ public $table="currencies";
             exit('Exiting due to production environment!');
         }
 
-        DB::table($table)->truncate();
+        DB::table($this->table)->truncate();
 
         Currency::create(['id'=>1,'currency_code'=>'AUD','currency_name'=>'Australian Dollar','currency_numeric'=>1]);
         Currency::create(['id'=>2,'currency_code'=>'CAD','currency_name'=>'Canadian Dollar','currency_numeric'=>2]);
