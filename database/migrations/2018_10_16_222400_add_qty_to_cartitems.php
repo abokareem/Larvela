@@ -15,7 +15,7 @@ class AddQtyToCartitems extends Migration
     {
 		Schema::table('cart_items', function($table)
 		{
-			$table->integer('customer_address')->unsigned();
+			$table->integer('qty');
 		});
     }
 
