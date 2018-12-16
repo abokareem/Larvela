@@ -24,7 +24,6 @@ class CreateCategoriesTable extends Migration
 			$table->string('category_visible');
 			$table->unsignedInteger('category_store_id')->nullable();
         });
-		DB::table('category')->insert(['id'=>1,'category_url'=>'','category_title'=>'Demo','category_description'=>'Demo Category','category_status'=>'A']);
     }
 
     /**
