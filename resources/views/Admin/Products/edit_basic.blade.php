@@ -215,11 +215,11 @@
 						<h4>Upload Display Images</h4>
 						<div class="input-group">
 							<label class="input-group-btn">
-								<span class="btn btn-primary"> Browse&hellip; <input type="file" name[]="file" id="file" style="display: none;" multiple></span>
+								<span class="btn btn-primary"> Browse&hellip; <input type="file" name="images[]" id="file" style="display: none;" multiple></span>
 							</label>
 							<input type="text" class="form-control" readonly>
 						</div>
-						<span class="help-block">Select files that will be downloaded at purchase time...</span>
+						<span class="help-block">Select files that will be displayed...</span>
 					</div>
 				</div>
 			</div>
@@ -319,6 +319,7 @@ $(function(){$(document).on('change',':file',function()
 });
 $("#file").on('fileselect',function(event, numFiles, label)
 {
+console.log("File tag hit");
 	var input = $(this).parents('.input-group').find(':text'),
 		log = numFiles > 1 ? numFiles + ' files selected' : label;
 	if(input.length) { input.val(log); } else { if( log ) alert(log); }

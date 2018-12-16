@@ -181,10 +181,16 @@
 		<div class='tab-pane' id='images'>	
 			<div class="row">
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-2">Main Product Image:</label>
-					<div class="col-xs-10">
-						<input name="file" type="file" id="file">
-						<button id='btnclear' type="button" class="btn btn-warning">Clear Image Selection</button>
+					<label class="control-label col-xs-12 col-sm-2">&nbsp;</label>
+					<div class="col-xs-12 col-sm-8">
+						<h4>Upload Display Images:</h4>
+						<div class="input-group">
+							<label class="input-group-btn">
+								<span class="btn btn-primary"> Browse&hellip; <input type="file" id="file" name="images[]" style="display: none;" multiple></span>
+							</label>
+							<input type="text" class="form-control" readonly>
+						</div>
+						<span class="help-block">Select files that will be downloaded at purchase time...</span>
 					</div>
 				</div>
 			</div>
@@ -192,7 +198,7 @@
 
 		<div class="row">
 			<div class="form-group">
-				<label class="control-label col-xs-12 col-sm-2"> </label>
+				<label class="control-label col-xs-12 col-sm-2">&nbsp;</label>
 				<div class="col-xs-12">
 					<button id='btnsave'   type="button" class="btn btn-success">Add Product</button>
 					<button id='btncancel' type="button" class="btn btn-warning">Cancel</button>

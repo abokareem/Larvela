@@ -266,10 +266,17 @@ function IsChecked($id, $items)
 			@endif
 			<div class="row">
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-2">Image:</label>
-					<div class="col-xs-3">
-					<input name="file" type="file" id="file">
-					<label class="btn btn-default btn-file"> </label>
+					<label class="control-label col-xs-12 col-sm-2">&nbsp;</label>
+					<div class="col-xs-12 col-sm-8">
+						<h4>Upload Display Images:</h4>
+						<div class="input-group">
+							<label class="input-group-btn">
+								<span class="btn btn-primary"> Browse&hellip; <input type="file" id="file" name="images[]" style="display: none;" multiple></span>
+							</label>
+							<input type="text" class="form-control" readonly>
+						</div>
+						<span class="help-block">Select files that will be displayed to customers...</span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -319,6 +326,23 @@ $('#edit').validate(
 		prod_short_desc: { required: true, minlength: 7 },
 		prod_long_desc: { required: true, minlength: 7 }
 	}
+});
+
+
+
+$(function(){$(document).on('change',':file',function()
+{
+	var input = $(this),
+		numFiles = input.get(0).files ? input.get(0).files.length : 1,
+		label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+		input.trigger('fileselect', [numFiles, label]);
+	});
+});
+$("#file").on('fileselect', function(event, numFiles, label)
+{
+	var input = $(this).parents('.input-group').find(':text'),
+		log = numFiles > 1 ? numFiles + ' files selected' : label;
+	if(input.length) { input.val(log); } else { if( log ) alert(log); }
 });
 
 
