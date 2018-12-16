@@ -3,7 +3,7 @@
  * \class	Installer
  * \date	2018-08-14
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.3
+ * \version	1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -39,6 +39,7 @@ use App\Http\Requests\AdminDetailsRequest;
 
 use App\User;
 use App\Models\Store;
+use App\Models\Currency;
 use App\Models\Country;
 use App\Models\Customer;
 
@@ -142,10 +143,7 @@ class Installer extends Controller
 			$c->customer_store_id = $s->id;
 			$c->customer_date_created = date("Y-m-d");
 			$c->save();
-			#
-			# @todo Move these to a Table we seed at install time
-			#
-			$currency = array('USD','AUD','GBP','EURO','NZD','YEN');
+			$currency = Currency::get();
 			return view("Install.install-3",['key_hash'=>$hash,'store'=>$s,'currency'=>$currency]);
 		}
 		return view("Install.install-2");
@@ -211,12 +209,15 @@ class Installer extends Controller
 		if($form['key_hash'] == $hash)
 		{
 			$s = Store::find($form['id']);
-			$currency = array('USD','AUD','GBP','EURO','NZD','YEN');
+			$currency = Currency::get();
 			$countries = Country::get();
 			$tzdata = explode("/",date_default_timezone_get());
 			return view("Install.install-2",[
-				'key_hash'=>$hash,'store'=>$s,'currency'=>$currency,'countries'=>$countries,'tzdata'=>$tzdata[0]
-				]);
+				'key_hash'=>$hash,
+				'store'=>$s,
+				'currency'=>$currency,
+				'countries'=>$countries,
+				'tzdata'=>$tzdata[0] ]);
 		}
 		return view("Install.install-1");
 	}
