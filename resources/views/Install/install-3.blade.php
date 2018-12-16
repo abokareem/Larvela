@@ -45,7 +45,7 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Store URL::</label>
 				<div class="col-xs-12 col-sm-4">
-					<input type="text" class="form-control" id='store_url' name="store_url" value="">
+					<input type="text" class="form-control" id='store_url' name="store_url" value="" placeholder="https://your-site-here.xyz">
 				</div>
 			</div>
 			<div class="form-group">
@@ -69,18 +69,18 @@
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Address:</label>
 				<div class="col-xs-12 col-sm-8">
-					<input type="text" class="form-control" id='store_address' name="store_address" value="">
+					<input type="text" class="form-control" id='store_address' name="store_address" value="" placeholder="your street address">
 				</div>
 			</div>
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Address 2:</label>
 				<div class="col-xs-12 col-sm-8">
-					<input type="text" class="form-control" id='store_address2' name="store_address2" value="">
+					<input type="text" class="form-control" id='store_address2' name="store_address2" value="" placeholder="suburb, postcode and state">
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="control-label col-xs-12 col-sm-2">Default Currency:</label>
-				<div class="col-xs-12 col-sm-2">
+				<label class="control-label col-xs-12 col-sm-4">Default Currency:</label>
+				<div class="col-xs-12 col-sm-4">
 					<select class="form-control" id="store_currency" name="store_currency">
 					@foreach($currency as $c)
 						<option value="{{$c->currency_code}}">{{$c->currency_name}}</option>
