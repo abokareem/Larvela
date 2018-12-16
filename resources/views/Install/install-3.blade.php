@@ -83,7 +83,7 @@
 				<div class="col-xs-12 col-sm-2">
 					<select class="form-control" id="store_currency" name="store_currency">
 					@foreach($currency as $c)
-						<option value="{{$c}}">{{$c}}</option>
+						<option value="{{$c->currency_code}}">{{$c->currency_name}}</option>
 					@endforeach
 					</select>
 				</div>
@@ -94,7 +94,6 @@
 				<label class="control-label col-xs-12 col-sm-2">&nbsp;</label>
 				<div class="col-xs-12 col-sm-6">
 					<button id='btnnext'  type="button" class="btn btn-success">Save</button>
-					<button id='btnprev'  type="button" class="btn btn-danger">Previous</button>
 				</div>
 			</div>
 		</div>
@@ -105,6 +104,5 @@
 </div>
 <script>
 $('#btnnext').click( function() { $('#install').attr('action','/install/save/3'); $('#install').submit(); });
-$('#btnprev').click( function() { $('#install').attr('action','/install/prev/2'); $('#install').submit(); });
 </script>
 @endsection

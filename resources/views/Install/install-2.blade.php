@@ -70,7 +70,6 @@
 				<label class="control-label col-xs-12 col-sm-2"> </label>
 				<div class="col-xs-12 col-sm-6">
 					<button id='btnnext'  type="button" class="btn btn-success">Next</button>
-					<button id='btnprev'  type="button" class="btn btn-danger">Previous</button>
 				</div>
 			</div>
 		</div>
