@@ -42,7 +42,7 @@ use App\Models\Store;
 use App\Models\Currency;
 use App\Models\Country;
 use App\Models\Customer;
-
+use App\Events\Larvela\NewInstallMessage;
 
 
 
@@ -178,6 +178,9 @@ class Installer extends Controller
 			$s->store_address = trim($form['store_address']);
 			$s->store_address2 = trim($form['store_address2']);
 			$s->save();
+
+			(new NewInstallMessage($store))->dispatch();
+
 			return view("Install.install-completed");
 		}
 		return view("Install.install-3");
