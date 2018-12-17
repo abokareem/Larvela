@@ -408,15 +408,6 @@ class TestMail extends Controller
 	}
 
 
-	public function test_dispatch_email()
-	{
-		$store = app('store');
-		$cart = Cart::first();
-		$product = Product::first();
-		$user = User::find(1);
-		$m = new AddToCartMessage($store,$user,$cart,$product);
-		$m->dispatch();
-	}
 
 
 
