@@ -1,6 +1,6 @@
 <?php
 /**
- * \class	PostPurchaseEmailJob
+ * \class	PostPurchaseJob
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2017-08-30
  *
@@ -39,7 +39,7 @@ use App\Traits\Logger;
 /**
  * \brief Send an email to the customer at some time after they have made a purchase and notify the admin its been sent.
  */
-class PostPurchaseEmailJob extends Job implements ShouldQueue
+class PostPurchaseJob extends Job implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
 use Logger;
