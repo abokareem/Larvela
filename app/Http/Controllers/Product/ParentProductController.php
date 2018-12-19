@@ -305,18 +305,4 @@ use ProductImageHandling;
 			$n->delete();
 		}
 	}
-
-
-
-
-	/**
-	 * return boolean true if this Product type
-	 * has children products.
-	 *
-	 * @return	boolean
-	 */
-	public function hasChildren()
-	{
-		return true;
-	}
 }

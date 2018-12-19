@@ -318,13 +318,10 @@ use ProductImageHandling;
 
 
 	/**
-	 * return boolean true if this Product type
-	 * has children products.
-	 *
-	 * @return	boolean
+	 * return true if the qty can be altered for this product type.
 	 */
-	public function hasChildren()
+	public function qtyCanChange($product)
 	{
-		return false;
+		return true;
 	}
 }

@@ -349,17 +349,4 @@ use ProductImageHandling;
 		$this->LogMsg("Required Category ID [".$category_id."]");
 		return Redirect::to("/admin/products?c=".$category_id."&s=".$store_id);
 	}
-
-
-
-	/**
-	 * Return boolean true if this Product type
-	 * has children products.
-	 *
-	 * @return	boolean
-	 */
-	public function hasChildren()
-	{
-		return false;
-	}
 }
