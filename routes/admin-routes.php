@@ -72,46 +72,30 @@ Route::post('/admin/setting/update/{id}','ConfigController@Update');
 Route::get( '/admin/setting/add','ConfigController@Add');
 Route::post('/admin/setting/save','ConfigController@Save');
 Route::get('/admin/setting/delete/{id}','ConfigController@Delete');
-#
-#
-Route::get( '/admin/actions','TemplateActionController@Show');
-Route::get( '/admin/action/add','TemplateActionController@Add');
-Route::post('/admin/action/save','TemplateActionController@Save');
-Route::get( '/admin/action/edit/{id}','TemplateActionController@Edit');
-Route::post('/admin/action/update/{id}','TemplateActionController@Update');
-Route::get( '/admin/action/delete/{id}','TemplateActionController@Delete');
-#
-#
-Route::get( '/admin/templates','TemplateController@Show');
-Route::get( '/admin/template/edit/{id}','TemplateController@Edit');
-Route::get( '/admin/template/add', 'TemplateController@Add');
-Route::post('/admin/template/save', 'TemplateController@Save');
-Route::post('/admin/template/update/{id}', 'TemplateController@Update');
-Route::post('/admin/template/delete/{id}', 'TemplateController@Delete');
-#
-#
+
+
 Route::get('/admin/stores','Admin\AdminStoreController@ShowStoresPage');
 Route::get('/admin/store/add','Admin\AdminStoreController@ShowAddStorePage');
 Route::get('/admin/store/edit/{id}','Admin\AdminStoreController@ShowEditStorePage');
 Route::get('/admin/store/addnew','Admin\AdminStoreController@ShowAddStorePage');
 Route::post('/admin/store/save','Admin\AdminStoreController@SaveNewStore');
 Route::post('/admin/store/update/{id}','Admin\AdminStoreController@UpdateStore');
-#
-#
+
+
 Route::get('/admin/customers',['uses'=>'CustomerController@ShowCustomers','roles'=>['ADMIN','root']]);
 Route::get('/admin/customer/edit/{id}','CustomerController@ShowEditCustomerPage');
 Route::get('/admin/customer/addnew','CustomerController@ShowAddCustomerPage');
 Route::post('/admin/customer/save','CustomerController@SaveNewCustomer');
 Route::post('/admin/customer/update/{id}','CustomerController@UpdateCustomer');
-#
-#
+
+
 Route::get('/admin/adverts',['uses'=>'AdvertController@ShowAdvertsPage','roles'=>'root']);
 Route::get('/admin/advert/add',['uses'=>'AdvertController@ShowAddAdvertPage','roles'=>'root']);
 Route::get('/admin/advert/edit/{id}',['uses'=>'AdvertController@ShowEditAdvertPage','roles'=>'root']);
 Route::post('/admin/advert/save/{id}',['uses'=>'AdvertController@SaveNewAdvert','roles'=>'root']);
 Route::post('/admin/advert/update/{id}',['uses'=>'AdvertController@UpdateAdvert','roles'=>'root']);
-#
-#
+
+
 Route::get('/admin/categories','CategoryController@ShowCategoriesPage');
 Route::get('/admin/category/addnew','CategoryController@ShowAddCategoryPage');
 Route::get('/admin/category/edit/{id}','CategoryController@ShowEditCategoryPage');
@@ -119,10 +103,8 @@ Route::post('/admin/category/update/{id}','CategoryController@UpdateCategory');
 Route::post('/admin/category/save','CategoryController@SaveNewCategory');
 Route::post('/admin/category/delete/{id}','CategoryController@DeleteCategory');
 Route::post('/admin/category/deletecat/{id}','CategoryController@DoDeleteCategory');
-#
-#
-#
-#
+
+
 Route::get('/admin/producttypes','Product\ProductTypeController@Show');
 Route::get('/admin/producttype/edit/{id}','Product\ProductTypeController@Edit');
 Route::get('/admin/producttype/addnew','Product\ProductTypeController@Add');
@@ -144,5 +126,27 @@ Route::get('/admin/attribute/edit/{id}','Admin\AttributesController@Edit');
 Route::post('/admin/attribute/delete','Admin\AttributesController@Delete');
 Route::post('/admin/attribute/save','Admin\AttributesController@Save');
 Route::post('/admin/attribute/update/{id}','Admin\AttributesController@Update');
+
+
+Route::get('/admin/subscriptions','Subscription\ShowSubscriptions@ShowSubscription');
+
+#
+# Templates are now obsolete thanks to Mailable interface
+#
+Route::get( '/admin/actions','TemplateActionController@Show');
+Route::get( '/admin/action/add','TemplateActionController@Add');
+Route::post('/admin/action/save','TemplateActionController@Save');
+Route::get( '/admin/action/edit/{id}','TemplateActionController@Edit');
+Route::post('/admin/action/update/{id}','TemplateActionController@Update');
+Route::get( '/admin/action/delete/{id}','TemplateActionController@Delete');
+
+
+Route::get( '/admin/templates','TemplateController@Show');
+Route::get( '/admin/template/edit/{id}','TemplateController@Edit');
+Route::get( '/admin/template/add', 'TemplateController@Add');
+Route::post('/admin/template/save', 'TemplateController@Save');
+Route::post('/admin/template/update/{id}', 'TemplateController@Update');
+Route::post('/admin/template/delete/{id}', 'TemplateController@Delete');
+
 }); # end of route group
 
