@@ -36,9 +36,9 @@ use App\Services\Payments\IShippingModule;
 
 
 /**
- * \brief Module for calculating postage costs and options for using AU Post
+ * \brief Larvela basic Module for Cash On Delivery (COD)
  */
-class COD_Payments implements IPaymentModule
+class COD_Payments implements IPaymentService
 {
 
 private $MODULE_CODE = "LARVELA_COD";
@@ -66,6 +66,13 @@ private $MODULE_CODE = "LARVELA_COD";
 	{
 		return "Cash On Delivery";
 	}
+
+
+	public function getHTMLOptions()
+	{
+		return "html string goes here";
+	}
+
 
 
 
@@ -106,5 +113,19 @@ private $MODULE_CODE = "LARVELA_COD";
 				return ($s->setting_value==1) ? true : false;
 			}
 		}
+	}
+
+
+
+	/**
+	 * COD Payment does nto have a ProcessPayment action so do nothing :)
+	 * Normall return success or fail at processing payment.
+	 *
+	 * @param	integer	$id	cart_id
+	 * @return	boolean	
+	 */
+	public function ProcessPayment($id)
+	{
+		return true;
 	}
 }
