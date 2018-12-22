@@ -253,6 +253,7 @@ use ProductImageHandling;
 		$this->SaveImages($request,$pid);
         $store_id = $store->id;
         $category_id = 0;
+		CategoryService::AssignCategories($request,$pid);
 		$this->LogMsg("Default store ID [".$store->id."]");
 		#
 		# @todo Replace with QueryFilter class
@@ -270,8 +271,7 @@ use ProductImageHandling;
 				}
 			}
 		}
-		$this->LogMsg("Required store ID [".$store_id."]");
-		$this->LogMsg("Required Category ID [".$category_id."]");
+		$this->LogMsg("Basic PROD Save - Required store ID [".$store_id."] Category [".$category_id."]");
 		return Redirect::to("/admin/products?c=".$category_id."&s=".$store_id);
 	}
 
