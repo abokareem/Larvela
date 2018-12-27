@@ -40,8 +40,6 @@ use Session;
 use App\Services\CartLocking;
 use App\Services\ShippingFactory;
 use App\Http\Controllers\Controller;
-use App\Events\Larvela\ShowCartMessage;
-use App\Events\Larvela\AddToCartMessage;
 
 use App\User;
 use App\Models\Cart;

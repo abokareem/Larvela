@@ -4,7 +4,7 @@
  * \date	2017-09-12
  * \author	Sid Young
  *
- *
+ * MOVE THIS TO COntrollers\Ajax and rename class.
  *
  */
 namespace App\Http\Controllers;

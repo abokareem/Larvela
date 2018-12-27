@@ -54,7 +54,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 
 use App\Traits\Logger;
-
+use App\Traits\CreateOrderItemsTrait;
 
 /** 
  * \brief  Place Order is called to kick off the order process, with either a
@@ -63,6 +63,7 @@ use App\Traits\Logger;
 class PlaceOrder extends Controller
 {
 use Logger;
+use CreateOrderItemsTrait;
 
 
 	/**
@@ -123,12 +124,24 @@ use Logger;
 			$cartitems = CartItem::where('cart_id',$id)->get();
 
 			$order = $this->CreateOrder($customer,$cartdata,$cartitems,$payment_ref);
+			$item_count = $this->CreateOrderItems($order);
+
 			dispatch(new OrderPlaced($store,$customer->customer_email, $order));
 			Mail::to($customer->customer_email)->send(new OrderPlacedEmail($store, $customer->customer_email, $order));
 			if(sizeof($payment_ref)>0)
 			{
 				dispatch(new OrderPaid($store, $customer->customer_email, $order));
 				Mail::to($customer->customer_email)->send(new OrderPaidEmail($store,$customer->customer_email,$order));
+				#
+				# Need to decide what to do at this point.
+				# Physical Product will be Dispatched Manually
+				# Virtual Product needs to be actioned NOW.
+				
+			}
+			else
+			{
+				dispatch(new OrderUnPaid($store, $customer->customer_email, $order));
+				Mail::to($customer->customer_email)->send(new OrderUnPaidEmail($store,$customer->customer_email,$order));
 			}
 	        return json_encode(array("S"=>"OK","C"=>$id,"CD"=>$cartdata->id,"CI"=>sizeof($cartitems),"Order"=>$order->id));
 		}

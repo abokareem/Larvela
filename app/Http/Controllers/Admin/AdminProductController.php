@@ -128,8 +128,7 @@ use Logger;
 				}
 			}
 		}
-		$this->LogMsg("Required store ID [".$store_id."]");
-		$this->LogMsg("Required Category ID [".$category_id."]");
+		$this->LogMsg("Required store ID [".$store_id."] Category ID [".$category_id."]");
 
 		$products = array();
 		#

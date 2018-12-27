@@ -3,7 +3,7 @@
  * \class	CartConfirm
  * \date	2016-09-05
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.6
+ * \version 1.0.7
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -104,7 +104,7 @@ use Logger;
 	 *
 	 * @return	mixed
 	 */
-	public function Confirm()
+	public function Confirm(Request $request)
 	{
 		$this->LogFunction("Confirm()");
 
@@ -112,13 +112,10 @@ use Logger;
 		$THEME_ERRORS = \Config::get('THEME_ERRORS');
 
 		$store = app('store');
-		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-
-		$this->LogMsg("Get Form Data.");
 		$form = \Input::all();
-dd($form);
-		$payment_method = $form['p'];
-		$shipping_method= $form['s'];	# product ID of shipping method.. use to get cost
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		$payment_method = $form['payment_options'];
+		$shipping_method= $form['shipping'];	# product ID of shipping method.. use to get cost
 		$customer_id = $form['cid'];
 
 		$this->LogMsg("Payment Method [".$payment_method."]");
@@ -132,7 +129,7 @@ dd($form);
 		# Cart, cart items and cart data
 		#
 		$cart = Cart::where('user_id',Auth::user()->id)->first();
-		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id));
+		$cart_data = CartData::firstOrNew(array('cd_cart_id'=>$cart->id,'cd_shipping_method'=>$shipping_method,'cd_payment_method'=>$payment_method));
 		$items = $cart->items;
 		#
 		# Build an array of products so we can pass descriptions to the required payment method if needed.
@@ -155,6 +152,7 @@ dd($form);
 
 		#======================================================================
 		#  @todo Redesign to use route factory or call payment gateways to get the route for each gateway
+		# 2018-12-03 payment gateways nearly done
 		#======================================================================
 		#
 		switch($payment_method)
@@ -202,6 +200,7 @@ dd($form);
 		$order->order_number = substr(Session::getId(),0,8);
 
 		$theme_path = $THEME_CART.$route.$s_route;
+		$this->LogMsg("route: [".$theme_path."]");
 		#
 		# {FIX_2017-09-12} Return an error page if product is now out of stock
 		#
@@ -228,9 +227,6 @@ dd($form);
 			'customer'=>$customer,
 			'address'=>$address,
 			'shipping'=>$product,	# the postage product being used.
-			# @todo - add bank code when built
-			#'bank_details'=>$bank_details,
-			#
 			'order'=>$order
 			]);
 	}

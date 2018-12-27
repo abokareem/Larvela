@@ -3,7 +3,7 @@
  * \class	AdminOrderController
  * \author	Sid Young <sid@off-grif-engineering.com>
  * \date	2018-08-22
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -60,8 +60,8 @@ use App\Mail\OrderDispatchedEmail;
 use App\Jobs\EmptyCartJob;
 use App\Jobs\OutOfStockJob;
 
+use App\User;
 use App\Models\Cart;
-use App\Models\User;
 use App\Models\Store;
 use App\Models\Order;
 use App\Models\Product;

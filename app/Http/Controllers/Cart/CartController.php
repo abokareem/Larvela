@@ -274,7 +274,7 @@ private $user;
 	 * Next action will be confirm/pay screen
 	 *
 	 * @return	mixed
-	 */
+	 *
 	public function ShowShipping()
 	{
 		$this->LogFunction("ShowShipping()");
@@ -344,9 +344,9 @@ private $user;
 		foreach($items as $item)
 		{
 			if(in_array($item->product_id, $product_id_list)==true) continue;
-			/*
-			 * Save it in array so we skip it and get one entry in the shoping cart
-			 */
+			#
+			# Save it in array so we skip it and get one entry in the shoping cart
+			# 
 			$this->LogMsg("Add to product_id_list");
 			array_push($product_id_list,$item->product_id);
 			$thumbnail = null;
@@ -479,7 +479,7 @@ private $user;
 			'postal_options'=>$postal_options
 			]);
 	}
-
+*/
 
 
 	/**
