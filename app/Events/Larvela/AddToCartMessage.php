@@ -106,6 +106,7 @@ protected $product;
 		#
 		# @todo Add code to process the message from the add code dispatch()
 		#
+		$this->LogMsg("JSON [".json_encode($msg)."]");
 		return json_encode($msg);
 	}
 }
