@@ -387,36 +387,4 @@ use Logger;
 		return Redirect::to("/admin/products");
 	}
 
-
-
-
-	/**
-	 * Call the view to present the "Add New" Product page
-	 *
-	 *----------------------------------------------------------------------
-	 *
-	 *      Deprecated
-	 *
-	 *----------------------------------------------------------------------
-	 *
-	 * GET ROUTE: /admin/product/addnew
-	 *
-	 * @return mixed - view object
-	 */
-	public function ShowAddProductPage()
-	{
-dd($this);
-		$this->LogFunction("ShowAddProductPage()");
-
-		$categories = Category::where('category_status','A')->orderBy('category_title')->get();
-		$stores = Store::all();
-		$product_types = ProductType::all();
-
-		return view('Admin.Products.addproduct',[
-			'categories'=>$categories,
-			'product_types'=>$product_types,
-			'stores'=>$stores
-			]);
-	}
-
 }
