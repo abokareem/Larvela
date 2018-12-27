@@ -104,7 +104,6 @@ use Logger;
 			function($cp){return$cp['product_id'];},
 			CategoryProduct::select('product_id')->whereIn('category_id',$categories)->get()->toArray()));
 		$dto->results = Product::whereIn('id',$pids)->get();
-
 		return $next($dto);
 	}
 	

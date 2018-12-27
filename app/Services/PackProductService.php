@@ -3,7 +3,7 @@
  * \class	PackProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  *
@@ -31,25 +31,28 @@
  */
 namespace App\Services;
 
-use App\Models\Attribute;
-use App\Models\AttributeProduct;
-use App\Models\AttributeValue;
-use App\Models\Category;
-use App\Models\Product;
+
 use App\Models\Store;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Attribute;
 use App\Models\StoreSetting;
 use App\Services\ImageService;
+use App\Models\AttributeValue;
+use App\Models\AttributeProduct;
+
+use App\Services\IProductService;
+
+
 use App\Traits\Logger;
 
 
 
 
 /**
- * \brief Pack Product Service for handling Controller requests for this type of Product.
- * - Created via the ProductPageFactory service.
- * - Pack instanciatation tested OK.
+ * \brief Pack Product Service  Class for handling discrete functions needed for this type of Product.
  */
-class PackProductService implements IProduct
+class PackProductService implements IProductService
 {
 use Logger;
 
@@ -64,7 +67,7 @@ protected $product;
 
 	function __construct($product)
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("PackProductService");
 
 		$this->product = $product;
@@ -87,13 +90,15 @@ protected $product;
 
 	/**
 	 * Return the name of the page used for editing this specific product type.
-	 * View will be "Admin/Product/edit_pack.blade.php"
+	 *
+	 * Called from Admin Controllers to get edit_ and add_ delete_ etc
+	 * i.e. View will be "Admin/Product/edit_pack.blade.php"
 	 *
 	 * @return	string
 	 */
-	public function getEditPageRoute()
+	public function getAdminPageRoute()
 	{
-		return "edit_pack";
+		return "pack";
 	}
 
 
@@ -121,5 +126,17 @@ protected $product;
 			'thumbnails'=>$thumbnails,
 			'product'=>$this->product
 		);
+	}
+
+
+	/**
+	 * Return boolean true if this Product type
+	 * has children products
+	 *
+	 * @return  boolean
+	 */
+	public function hasChildren()
+	{
+		return true;
 	}
 }

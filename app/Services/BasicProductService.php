@@ -3,7 +3,7 @@
  * \class	BasicProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- * \version	1.0.2
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -28,16 +28,20 @@
  */
 namespace App\Services;
 
-use App\Models\Attribute;
-use App\Models\AttributeProduct;
-use App\Models\AttributeValue;
-use App\Models\Category;
-use App\Models\Product;
+
+
 use App\Models\Store;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Attribute;
 use App\Models\StoreSetting;
+use App\Models\AttributeValue;
 use App\Services\ImageService;
+use App\Models\AttributeProduct;
+use App\Services\IProductService;
+
+
 use App\Traits\Logger;
-use App\Services\Products\IProduct;
 
 
 /**
@@ -45,7 +49,7 @@ use App\Services\Products\IProduct;
  * - Created via the ProductPageFactory service.
  * - Basic instanciatation tested OK.
  */
-class BasicProductService implements IProduct
+class BasicProductService implements IProductService
 {
 use Logger;
 
@@ -86,9 +90,9 @@ protected $product;
 	 *
 	 * @return	string
 	 */
-	public function getEditPageRoute()
+	public function getAdminPageRoute()
 	{
-		return "edit_basic";
+		return "basic";
 	}
 
 
@@ -119,5 +123,16 @@ protected $product;
 			'thumbnails'=>$thumbnails,
 			'product'=>$this->product
 		);
+	}
+
+	/**
+	 * Return boolean true if this Product type
+	 * has children products.
+	 *
+	 * @return  boolean
+	 */
+	public function hasChildren()
+	{
+		return false;
 	}
 }

@@ -90,7 +90,7 @@ private $lowest_price_flag = 0;
 			$values = array_filter($dto->settings->toArray(),
 				function($setting)
 				{
-					if($setting['setting_name'] == "LWEST_PRICE_FIRST") return true;
+					if($setting['setting_name'] == "LOWEST_PRICE_FIRST") return true;
 				});
 			if(sizeof($values)>0)
 			{

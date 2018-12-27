@@ -105,8 +105,8 @@ class ProductService
 		$o->prod_has_free_shipping = $request['prod_has_free_shipping'];
 		$o->prod_status = "A";
 		
-# $o->prod_is_taxable = $request['prod_is_taxable'];
-# $o->prod_tax_rate = $request['prod_tax_rate'];
+		$o->prod_is_taxable = $request['prod_is_taxable'];
+		$o->prod_tax_rate = $request['prod_tax_rate'];
 
 		$o->prod_date_created = date("Y-m-d");
 		$o->prod_time_created = date("H:i:s");
@@ -149,10 +149,8 @@ class ProductService
 		$o->prod_combine_code = $request['prod_combine_code'];
 		$o->prod_type = $request['prod_type'];
 		$o->prod_has_free_shipping = $request['prod_has_free_shipping'];
-
-# $o->prod_is_taxable = $request['prod_is_taxable'];
-# $o->prod_tax_rate = $request['prod_tax_rate'];
-
+		$o->prod_is_taxable = $request['prod_is_taxable'];
+		$o->prod_tax_rate = $request['prod_tax_rate'];
 		$o->prod_date_updated = date("Y-m-d");
 		$o->prod_time_updated = date("H:i:s");
 		if(($rv=$o->save()) >0)

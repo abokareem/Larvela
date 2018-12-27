@@ -34,13 +34,13 @@ use Request;
 use App\Http\Requests;
 
 
+use App\User;
 use App\Models\Cart;
 use App\Models\Product;
 use App\Models\CartData;
 use App\Models\CartItem;
 
 
-use App\User;
 
 
 /** 

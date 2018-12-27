@@ -35,4 +35,5 @@ interface IProductService
 	function getPageRoute();
 	function getAdminPageRoute();
 	function getPageVariables();
+	function hasChildren();
 }

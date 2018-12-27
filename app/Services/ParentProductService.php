@@ -3,7 +3,7 @@
  * \class	ParentProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  *
@@ -31,14 +31,18 @@
  */
 namespace App\Services;
 
-use App\Models\Attribute;
-use App\Models\AttributeProduct;
-use App\Models\AttributeValue;
-use App\Models\Category;
-use App\Models\Product;
+
 use App\Models\Store;
+use App\Models\Product;
+use App\Models\Category;
+use App\Models\Attribute;
 use App\Models\StoreSetting;
 use App\Services\ImageService;
+use App\Models\AttributeValue;
+use App\Models\AttributeProduct;
+use App\Services\IProductService;
+
+
 use App\Traits\Logger;
 
 
@@ -49,7 +53,7 @@ use App\Traits\Logger;
  * - Created via the ProductPageFactory service.
  * - Parent instanciatation tested OK.
  */
-class ParentProductService implements IProduct
+class ParentProductService implements IProductService
 {
 use Logger;
 
@@ -90,9 +94,9 @@ protected $product;
 	 *
 	 * @return	string
 	 */
-	public function getEditPageRoute()
+	public function getAdminPageRoute()
 	{
-		return "edit_parent";
+		return "parent";
 	}
 
 
@@ -116,7 +120,6 @@ protected $product;
 #
 
 
-
 		return array(
 			'store'=>$store,
 			'settings'=>$settings,
@@ -128,5 +131,18 @@ protected $product;
 			'thumbnails'=>$thumbnails,
 			'product'=>$this->product
 		);
+	}
+	
+	
+	
+	/**
+	 * Return boolean true if this Product type
+	 * has children products.
+	 *
+	 * @return  boolean
+	 */
+	public function hasChildren()
+	{
+		return true;
 	}
 }

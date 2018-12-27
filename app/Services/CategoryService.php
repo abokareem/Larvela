@@ -175,7 +175,7 @@ class CategoryService
 				$o->category_id = $c;
 				$o->product_id = $product_id;
 				$o->save();
-				echo "<h1> C=".$c." P=".$product_id."</h1>";
+				#echo "<h1> C=".$c." P=".$product_id."</h1>";
 			}
 		}
 	}

@@ -3,8 +3,7 @@
  * \class	VirtualProductService
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-09-17
- * \version	1.0.2
- *
+ * \version	1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -38,7 +37,7 @@ use App\Models\ProductType;
 use App\Models\StoreSetting;
 use App\Services\ImageService;
 use App\Models\AttributeValue;
-use App\Services\Products\IProduct;
+use App\Services\IProductService;
 
 use App\Traits\Logger;
 
@@ -49,7 +48,7 @@ use App\Traits\Logger;
  * - Created via the ProductPageFactory service.
  * - Virtual instanciatation tested OK.
  */
-class VirtualProductService implements IProduct
+class VirtualProductService implements IProductService
 {
 use Logger;
 
@@ -64,7 +63,7 @@ protected $product;
 
 	function __construct($product)
 	{
-		$this->setFileName("store");
+		$this->setFileName("larvela");
 		$this->setClassName("VirtualProductService");
 
 		$this->product = $product;
@@ -107,16 +106,16 @@ protected $product;
 	 *
 	 * @return	string
 	 */
-	public function getEditPageRoute()
+	public function getAdminPageRoute()
 	{
 		$type = ProductType::find($this->product->prod_type);
 		switch($type->product_type_token)
 		{
 			case "VLIMITED":
-					return	"edit_virtual_limited";
+					return	"virtual_limited";
 				break;
 			case "VUNLIMITED":
-					return	"edit_virtual_unlimited";
+					return	"virtual_unlimited";
 					break;
 		}
 		return "edit_virtual";
@@ -151,5 +150,18 @@ protected $product;
 			'thumbnails'=>$thumbnails,
 			'product'=>$this->product
 		);
+	}
+
+
+
+
+	/**
+	 * Return boolean true if this Product type has children products.
+	 *
+	 * @return  boolean
+	 */
+	public function hasChildren()
+	{
+		return false;
 	}
 }
