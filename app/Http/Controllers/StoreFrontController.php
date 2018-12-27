@@ -138,8 +138,10 @@ use PathManagementTrait;
 			}
 		}
 		$store = app('store');
+
 		$filter = new FilterProducts;
 		$products = $filter->ReturnProducts();
+		
 		$categories = Category::where('category_store_id',$store->id)->where('category_status','A')->get();
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		$attributes = Attribute::where('store_id',$store->id)->get()->toArray();

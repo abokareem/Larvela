@@ -31,11 +31,12 @@ use App\Jobs\OrderDispatched;
 use App\Jobs\CheckPendingOrders;
 use App\Jobs\OrderDispatchPending;
 
+use App\Jobs\PostPurchaseJob;
+use App\Mail\PostPurchaseEmail;
+
 use App\Jobs\BackInStock;
 use App\Jobs\OutOfStockJob;
 use App\Mail\BackInStockEmail;
-
-use App\Jobs\PostPurchaseEmail;
 
 use App\Jobs\SendWelcome;
 use App\Mail\SendWelcomeEmail;
@@ -57,6 +58,8 @@ use App\Mail\OrderDispatchedEmail;
 
 use App\Mail\AbandonedCartEmail;
 use App\Mail\AbandonedWeekOldCartEmail;
+use App\Mail\SubscriptionReportEmail;
+
 
 use App\User;
 use App\Models\Cart;
@@ -71,8 +74,6 @@ use App\Models\OrderItem;
 use App\Models\Notification;
 use App\Models\CategoryImage;
 
-use App\Events\Larvela\AddToCartMessage;
-use App\Events\Larvela\DispatcherFactory;
 
 
 
@@ -88,6 +89,25 @@ class TestMail extends Controller
  *
  *============================================================
  */
+
+	/**
+	 *
+	 *
+	 * @param	integer	$days
+	 * @return	mixed
+	 */
+	public function test_subscription_report()
+	{
+		$store=app('store');
+		$email = Config::get("app.test_email");
+		Mail::to($email)->send(new SubscriptionReportEmail($store, $email));
+		dd(new SubscriptionReportEmail($store, $email));
+	}
+
+
+
+
+
 
 	/**
 	 *
@@ -241,7 +261,7 @@ class TestMail extends Controller
  */
 
 	/**
-	 * GET ROUTE: /test/orders/cancelled
+	 * GET ROUTE: /test/order/cancelled
 	 *
 	 * @return	mixed
 	 */
@@ -254,8 +274,9 @@ class TestMail extends Controller
 		dd($this);
 	}
 
+
 	/**
-	 * GET ROUTE: /test/orders/dispatched
+	 * GET ROUTE: /test/order/dispatched
 	 *
 	 * @return	mixed
 	 */
@@ -265,6 +286,21 @@ class TestMail extends Controller
 		$email = Config::get("app.test_email");
 		$order = Order::find(28);
 		Mail::to($email)->send(new OrderDispatchedEmail($store, $email, $order));
+		dd($this);
+	}
+
+
+	/**
+	 * GET ROUTE: /test/order/postpurchase
+	 *
+	 * @return	mixed
+	 */
+	public function test_order_postpurchase()
+	{
+		$store = app("store");
+		$email = Config::get("app.test_email");
+		$order = Order::find(28);
+		Mail::to($email)->send(new PostPurchaseEmail($store, $email, $order));
 		dd($this);
 	}
 

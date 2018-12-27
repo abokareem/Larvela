@@ -124,7 +124,7 @@ use Logger;
 	 * @param	integer	$id 		Cart ID
 	 * @return	array
 	 */
-	public function Purchase($id)
+	private function Purchase($id)
 	{
 		$this->LogFunction("CartPaypalPurchase()");
 

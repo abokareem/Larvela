@@ -29,6 +29,7 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Request;
+use App\Models\CategoryProduct;
 use App\Services\ProductService;
 use App\Services\CategoryService;
 use App\Services\AttributeService;

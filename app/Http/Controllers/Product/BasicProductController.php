@@ -195,6 +195,8 @@ use ProductImageHandling;
 		$product = Product::find($id);
 		CategoryProduct::where('product_id',$id)->delete();
 		CategoryService::AssignCategories($request,$id);
+		$request['id'] = $id;
+		ProductService::update($request);
 		#
 		# get the product and if the qty was 0 and is now >0 then call Back In Stock
 		#
@@ -224,8 +226,6 @@ use ProductImageHandling;
 				}
 			}
 		}
-		$request['id'] = $id;
-		ProductService::update($request);
 		return Redirect::to("/admin/products");
 	}
 
@@ -248,8 +248,12 @@ use ProductImageHandling;
 		$this->LogFunction("SaveNewProduct()");
 
 		$store=app('store');
+		#
+		# @todo Move to a Trait perhaps or back into a Service
+		#
 		$pid = $request->SaveProduct();
-		$this->LogMsg("Insert New Product new ID [".$pid."]");
+
+		$this->LogMsg("New Product new ID [".$pid."]");
 		$this->SaveImages($request,$pid);
         $store_id = $store->id;
         $category_id = 0;

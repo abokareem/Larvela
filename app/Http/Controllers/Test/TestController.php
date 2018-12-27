@@ -72,6 +72,7 @@ use App\Models\Category;
 use App\Models\CartItem;
 use App\Models\Attribute;
 use App\Models\OrderItem;
+use App\Models\StoreSetting;
 use App\Models\Notification;
 use App\Models\CategoryImage;
 use App\Models\AttributeValue;
@@ -103,6 +104,20 @@ class TestController extends Controller
 		echo json_encode($o->ReturnProducts());
 	}
 
+
+	public function test_pagination_options()
+	{
+		$store = app("store");
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		$pagination_options = array_filter($settings->toArray(),function($setting)
+		{
+			if($setting['setting_name'] == "PAGINATION_OPTIONS") return true;
+		});
+#		dd(array_pop($pagination_options));
+
+		$data = json_encode(array("S"=>"OK","O"=>array(array_pop($pagination_options)['setting_value'])));
+		dd($data);
+	}
 
 
 
