@@ -357,7 +357,7 @@ use Logger;
 			}
 			$product_types = ProductType::all();
 			$page_object = ProductPageFactory::build($product);
-			$view = $page_object->getEditPageRoute();
+			$view = "edit_".$page_object->getAdminPageRoute();
 			$imagemap = ProdImageMap::where('product_id',$id)->get();
 			$prod_categories = CategoryProduct::where('product_id',$id)->get();
 			$images = array();
