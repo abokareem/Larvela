@@ -56,7 +56,7 @@ Route::get('/test/subscription/confirmed','TestController@test_subscription_conf
 Route::get('/test/subscription/sendwelcome','TestController@test_subscription_sendwelcome');
 Route::get('/test/subscription/finalrequest','TestController@test_subscription_finalrequest');
 Route::get('/test/subscription/resend','TestController@test_subscription_resend');
-
+Route::get('/test/subscription/report','Test\TestMail@test_subscription_report');
 #
 # Orders
 #
@@ -67,6 +67,7 @@ Route::get('/test/order/onhold','Test\TestMail@test_order_onhold');
 Route::get('/test/order/pending','Test\TestMail@test_order_pending');
 Route::get('/test/order/cancelled','Test\TestMail@test_order_cancelled');
 Route::get('/test/order/dispatched','Test\TestMail@test_order_dispatched');
+Route::get('/test/order/postpurchase','Test\TestMail@test_order_postpurchase');
 
 #
 #

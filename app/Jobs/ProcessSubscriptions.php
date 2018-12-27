@@ -1,9 +1,9 @@
 <?php
 /**
  * \class	ProcessSubscriptions
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2018-03-10
- *
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2018-03-10
+ * \version	1.0.1
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -175,8 +175,21 @@ protected $from;
 		$o->subs_resent_count = $counter_resend;
 		$o->subs_date_created = date("Y-m-d");
 		$o->save();
-
 		$this->LogMsg("Done! - Compile and send Report.");
+	}
+
+
+
+	/**
+	 * refactored this into its own function.
+	 *
+	 * DEPRECATED
+	 *
+	 * @return	void
+	 */
+	public function SendReport($counter_final,$counter_deleted,$counter_resend,$counter_progressing)
+	{
+
 		$subject = "[Larvela] Subscription Processing for ".date("Y-m-d");
 
 		$file = base_path()."/templates/subscription_processing.tpl";

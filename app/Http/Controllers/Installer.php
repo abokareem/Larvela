@@ -179,7 +179,7 @@ class Installer extends Controller
 			$s->store_address2 = trim($form['store_address2']);
 			$s->save();
 
-			(new NewInstallMessage($store))->dispatch();
+			(new NewInstallMessage($s))->dispatch();
 
 			return view("Install.install-completed");
 		}
