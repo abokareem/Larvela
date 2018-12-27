@@ -325,7 +325,7 @@ use ProductImageHandling;
 		$pid = $request->SaveProduct();
 		$this->LogMsg("Insert New Product new ID [".$pid."]");
 		$product = Product::find($pid);
-		$filename = $this->SaveUploadedFile($pid);
+		$filename = $this->SaveUploadedFile($request,$pid);
 		$product->prod_combine_code = $filename;
 		$product->save();
 		$this->SaveUploadedImage($pid);
