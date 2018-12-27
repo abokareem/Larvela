@@ -274,9 +274,9 @@
 					<div class="col-xs-8">
 					@foreach($categories as $cat)
 						@if(in_array($cat->id, $mapping))
-							<input type="checkbox" name="category[]" value="{{$cat->id}}" checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+							<input type="checkbox" name="categories[]" value="{{$cat->id}}" checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
 						@else
-							<input type="checkbox" name="category[]" value="{{$cat->id}}"> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+							<input type="checkbox" name="categories[]" value="{{$cat->id}}"> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
 						@endif
 					@endforeach
 					</div>

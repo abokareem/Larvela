@@ -39,7 +39,7 @@ function IsChecked($id, $items)
 	<ul id='tabs' class='nav nav-tabs' data-tabs='tabs'>
 		<li class='active'><a href='#details' data-toggle='tab'>Details</a></li>
 		<li><a href='#images' data-toggle='tab'>Images</a></li>
-		<li><a href='#categories' data-toggle='tab'>Categories</a></li>
+		<li><a href='#categorytab' data-toggle='tab'>Categories</a></li>
 		<li><a href='#attributetab' data-toggle='tab'>Attributes</a></li>
 	</ul>
 	<div id="my-tab-content" class="tab-content" style="padding-top:25px;">
@@ -204,16 +204,16 @@ function IsChecked($id, $items)
 			@endforeach
 		</div>
 
-		<div class='tab-pane' id='categories'>
+		<div class='tab-pane' id='categorytab'>
 			<div class="row">
 				<div class="control-group">
 					<label class="control-label col-xs-12 col-sm-2">Category:</label>
 					<div class="col-xs-8">
 					@foreach($categories as $cat)
 						@if(in_array($cat->id, $mapping))
-							<input type='checkbox' name='category[]' value='{{$cat->id}}' checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+							<input type='checkbox' name='categories[]' value='{{$cat->id}}' checked> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
 						@else
-						<input type='checkbox' name='category[]' value='{{$cat->id}}'> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
+						<input type='checkbox' name='categories[]' value='{{$cat->id}}'> {{ $cat->category_title }} &nbsp;&nbsp;<span style="color:blue; text-weight:bold;"><i> {{ $store_name[$cat->category_store_id] }}</i></span><br>
 						@endif
 					@endforeach
 					</div>
