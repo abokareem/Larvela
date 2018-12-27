@@ -166,7 +166,7 @@ class CategoryService
 	public static function AssignCategories(ProductRequest $request, $product_id)
 	{
 		$empty = array();
-		$categories = $request->input('category',$empty);
+		$categories = $request->input('categories',$empty);
 		if(sizeof($categories)>0)
 		{
 			foreach($categories as $c)
