@@ -189,7 +189,7 @@ use ProductImageHandling;
 	 */
 	public function Update(Request $request, $id)
 	{
-		$this->LogFunction("UpdateProduct(".$id.")");
+		$this->LogFunction("Update(".$id.")");
 		
 		$this->SaveImages($request,$id);
 		$product = Product::find($id);
@@ -253,7 +253,6 @@ use ProductImageHandling;
 		$this->SaveImages($request,$pid);
         $store_id = $store->id;
         $category_id = 0;
-		CategoryService::AssignCategories($request,$pid);
 		$this->LogMsg("Default store ID [".$store->id."]");
 		#
 		# @todo Replace with QueryFilter class
