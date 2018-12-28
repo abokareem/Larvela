@@ -222,9 +222,11 @@ use ProductImageHandling;
 		{
 			$this->LogMsg("There are files in request");
 			$files = $request->file('dfile');
-			$file_count = sizeof($files);
+			#$file_count = sizeof($files);
+			$file_count=0;
 			foreach($files as $file)
 			{
+				$file_count++;
 				$this->LogMsg( print_r($file,1) );
 				$file_type = explode("/",$file->getClientMimeType());
 				$file_extension = strtolower($file_type[1]);
