@@ -1,15 +1,30 @@
-@extends('Mail.DEMO.template')
+@extends('Mail.RD.template-2018-04')
 
 @section("content")
 
 <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 <p style="text-align:center;font-family: 'Open Sans', sans-serif;font-size:18px;">
 <br>
-<span style="font-size:24px;">Order on Hold</span><br/><br/>
-<p>Your order has been placed on hold for the time being.</p>
+<span style="font-size:18px;">Thanks you for purchasing from my store!</span><br/><br/>
+<p>Your order has been picking and dispatch and is now marked as <b>Complete</b>.</p>
 
-@IncludeIf('Mail.{{ $store->store_code }}.block-order-details')
-
+The order has the following items:<br/><br/>
+<center>
+<p>Order Item Detail</p>
+<table class="table table-stripped">
+@foreach($order_items as $oi)
+	<tr>
+		<td>{{ $oi->order_item_sku }}</td>
+		<td>{{ $oi->order_item_desc }}</td>
+		<td>{{ $oi->order_item_qty_purchased}}</td>
+		<td>{{ $oi->order_item_price}}</td>
+	</tr>
+@endforeach
+</table>
+</center>
+<br/>
+<br/>
+<br/>
 </p>
 @endsection
 
