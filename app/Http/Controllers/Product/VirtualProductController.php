@@ -330,7 +330,7 @@ use ProductImageHandling;
 		$filename = $this->SaveUploadedFile($request,$pid);
 		$product->prod_combine_code = $filename;
 		$product->save();
-		$this->SaveUploadedImage($pid);
+		$this->SaveImages($request,$pid);
         $store_id = $store->id;
         $category_id = 0;
 		$this->LogMsg("Default store ID [".$store->id."]");
