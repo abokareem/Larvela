@@ -118,19 +118,19 @@ use Logger;
 
 		$filters = $this->getFilters();
 		$dto = new FilterDTO;
-		$preprocessing = app(Pipeline::class)
+		$prep_rocessing = app(Pipeline::class)
 			->send($dto)
 			->through($filters)
 			->via("PreProcessor")
 			->then(function($dto){$this->LogMsg("State 0 done");});
 		$dto->state++;
-		$preprocessing = app(Pipeline::class)
+		$prep_rocessing = app(Pipeline::class)
 			->send($dto)
 			->through($filters)
 			->via("Processor")
 			->then(function($dto) { $this->LogMsg("State 1 done"); });
 		$dto->state++;
-		$preprocessing = app(Pipeline::class)
+		$post_processing = app(Pipeline::class)
 			->send($dto)
 			->through($filters)
 			->via("PostProcessor")
