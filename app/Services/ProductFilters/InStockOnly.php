@@ -31,6 +31,7 @@ namespace App\Services\ProductFilters;
 
 use Closure;
 use App\Traits\Logger;
+use App\Models\ProductType;
 
 
 /**
@@ -39,6 +40,13 @@ use App\Traits\Logger;
 class InStockOnly implements IProductOptions
 {
 use Logger;
+
+
+/**
+ * @var integer	$in_stock_only
+ */
+private $prod_types = array();
+
 
 
 /**
@@ -91,6 +99,7 @@ private $in_stock_only = 0;
 				function($setting)
 				{
 					if($setting['setting_name'] == "IN_STOCK_ONLY") return true;
+					$this->LogMsg("Setting IN_STOCK_ONLY Flag");
 				});
 			if(sizeof($values)>0)
 			{
@@ -130,15 +139,42 @@ private $in_stock_only = 0;
 	{
 		$this->LogFunction("PostProcessor(".$dto->state.")");
 		if($this->in_stock_only	!= 1) return $next($dto);
-		
+		#
+		# Retrieve al product types that decrement QTY
+		#
+		$this->prod_types = ProductType::whereIn('product_type_token',["BASIC","VLIMITED"])->get();
 		$this->LogFunction("Before filtering [".sizeof($dto->results)."]");
 		$products = array();
 		foreach($dto->results as $product)
 		{
+			if($this->CheckProdTypeDecrements($product)==true)
+			{
 			if($product->prod_qty > 0) array_push($products, $product);
+			}
+			else
+			{
+				array_push($products, $product);
+			}
 		}
 		$dto->results =  $products;
 		$this->LogFunction("After filtering [".sizeof($dto->results)."]");
 		return $next($dto);
+	}
+	
+	
+	
+	/** 
+	 * If the product type decrements its qty then return true if we match it.
+	 *
+	 * @param	App\Models\Product	$product
+	 * @return	boolean
+	 */
+	protected function CheckProdTypeDecrements($product)
+	{
+		foreach($this->prod_types as $pt)
+		{
+			if($product->prod_type == $pt->id) return true;
+		}
+		return false;
 	}
 }
