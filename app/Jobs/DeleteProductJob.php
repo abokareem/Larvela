@@ -38,12 +38,12 @@ use App\Jobs\Job;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
-use App\Jobs\EmailUserJob;
-
-use App\Traits\Logger;
 
 use	App\Models\Image;
 use App\Models\Product;
+use App\Traits\Logger;
+use App\Jobs\EmailUserJob;
+use App\Exceptions\Handler;
 use	App\Models\ProdImageMap;
 use App\Models\ImageProduct;
 use App\Models\Notification;
@@ -147,7 +147,7 @@ protected $product_id;
 			{
 				unlink($path);
 			}
-			catch(Exception ex)
+			catch(\Exception $ex)
 			{
 				$this->LogMsg( "Remove image ".$img->image_file_name." - FAILED!");
 			}
