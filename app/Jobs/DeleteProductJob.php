@@ -143,8 +143,14 @@ protected $product_id;
 			$this->LogMsg( "Remove image ".$img->image_file_name );
 			$path = $img->image_folder_name."/".$img->image_file_name;
 			$finalpath = public_path()."/media/".$path;
-			unlink($path);
-
+			try
+			{
+				unlink($path);
+			}
+			catch(Exception ex)
+			{
+				$this->LogMsg( "Remove image ".$img->image_file_name." - FAILED!");
+			}
 			$rv = $img->delete();
 			$this->LogMsg("Base (parent) Image removed  RC=[".$rv."]");
 		}
