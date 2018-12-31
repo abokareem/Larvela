@@ -3,7 +3,7 @@
  * \class	SEOController
  * \author	Sid Young <sid@off-grif-engineering.com>
  * \date	2016-08-23
- * \version	1.0.0
+ * \version	1.0.1
  * 
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -30,7 +30,7 @@
  * SEOController - The SEO Controller is responsible for managing SEO content.
  * - Security has not yet been added to this controller.
  */
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SEO;
 
 use Input;
 use App\Http\Requests;
@@ -133,7 +133,7 @@ class SEOController extends Controller
 		$blocks = Seo::all();
 		$store = app('store');
 		$stores = Store::all();
-		return view('Admin.SEO.listseo',['blocks'=>$blocks]);
+		return view('Admin.SEO.listseo',['store'=>$store,'stores'=>$stores,'blocks'=>$blocks]);
 	}
 
 
@@ -151,11 +151,7 @@ class SEOController extends Controller
 		$stores = Store::all();
 		$block = Seo::find($id); 
 
-		return view('Admin.SEO.editseo',[
-			'store'=>$store,
-			'seoblock'=>$block,
-			'stores'=>$stores
-			]);
+		return view('Admin.SEO.editseo',['store'=>$store,'seoblock'=>$block,'stores'=>$stores]);
 	}
 
 
