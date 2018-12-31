@@ -3,7 +3,7 @@
  * \class	SEOController
  * \author	Sid Young <sid@off-grif-engineering.com>
  * \date	2016-08-23
- *
+ * \version	1.0.0
  * 
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -32,10 +32,11 @@
  */
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Input;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Requests\SeoRequest;
+use App\Http\Controllers\Controller;
 
 
 use App\Models\Seo;
