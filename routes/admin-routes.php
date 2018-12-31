@@ -113,11 +113,11 @@ Route::post('/admin/producttype/update/{id}','Product\ProductTypeController@Upda
 Route::post('/admin/producttype/delete/{id}','Product\ProductTypeController@Delete');
 #
 #
-Route::get('/admin/seo','SEOController@ShowSEOList');
-Route::get('/admin/seo/addnew','SEOController@ShowAddSEO');
-Route::get('/admin/seo/edit/{id}','SEOController@ShowEditPage');
-Route::post('/admin/seo/save','SEOController@SaveNewSEO');
-Route::post('/admin/seo/update/{id}','SEOController@UpdateSEO');
+Route::get('/admin/seo','SEO\SEOController@ShowSEOList');
+Route::get('/admin/seo/addnew','SEO\SEOController@ShowAddSEO');
+Route::get('/admin/seo/edit/{id}','SEO\SEOController@ShowEditPage');
+Route::post('/admin/seo/save','SEO\SEOController@SaveNewSEO');
+Route::post('/admin/seo/update/{id}','SEO\SEOController@UpdateSEO');
 	
 
 Route::get('/admin/attributes','Admin\AttributesController@ShowAttributesPage');
