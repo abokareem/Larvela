@@ -9,7 +9,9 @@
 </p>
 <p style="text-align:center;font-family: 'Open Sans', sans-serif;font-size:16px;">
 <br/><br/>
+@if( !is_null($customer))
 <span style="font-weight:bold;font-size:18px;">Hi {{ strtok($customer->customer_name," ") }}</span><br/>
+@endif
 <br/>
 This email is to inform you that a <span style="color:red;font-weight:bold">failed login</span> attempt has been recorded using your email address at our store.
 <br/>
