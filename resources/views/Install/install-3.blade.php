@@ -43,11 +43,18 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="control-label col-xs-12 col-sm-2">Store URL::</label>
+				<label class="control-label col-xs-12 col-sm-2">Store URL:</label>
 				<div class="col-xs-12 col-sm-4">
 					<input type="text" class="form-control" id='store_url' name="store_url" value="" placeholder="https://your-site-here.xyz">
 				</div>
 			</div>
+			<div class="form-group">
+				<label class="control-label col-xs-12 col-sm-2">Google Analytics Code:</label>
+				<div class="col-xs-12 col-sm-4">
+					<input type="text" class="form-control" id='google_analytics' name="google_analytics" value="" placeholder="Enter tracking ID here">
+				</div>
+			</div>
+			<div class="form-group">
 			<div class="form-group">
 				<label class="control-label col-xs-12 col-sm-2">Store Hours:</label>
 				<div class="col-xs-12 col-sm-4">
@@ -79,7 +86,7 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<label class="control-label col-xs-12 col-sm-4">Default Currency:</label>
+				<label class="control-label col-xs-12 col-sm-2">Default Currency:</label>
 				<div class="col-xs-12 col-sm-4">
 					<select class="form-control" id="store_currency" name="store_currency">
 					@foreach($currency as $c)
