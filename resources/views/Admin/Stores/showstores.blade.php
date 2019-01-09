@@ -16,6 +16,7 @@
 						<th>ID</th>
 						<th>Store Code</th>
 						<th>Name</th>
+						<th>Analytics Code</th>
 						<th>Contact Number</th>
 						<th>Hours</th>
 						<th>URL</th>
@@ -30,22 +31,24 @@
 					</tr>
 				</thead>
 				<tbody>
-				@foreach($stores as $store)
+				@foreach($stores as $st)
 					<tr onclick='editrow( {{ $store->id }} );'>
-						<td>{{ $store->id }}</td>
-						<td>{{ $store->store_env_code }}</td>
-						<td>{{ $store->store_name }}</td>
-						<td>{{ $store->store_contact }}</td>
-						<td>{{ $store->store_hours }}</td>
-						<td>{{ $store->store_url }}</td>
-						<td>{{ $store->store_parent_id }}</td>
-						<td>{{ $store->store_currency }}</td>
-						<td>{{ $store->store_logo_filename }}</td>
-						<td>{{ $store->store_logo_alt_text }}</td>
-						<td>{{ $store->store_logo_thumb }}</td>
-						<td>{{ $store->store_logo_invoice }}</td>
-						<td>{{ $store->store_logo_email }}</td>
-						<td>{{ $store->store_status }}</td>
+						<td>{{ $st->id }}</td>
+						<td>{{ $st->store_env_code }}</td>
+						<td>{{ $st->store_name }}</td>
+						<td> N/A </td>
+						<td>{{ $st->store_contact }}</td>
+						<td>{{ $st->store_hours }}</td>
+						<td>{{ $st->store_url }}</td>
+						<td>{{ $st->store_parent_id }}</td>
+						<td>{{ $st->store_currency }}</td>
+						<td>{{ $st->store_logo_filename }}</td>
+						<td>{{ $st->store_logo_alt_text }}</td>
+						<td>{{ $st->store_logo_thumb }}</td>
+						<td>{{ $st->store_logo_invoice }}</td>
+						<td>{{ $st->store_logo_email }}</td>
+						<td>{{ $st->store_status }}</td>
+						<td><i class="fa fa-trash"></i> Delete</td>
 					</tr>
 				@endforeach
 				</tbody>

@@ -1,11 +1,34 @@
 <?php
 /**
-* \class	UpdateCartLocks
- *\date		2017-09-13
+ * \class	UpdateCartLocks
+ * \date	2017-09-13
+ * \version	1.0.1
+ *
+ *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, 
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * \addtogroup CRON
  * Iterate through the 'product_locks' table, get all rows and see if any locks are stale.
  * Remove them and increment the product qty by the value stored in the row.
+ * Only change if the product is not an unlimited virtual or parent product.
  */
 namespace App\Jobs;
 
@@ -14,10 +37,12 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
+use DB;
 use App\Models\Product;
 use App\Models\ProductLock;
+use App\Services\Products\ProductFactory;
 use App\Traits\Logger;
-use DB;
+
 
 /**
  * \brief Iterate through the 'product_locks' table get
@@ -57,6 +82,7 @@ use Logger;
 	{
 		$this->setFileName("larvela-cron");
 		$stale_time = time()-300;
+
 		$product_locks = ProductLock::all();
 		if(sizeof($product_locks)>0)
 		{
@@ -76,8 +102,12 @@ use Logger;
 	
 					\DB::beginTransaction();
 					$this->LogMsg("Updating Product [".$product->id."]");
-					$product->prod_qty = $stock_qty + $locked_qty;
+					
+					$qty = $stock_qty + $locked_qty;
+					$product->prod_qty = $qty;
 					$product->save();
+
+					$this->IncProductQty($product, $qty);
 					$this->LogMsg("Removing Lock [".$locked->id."]");
 					$locked->delete();
 					\DB::commit();
@@ -86,5 +116,20 @@ use Logger;
 			}
 			$this->LogEnd();
 		}
+	}
+
+
+
+	/**
+	 * Increment the qty if the Product supports this.
+	 * Need to check the ProductController if supported.
+	 *
+	 * @param	mixed	$product
+	 * @param	integer	$qty
+	 * @return	void
+	 */
+	protected function IncProductQty($product, $newqty)
+	{
+		$controller = ProductFactory::build($product->prod_type);
 	}
 }

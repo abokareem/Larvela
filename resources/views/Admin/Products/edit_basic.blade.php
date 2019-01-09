@@ -239,7 +239,7 @@
 					<label class="control-label col-xs-12 col-sm-2">Tax Rate:</label>
 					<div class="col-xs-3">
 						<div class='input-group'>
-							<input type='text' class="form-control"  name='prod_tax_rate' >
+							<input type='text' class="form-control"  name='prod_tax_rate' value="{{$product->prod_tax_rate }}">
 							<span class="input-group-addon">%</span>
 						</div>
 					</div>

@@ -32,7 +32,7 @@ protected $GUIDDIR= '/download';
 	 * @param	integer	$id - the product ID
 	 * @return	string 
 	 */
-	protected function getStoragePath( $id )
+	public function getStoragePath( $id )
 	{
 		$this->LogFunction("getStoragePath(".$id.")");
 		$path="";
@@ -67,7 +67,7 @@ protected $GUIDDIR= '/download';
 	 * @param	integer	$id - the product ID
 	 * @return	string
 	 */
-	protected function getStorageSubPath($id)
+	public function getStorageSubPath($id)
 	{
 		$this->LogFunction("getStorageSubPath(".$id.")");
 
@@ -94,7 +94,7 @@ protected $GUIDDIR= '/download';
 	 * @param	integer	$id - the product ID
 	 * @return	string
 	 */
-	protected function getDownloadPath($id)
+	public function getDownloadPath($id)
 	{
 		$this->LogFunction("getDownloadPath(".$id.")");
 
@@ -117,7 +117,7 @@ protected $GUIDDIR= '/download';
 	 * @param	string	$finalpath
 	 * @return	string
 	 */
-	protected function CreatePath($finalpath)
+	public function CreatePath($finalpath)
 	{
 		$this->LogMsg("Create Path [".$finalpath."]");
 		try { mkdir($finalpath,0775,true); }

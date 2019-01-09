@@ -100,10 +100,12 @@ use Logger;
 			function($c){return $c['id'];},
 			Category::where('category_store_id',$store->id)->get()->toArray()
 			),SORT_NUMERIC);
+	
 		$pids = array_unique(array_map(
 			function($cp){return$cp['product_id'];},
 			CategoryProduct::select('product_id')->whereIn('category_id',$categories)->get()->toArray()));
 		$dto->results = Product::whereIn('id',$pids)->get();
+##		$dto->results = Product::whereIn('id',$pids)->paginate(24);
 		return $next($dto);
 	}
 	

@@ -189,15 +189,19 @@
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-2">Tax Applicable:</label>
 					<div class="col-xs-10 checkbox">
-						<label> <input type="radio" name="prod_is_taxable" value="Y"> Product is Taxable </label><br>
-						<label> <input type="radio" name="prod_is_taxable" value="N" checked> Product is Tax free </label><br>
+						<?php $ptryes=" "; $ptrno="checked" ?>
+						@if($product->prod_tax_rate > 0)
+							<?php $ptryes="checked"; $ptrno=" " ?>
+						@endif
+						<label> <input type="radio" name="prod_is_taxable" value="Y" {{$ptryes}}> Product is Taxable </label><br>
+						<label> <input type="radio" name="prod_is_taxable" value="N" {{$ptrno}}> Product is Tax free </label><br>
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="control-label col-xs-12 col-sm-2">Tax Rate:</label>
 					<div class="col-xs-3">
 						<div class='input-group'>
-							<input type='text' class="form-control"  name='prod_tax_rate' >
+							<input type='text' class="form-control"  name='prod_tax_rate'  value="{{$product->prod_tax_rate }}">
 							<span class="input-group-addon">%</span>
 						</div>
 					</div>

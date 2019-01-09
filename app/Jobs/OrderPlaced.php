@@ -107,8 +107,8 @@ protected $email;
     {
 		$admin_user = Customer::find(1);
 		$from = $this->store->store_sales_email;
-		$subject = "[LARVELA] Order #".$this->order->id." placed -> message sent to [".$this->to."]";
-		$text = "Order #".$this->order->id." placed and email sent to [".$tis->email."]";
+		$subject = "[LARVELA] Order #".$this->order->id." placed -> message sent to [".$this->email."]";
+		$text = "Order #".$this->order->id." placed and email sent to [".$this->email."]";
 		dispatch(new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
     }
 }

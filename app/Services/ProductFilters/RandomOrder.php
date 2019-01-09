@@ -111,8 +111,10 @@ private $return_random = 0;
 	 */
 	public function Processor($dto, Closure $next)
 	{
+		$this->LogFunction("Processor(".$dto->state.")");
 		if($this->return_random	!= 1) return $next($dto);
 		if(sizeof($dto->results) == 0) return $next($dto);
+		$this->LogFunction("Running Processor");
 		$pids = array_map(function($product) {return $product['id'];}, $results);
 
 		$selected = array();

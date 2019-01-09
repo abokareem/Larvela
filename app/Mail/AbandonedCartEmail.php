@@ -4,7 +4,7 @@
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-07-20
  *
- * [CC]
+ * 
  *
  * \addtogroup CartAbandonment
  * AbandonedCartEmail - Send a templated email after the Customer has abandond the cart for a period of time.
@@ -24,12 +24,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
-use App\Models\Customer;
-use App\Models\User;
+use App\User;
 use App\Models\Cart;
 use App\Models\Store;
-use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\CartItem;
+use App\Models\Customer;
 
 
 use App\Traits\Logger;
