@@ -19,7 +19,7 @@
 ?>
 @section("content")
 <script src="//www.paypalobjects.com/api/checkout.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.6.7/jquery.lazy.min.js"></script>
+<xxxscript src="//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.6.7/jquery.lazy.min.js"></xxxscript>
 
 <?php
 
@@ -39,113 +39,58 @@ $shipping = "0.00";
 </style>																										 
 
 <!-- START:productpage mobile-first-->
-<div class="container prodpage-block">
-
-	<div class="row">
-		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-			<div class="prodpage-mainimage">
-				<span class="zoom" id="main_image">
-					<img id="zoom_image" src="{{ $main_image_folder_name }}/{{ $main_image_file_name }}" width="400" height="300"">
-				</span>
-			</div>
-			<div class="prodpage-images">
-				<div class="prodpage-image-gallery">
-					@foreach($thumbnails as $thumb)
-					<span class="prodpage-thumb">
-						<img src="/{{ $thumb->image_folder_name }}/{{ $thumb->image_file_name }}" width="68" height="68" id="thumb{{ $thumb->id }}">
+<div class="container">
+	<div class="row" style="font-size:19px;">
+		<div class="col-xs-12 col-sm-6">
+			<div class="col-xs-12">
+				<div class="pl-5px pr-5px">
+					<span class="zoom" id="main_image">
+						<img id="zoom_image" src="{{ $main_image_folder_name }}/{{ $main_image_file_name }}" width="400" height="300"">
 					</span>
-					@endforeach
+				</div>
+				<div class="prodpage-images">
+					<div class="prodpage-image-gallery">
+						@foreach($thumbnails as $thumb)
+						<span class="prodpage-thumb">
+							<img src="/{{ $thumb->image_folder_name }}/{{ $thumb->image_file_name }}" width="68" height="68" id="thumb{{ $thumb->id }}">
+						</span>
+						@endforeach
+					</div>
 				</div>
 			</div>
 		</div>
-
-		<div class="col-xs-12 col-sm-3 col-md-4 col-lg-5">
-			<div class="prodpage-title-block">
-				<span class="prodpage-title">Product Name:</span>&nbsp;
-				<span class="prodpage-title"><p>{{ $product->prod_title }}</p></span>
-				<span class="prodpage-title">Price:</span>&nbsp;
+	
+		<div class="col-xs-12 col-sm-6 text-black font-sans text-xl bg-white">
+			<form id='purchase' name='purchase' method='post'>
+				<span class="font-bold text-5xl"><p>{{ $product->prod_title }}</p></span>
+				<p><span class="text-grey-darkest font-sans text-xl">SKU: </span><span class="text-xl text-grey">{{ $product->prod_sku }}</span></p>
+				<p class="font-serif text-2xl">{!! $product->prod_short_desc !!}</p>
+				<p>
+				<span class="text-3xl font-sans text-grey-darkest">Price:</span>&nbsp;
 				@if($product->prod_retail_cost == 0)
-				<span class="prod-matrix-price">Call for pricing</p></span>
+					<span class="prod-matrix-price">Free!</span>
 				@else
-				<span class="prod-matrix-price">${{ number_format($product->prod_retail_cost,2) }}</p></span>
+					<span class="prod-matrix-price">${{ number_format($product->prod_retail_cost,2) }}</span>
 				@endif
 				@if($product->prod_has_free_shipping > 0)
-				<span style="color:green;font-size:18px;font_weight:bold;">*** Free Shipping ***</span><br/>
-				<?php $shipping_cost = 0; ?>
+					<span class="pl-5">With </span><span class="text-green text-bold text-3xl"> *** Free Shipping ***</span><br/>
+					<?php $shipping_cost = 0; ?>
 				@endif
-				<div class="prodpage-desc-short">Description:</div>
-				<div class="prodpage-desc-short">{!! $product->prod_long_desc !!} 
-				Only {!! $product->prod_qty !!} of {!! $product->prod_reorder_qty !!} left!</div>
-			</div>
-		</div>
-
-		<div class="col-xs-12 col-sm-3 col-md-4 col-lg-3">
-			<div class="prodpage-qty-block">
-				@if($product->prod_retail_cost > 0)
-					@if($product->prod_qty < 1)
-					<div class="prodpage-notinstock col-xs-12">
-						<div class="panel panel-default">
-							<div class="prodpage-panel-heading panel-heading">OMG - No Stock!</div>
-							<div class="panel-body" id='nfbody'>We can notify you when this item comes in.<br>
-								<div class="input-group">
-									<form id='cf' name='cf' method='post'>
-									<input type='text' id='nf' name='nf' class='form-control' placeholder='Enter your email here...'>
-									<span class="input-group-btn">
-										<button class="btn btn-success" id="btnnotify" type="button">Notify me!</button>
-									</span>
-									<input type="hidden" name="_token" id="csrf-token" value="{{ Session::token() }}" />
-									<input type="hidden" name="sku" value="{{ $product->prod_sku }}" />
-									</form>
-								</div>
-								<span id="paypal-button" style="visibility:hidden"></span>
-							</div>
-						</div>
-					</div>
-					@else
-					<form id='purchase' name='purchase' method='post'>
-					<div class="prodpage-order panel panel-default">
-						<div class="card">
-							@if($product->prod_qty == 1)
-							<div class="card-header">
-								<span class="prodpage-qty-lastone">Last one Left!</span>
-							</div>
-							<div class="card-block">
-								<h4 class="card-title">Dont miss this one!</h4>
-								<p class="card-text">While we aim to keep stock, our stock is custom made for us and can take 1-2 months to get back in. If you miss it now it could be over 2 months before its back in stock.</p>
-							@else
-							<div class="card-header">
-								<span class="prodpage-in-stock">In Stock!</span>
-							</div>
-							<div class="card-block">
-								<h4 class="card-title">Buy more than 1!</h4>
-								<p class="card-text">You can buy this instantly using Paypal or put it in your cart and checkout later with all your other items.</p>
-							</div>
-							@endif
-					
-							@if($product->prod_qty > 1)
-							<div class="prodpage-qty-text">Qty In Stock: <span class="prodpage-qty-available">{{ $product->prod_qty }}</span></div><br>
-							<div class="input-group">
-								<span class="input-group-btn text-center"><span style="font-size:18px;">Qty: </span>
-									<span style="padding-right:5px;font-size:18px;font-face:Verdana;" id="qtydisp">1</span>
-									<button id='incqty' class="btn btn-secondary" type="button" style="background-color:white;border-color:white;"><i class="fa fa-plus"></i></button><span style="font-weight:bold;font-color:pink;"> / </span>  
-									<button id='decqty' class="btn btn-secondary" type="button" style="background-color:white;border-color:white;"><i class="fa fa-minus"></i></button>
-								</span>
-							</div><br/>
-							@endif
-							<div class='prodpage-add-to-cart-btn text-center'>
-								<span style="text-align:center;" id="paypal-button"></span>
-								</br>To Pay via Credit Card select your card type above <b>or</b>...</br>
-								<span style="text-align:center;" align="center">
-									<button style="text-align:center;" id="addtocart" class="btn btn-danger">Add to Cart</button>
-								</span>
-							</div>
-						</div>
-					</div>
-					<input type="hidden" name="_token" id="csrf-token" value="{{ Session::token() }}" />
-					</form>
-					@endif
-				@endif
-			</div>
+				<span class="font-sans">Only {!! $product->prod_qty !!} left!</span>
+				</p>
+				<p class="pt-3">
+				<div class='text-center'>
+					<span style="text-align:center;" id="paypal-button"></span>
+					</br>To Pay via Credit Card select your card type above </br><b>or</b>...</br>
+					<span class="text-center">
+						<button id="addtocart" class="btn btn-danger text-center">Add to Cart</button>
+					</span>
+				</div>
+				</p>
+				<div class="text-3xl font-sans text-grey-darkest">Full Description:</div>
+				<div class="font-serif text-2xl">{!! $product->prod_long_desc !!}</div>
+				<input type="hidden" name="_token" id="csrf-token" value="{{ Session::token() }}" />
+			</form>
 		</div>
 	</div>
 
@@ -307,5 +252,5 @@ paypal.Button.render({
 
 </script>
 <script src='/zoom/jquery.zoom.js'></script>
-<!-- END:productpage -->
+<!-- END:productpage - unlimited-vitual-product -->
 @stop
