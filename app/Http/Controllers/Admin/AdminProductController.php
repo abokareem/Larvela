@@ -58,6 +58,8 @@ use App\Models\CategoryProduct;
 use App\Models\AttributeProduct;
 
 use App\Traits\Logger;
+use App\Traits\PathManagementTrait;
+use App\Traits\ProductImageHandling;
 
 /**
  * \brief MVC Controller to Handle the Product Administration functions initiated from the admin dashboard.
@@ -70,6 +72,8 @@ use App\Traits\Logger;
 class AdminProductController extends Controller
 {
 use Logger;
+use PathManagementTrait;
+use ProductImageHandling;
 
 
 	/**
@@ -369,6 +373,17 @@ use Logger;
 			}
 			$text = "There are ".sizeof($images)." images assembled.";
 			$this->LogMsg( $text );
+			$download_files = array();
+			$file_path = $this->getDownloadPath($id);
+			if(file_exists($file_path))
+			{
+				if(is_dir($file_path))
+				{
+					$download_files = scandir($file_path);
+					unset($download_files[array_search('.', $download_files, true)]);
+					unset($download_files[array_search('..', $download_files, true)]);
+				}
+			}
 
 			return view('Admin.Products.'.$view, [
 				'product'=>$product,
@@ -380,7 +395,8 @@ use Logger;
 				'categories'=>$categories,
 				'store'=>$store,
 				'stores'=>$stores,
-				'catmappings'=>$prod_categories]);
+				'catmappings'=>$prod_categories,
+				'download_files'=>$download_files]);
 		}
 		\Session::flash('flash_error','ERROR - Selected Product is invalid!');
 		return Redirect::to("/admin/products");
