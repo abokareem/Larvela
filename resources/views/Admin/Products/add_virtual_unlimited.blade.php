@@ -95,9 +95,16 @@
 			</div>
 			<div class="row">
 				<div class="form-group">
-					<label class="control-label col-xs-12 col-sm-2">Download File:</label>
-					<div class="col-xs-6">
-						<div class="input-group"><input name="dfile" type="file" id="dfile"><span class="input-group-addon"><button id='btnclear' type="button" class="btn  btn-warning"> Clear </button></span></div>
+					<label class="control-label col-xs-12 col-sm-2">Upload File:</label>
+					<div class="col-xs-12 col-sm-8">
+						<h4>Upload (Downloadable) Content</h4>
+						<div class="input-group">
+							<label class="input-group-btn">
+							<span class="btn btn-primary"> Browse… <input type="file" name="dfile[]" id="dfile" style="display: none;" multiple></span>
+							</label>
+							<input type="text" class="form-control" readonly>
+						</div>
+						<span class="help-block">Select files that will be downloaded to customer after purchase...</span>
 					</div>
 				</div>
 			</div>
@@ -284,6 +291,13 @@ $("#file").on('fileselect', function(event, numFiles, label)
 	if(input.length) { input.val(log); } else { if( log ) alert(log); }
 });
 
+
+$("#dfile").on('fileselect', function(event, numFiles, label)
+{
+	var input = $(this).parents('.input-group').find(':text'),
+		log = numFiles > 1 ? numFiles + ' files selected' : label;
+		if(input.length) { input.val(log); } else { if( log ) alert(log); }
+});
 
 $('#btnsave').click( function()
 {
