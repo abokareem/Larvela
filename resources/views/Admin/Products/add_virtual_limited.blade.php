@@ -89,12 +89,22 @@
             <input type="radio" name="prod_weight" value='0'> NO
            </div>
         </div>
-        <div class="form-group">
-          <label class="control-label col-xs-12 col-sm-2">Contect Path:</label>
-          <div class="col-xs-10">
-            <input type="text" class="form-control" id='prod_combine_code' name="prod_combine_code" value='/downloadable' placeholder="Content is stored in public but with a temporary GUID">
-           </div>
-        </div>
+
+
+		<div class="form-group">
+			<label class="control-label col-xs-12 col-sm-2">Upload File:</label>
+			<div class="col-xs-12 col-sm-8">
+				<h4>Upload (Downloadable) Content</h4>
+				<div class="input-group">
+					<label class="input-group-btn">
+					<span class="btn btn-primary"> Browse… <input type="file" name="dfile[]" id="dfile" style="display: none;" multiple></span>
+					</label>
+					<input type="text" class="form-control" readonly>
+				</div>
+				<span class="help-block">Select files that will be downloaded to customer after purchase...</span>
+			</div>
+		</div>
+        
         <div class="form-group">
           <label class='control-label col-xs-12 col-sm-2'>Visible:</label>
           <div class='col-xs-8'>
@@ -246,13 +256,14 @@
     <div class="form-group">
       <label class="control-label col-xs-12 col-sm-2"> </label>
       <div class="col-xs-6">
-        <button id='btnsave'   type="button" class="btn btn-success">Add Product</button>
-        <button id='btncancel' type="button" class="btn btn-warning">Cancel</button>
+        <button id="btnsave"   type="button" class="btn btn-success">Add Product</button>
+        <button id="btncancel" type="button" class="btn btn-warning">Cancel</button>
        </div>
     </div>
   </div>
   <input type="hidden" name="prod_type" value="{{ $product_type->id }}">
-  <input type="hidden" name="prod_reorder_qty" value='0000'>
+  <input type="hidden" name="prod_reorder_qty" value="0000">
+  <input type="hidden" name="prod_combine_code" value=" ">
   {!! Form::token() !!}
   {!! Form::close() !!}
 </div>
@@ -288,6 +299,13 @@ $(function(){$(document).on('change',':file',function()
 	});
 });
 $("#file").on('fileselect', function(event, numFiles, label)
+{
+	var input = $(this).parents('.input-group').find(':text'),
+		log = numFiles > 1 ? numFiles + ' files selected' : label;
+	if(input.length) { input.val(log); } else { if( log ) alert(log); }
+});
+
+$("#dfile").on('fileselect', function(event, numFiles, label)
 {
 	var input = $(this).parents('.input-group').find(':text'),
 		log = numFiles > 1 ? numFiles + ' files selected' : label;
