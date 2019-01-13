@@ -31,7 +31,7 @@ namespace App\Services\Payments;
 
 
 use App\models\StoreSetting;
-use App\Services\Payments\IShippingModule;
+use App\Services\Payments\IPaymentModule;
 
 
 
@@ -70,7 +70,16 @@ private $MODULE_CODE = "LARVELA_COD";
 
 	public function getHTMLOptions()
 	{
-		return "html string goes here";
+		$options = array();
+
+		$option = new \stdClass;
+		$option->id = 1;
+		$option->display = "Cash On Delivery";
+		$option->html = "<input type='radio' name='payment' value='".$this->MODULE_CODE."-0'>";
+		$option->value = $this->MODULE_CODE."-0";
+		
+		array_push($options, $option);
+		return $options;
 	}
 
 
@@ -81,7 +90,6 @@ private $MODULE_CODE = "LARVELA_COD";
 	 * - all modules return this so you can display 1 or more payment options.
 	 *
 	 * @return	array
-	 */
 	public function Calculate()
 	{
 		$options = array();
@@ -95,6 +103,7 @@ private $MODULE_CODE = "LARVELA_COD";
 		array_push($options, $option);
 		return $options;
 	}
+	 */
 
 
 
