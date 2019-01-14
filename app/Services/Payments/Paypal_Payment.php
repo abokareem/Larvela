@@ -43,7 +43,7 @@ class Paypal_Payments implements IPaymentService
 
 
 private $MODULE_CODE = "LARVELA_PAYPAL_EXPRESS";
-private $MODULE_NAME = "Larvela Paypal Express";
+private $MODULE_NAME = "Paypal Express";
 
 
 
@@ -78,8 +78,18 @@ private $MODULE_NAME = "Larvela Paypal Express";
 	 */
 	public function isActive()
 	{
-		return true;
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		foreach($settings as $setting)
+		{
+			if($s->setting_name==$this->MODULE_CODE)
+			{
+				return ($s->setting_value==1) ? true : false;
+			}
+		}
+		return false;
 	}
+
 
 
 

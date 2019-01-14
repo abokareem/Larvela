@@ -42,7 +42,7 @@ class COD_Payments implements IPaymentService
 {
 
 private $MODULE_CODE = "LARVELA_COD";
-private $MODULE_NAME = "Larvela Cash On Delivery";
+private $MODULE_NAME = "Cash On Delivery";
 
 
 
@@ -98,11 +98,12 @@ private $MODULE_NAME = "Larvela Cash On Delivery";
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
 		foreach($settings as $setting)
 		{
-			if($s->setting_name=="COD_ENABLED")
+			if($s->setting_name==$this->MODULE_CODE)
 			{
 				return ($s->setting_value==1) ? true : false;
 			}
 		}
+		return false;
 	}
 
 
