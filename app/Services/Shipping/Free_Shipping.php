@@ -2,7 +2,7 @@
 /**
  * \class	Free_Shipping
  * \date	2018-08-24
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -85,7 +85,9 @@ private $MODULE_CODE = "LARVELA_FREE_SHIPPING";
 			$option->count = sizeof($free_products);
 			$option->cost = 0.0;
 			$option->display = "<span id='free_shipping'>Free Shipping</span>";
-			$option->html = "<input type='radio' name[]='shipping' value='".$this->MODULE_CODE."'>";
+			$option->html = "<input type='radio' name='shipping_method' value='".$this->MODULE_CODE."'>";
+			$option->value = $this->MODULE_CODE."-0";
+			$option->code = $this->MODULE_CODE;
 			
 			array_push($options, $option);
 			return $options;
@@ -104,6 +106,15 @@ private $MODULE_CODE = "LARVELA_FREE_SHIPPING";
 	 */
 	public function isActive()
 	{
-		return true;
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		foreach($settings as $setting)
+		{
+			if($s->setting_name==$this->MODULE_CODE)
+			{
+				return ($s->setting_value==1) ? true : false;
+			}
+		}
+		return false;
 	}
 }

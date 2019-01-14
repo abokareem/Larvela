@@ -2,7 +2,7 @@
 /**
  * \class	AUPOST_Shipping
  * \date 	2018-08-24
- * \version	1.0.3
+ * \version	1.0.4
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -103,28 +103,31 @@ private $MODULE_CODE = "LARVELA_AUPOST";
 			$option->id = $po['id'];
 			$option->cost = $po['prod_retail_cost'];
 			$option->display = $po['prod_title'];
-			$option->html = "<input type='radio' name='shipping' value='".$this->MODULE_CODE."-".$po['id']."' >";
+			$option->html = "<input type='radio' name='shipping_method' value='".$this->MODULE_CODE."-".$po['id']."' >";
 			$option->value=$this->MODULE_CODE."-".$po['id'];
+			$option->code=$this->MODULE_CODE;
 			array_push($options, $option);
 		}
 		return $options;
 	}
 
 
-
-
-
 	/**
-	 * Draft function to return if the module is active or not.
-	 *
-	 *
-	 * @todo Need to change this to use a system variable or future shipping module admin page.
-	 *
+	 * Return boolean if the module is active or not.
 	 *
 	 * @return	boolean
 	 */
 	public function isActive()
 	{
-		return true;
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
+		foreach($settings as $setting)
+		{
+			if($s->setting_name==$this->MODULE_CODE)
+			{
+				return ($s->setting_value==1) ? true : false;
+			}
+		}
+		return false;
 	}
 }
