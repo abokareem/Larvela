@@ -20,6 +20,7 @@
 	</div>
 </div>
 
+<form id="capture"  name="capture" method="POST">
 <div class="row" style="padding:25px;">
 	<div class="col-xs-12 col-md-2">&nbsp;</div>
 	<div class="col-xs-12 col-md-6">
@@ -63,7 +64,6 @@
 			<div class="col-xs-12"><h4>Shipping Method:</h4></div>
 		</div>
 		<div class="control-group">
-		<form id="shipment_types"  name="shipment_types">
 			<table class="table">
 			@foreach($postal_options as $p)
 			<tr>
@@ -73,7 +73,6 @@
 			</tr>
 			@endforeach
 			</table>
-		</form>
 		</div>
 	</div>
 	<div class="col-xs-12 col-md-2">&nbsp;</div>
@@ -88,26 +87,14 @@
 			<div class="col-xs-12"><h4>Payment Method:</h4></div>
 		</div>
 		<div class="control-group">
-		<form id="payment_types"  name="payment_types">
 			<table class="table"
+			@foreach($payment_options as $option)
 				<tr>
-					<td align="right"><input type="radio" name="payment_options" value="0"></td>
-					<td>Cash On Delivery</td>
+					<td align="right">{!! $option->html !!}</td>
+					<td>{{ $option->name}}</td>
 				</tr>
-				<tr>
-					<td align="right"><input type="radio" id="btnbank" name="payment_options" value="BD"></td>
-					<td>Bank Deposit</td>
-				</tr>
-				<tr>
-					<td align="right"><input type="radio" id="btncc" name="payment_options" value="CC"></td>
-					<td>Credit Card</td>
-				</tr>
-				<tr>
-					<td align="right"><input type="radio" id="btnpp" name="payment_options" value="PP"></td>
-					<td>Paypal / Credit Card via Paypal</td>
-				</tr>
+			@endforeach
 			</table>
-		</form>
 		</div>
 	</div>
 	<div class="col-xs-12 col-md-2">&nbsp;</div>
@@ -129,11 +116,10 @@
 	<br/>
 </div>
 </div>
-<form id="capture" method="POST">
-{!! Form::token() !!}
 <input type="hidden" name="s" id="s" value="">
 <input type="hidden" name="p" id="p" value="">
 <input type="hidden" name="cid" value="{{$customer->id}}">
+{!! Form::token() !!}
 </form>
 
 
@@ -146,17 +132,12 @@ $('#myaccount').click(function(){
 
 var post=false;
 var pay=false;
-$('#shipment_types').on('change',function()
+$('#capture').on('change',function()
 {
 var p1 = $('input[name=shipping]:checked').val();
 console.log("Post Value:"+p1 );
 post=true;
 $('#s').val(p1);
-if((pay==true)&&(post==true)) { $('#btnconfirm').prop('disabled', false); }
-});
-
-$('#payment_types').on('change',function()
-{
 var p2 = $('input[name=payment_options]:checked').val();
 console.log("Pay Value:"+p2 );
 pay=true;
@@ -166,10 +147,10 @@ if((pay==true)&&(post==true)) { $('#btnconfirm').prop('disabled', false);  }
 
 $('#btnconfirm').click(function()
 {
-$('#capture').attr('action','/confirm');
+$('#capture').attr('action','/confirm?rnd=<?php echo rand(10,100); ?>');
 $('#capture').submit();
 });
 </script>
 
-<!-- {{ $THEME_HOME }}.Cart.2-shipping -->
+<!-- {{ $THEME_HOME }}Cart.2-shipping -->
 @endsection

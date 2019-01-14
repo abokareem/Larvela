@@ -63,12 +63,11 @@
 			<h4 class="text-right">Payment Options</h4>
 		</div>
 		<div class="col-xs-9">
-			<span class="input-group"><input type="radio" name="payment_options" value="0"> Cash On Delivery</span>
-			<span class="input-group"><input type="radio" id="btnbank" name="payment_options" value="BD"> Bank Deposit</span>
-			<span class="input-group"><input type="radio" id="btncc" name="payment_options" value="CC" disabled> Credit Card</span>
+		@foreach($payment_options as $option)
 			<span class="input-group">
-				<input type="radio" id="btnpp" name="payment_options" value="PP"> Paypal
+				{{ $option->html }}
 			</span>
+		@endforeach
 		</div>
 	</form>
 	</div>
