@@ -108,7 +108,7 @@ private $MODULE_CODE = "LARVELA_FREE_SHIPPING";
 	{
 		$store = app('store');
 		$settings = StoreSetting::where('setting_store_id',$store->id)->get();
-		foreach($settings as $setting)
+		foreach($settings as $s)
 		{
 			if($s->setting_name==$this->MODULE_CODE)
 			{
