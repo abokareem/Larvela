@@ -120,10 +120,13 @@ class PaymentFactory extends Facade
 		$options = array();
 		foreach($modules as $module)
 		{
-			$module_options = $module->getHTMLOptions();
-			if(!is_null($module_options))
+			if($module->isActive())
 			{
-				$options = array_merge($options, $module_options);
+				$module_options = $module->getHTMLOptions();
+				if(!is_null($module_options))
+				{
+					$options = array_merge($options, $module_options);
+				}
 			}
 		}
 		return $options;
