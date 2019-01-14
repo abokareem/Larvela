@@ -3,7 +3,7 @@
  * \class	EFT_Payments
  * \date	2019-09-13
  * \author	Sid Young
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,8 +42,8 @@ class EFT_Payments implements IPaymentService
 {
 
 
-private $MODUEL_CODE = "LARVELA_PAYPAL_EXPRESS";
-private $MODUEL_NAME = "Larvela Paypal Express";
+private $MODULE_CODE = "LARVELA_EFT_PAYMENT";
+private $MODULE_NAME = "Larvela EFT Payment";
 
 
 
@@ -102,10 +102,13 @@ private $MODUEL_NAME = "Larvela Paypal Express";
 	public function getHTMLOptions()
 	{
 		$options = array();
-		$otpion = new \stdClass;
+		$option = new \stdClass;
 		$option->id = 1;
 		$option->display = "EFT Payment";
-		$option->html = "<input type='radio' name='".$this->MODULE_CODE."-0' value='".$this->MODULE_CODE."-0>";
+		$option->name = $this->MODULE_NAME;
+		$option->code = $this->MODULE_CODE;
+		$option->value = $this->MODULE_CODE."-0";
+		$option->html = "<input type='radio' name='payment_option' value='".$this->MODULE_CODE."-0'>";
 		array_push($options,$option);
 		return $options;
 	}
@@ -114,6 +117,6 @@ private $MODUEL_NAME = "Larvela Paypal Express";
 
 	public function getPaymentName()
 	{
-		return "Electronic Funds Transfer";
+		return $this->MODULE_NAME;
 	}
 }

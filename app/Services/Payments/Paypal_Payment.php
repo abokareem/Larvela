@@ -3,7 +3,7 @@
  * \class	Paypal_Payments
  * \date	2017-09-18
  * \author	Sid Young
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,7 +42,8 @@ class Paypal_Payments implements IPaymentService
 {
 
 
-private $MODUEL_CODE = "LARVELA_PAYPAL_EXPRESS";
+private $MODULE_CODE = "LARVELA_PAYPAL_EXPRESS";
+private $MODULE_NAME = "Larvela Paypal Express";
 
 
 
@@ -65,7 +66,7 @@ private $MODUEL_CODE = "LARVELA_PAYPAL_EXPRESS";
 	 */
 	public function getDisplayName()
 	{
-		return "Paypal Express Payments";
+		return $this->MODULE_NAME;
 	}
 
 
@@ -101,10 +102,13 @@ private $MODUEL_CODE = "LARVELA_PAYPAL_EXPRESS";
 	public function getHTMLOptions()
 	{
 		$options = array();
-		$otpion = new \stdClass;
+		$option = new \stdClass;
 		$option->id = 1;
 		$option->display = "Paypal Express Payment";
-		$option->html = "<input type='radio' name='LARVELA_PAYPAL_EXPRESS' value='".$this->MODULE_CODE."-0>";
+		$option->code = $this->MODULE_CODE;
+		$option->name = $this->MODULE_NAME;
+		$option->value = $this->MODULE_CODE."-0";
+		$option->html = "<input type='radio' name='payment_option' value='".$this->MODULE_CODE."-0'>";
 		array_push($options,$option);
 		return $options;
 	}
@@ -113,7 +117,7 @@ private $MODUEL_CODE = "LARVELA_PAYPAL_EXPRESS";
 
 	public function getPaymentName()
 	{
-		return "Paypal";
+		return $this->MODULE_NAME;
 	}
 	
 

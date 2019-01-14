@@ -42,6 +42,7 @@ class COD_Payments implements IPaymentService
 {
 
 private $MODULE_CODE = "LARVELA_COD";
+private $MODULE_NAME = "Larvela Cash On Delivery";
 
 
 
@@ -75,35 +76,15 @@ private $MODULE_CODE = "LARVELA_COD";
 		$option = new \stdClass;
 		$option->id = 1;
 		$option->display = "Cash On Delivery";
-		$option->html = "<input type='radio' name='payment' value='".$this->MODULE_CODE."-0'>";
+		$option->html = "<input type='radio' name='payment_option' value='".$this->MODULE_CODE."-0'>";
 		$option->value = $this->MODULE_CODE."-0";
+		$option->code = $this->MODULE_CODE;
+		$option->name = $this->MODULE_NAME;
 		
 		array_push($options, $option);
 		return $options;
 	}
 
-
-
-
-	/**
-	 * Return an array of displayable options as a radio group named 'payment'
-	 * - all modules return this so you can display 1 or more payment options.
-	 *
-	 * @return	array
-	public function Calculate()
-	{
-		$options = array();
-
-		$option = new \stdClass;
-		$option->id = 1;
-		$option->display = "Cash On Delivery";
-		$option->html = "<input type='radio' name='payment' value='".$this->MODULE_CODE."-0'>";
-		$option->value = $this->MODULE_CODE."-0";
-		
-		array_push($options, $option);
-		return $options;
-	}
-	 */
 
 
 

@@ -115,12 +115,12 @@ class PaymentFactory extends Facade
 	 * @param	mixed	$address
 	 * @return	array
 	 */
-	public static function getPaymentOptions($modules, $store, $user, $products, $address)
+	public static function getPaymentOptions($modules)
 	{
 		$options = array();
 		foreach($modules as $module)
 		{
-			$module_options = $module->Calculate($store, $user, $products, $address);
+			$module_options = $module->getHTMLOptions();
 			if(!is_null($module_options))
 			{
 				$options = array_merge($options, $module_options);
