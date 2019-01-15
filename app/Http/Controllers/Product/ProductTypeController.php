@@ -40,8 +40,6 @@ use Illuminate\Contracts\Bus\Dispatcher;
 
 
 use App\Helpers\StoreHelper;
-use App\Services\ProductService;
-
 
 use App\Jobs\BackInStock;
 use App\Jobs\ResizeImages;

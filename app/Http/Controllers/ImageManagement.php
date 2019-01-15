@@ -40,7 +40,6 @@ use Illuminate\Contracts\Bus\Dispatcher;
 
 
 use App\Helpers\StoreHelper;
-use App\Services\ProductService;
 
 use App\Jobs\DeleteImageJob;
 use App\Jobs\DeleteProductJob;

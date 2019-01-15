@@ -43,7 +43,6 @@ use App\Http\Requests\ProductRequest;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 
-use App\Services\ProductService;
 use App\Services\CategoryService;
 
 

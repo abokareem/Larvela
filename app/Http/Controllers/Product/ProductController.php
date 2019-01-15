@@ -39,7 +39,6 @@ use Illuminate\Contracts\Bus\Dispatcher;
 
 
 use App\Helpers\StoreHelper;
-use App\Services\ProductService;
 use App\Services\Products\ProductFactory;
 
 use App\Jobs\BackInStock;
