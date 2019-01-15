@@ -91,6 +91,7 @@ class PaymentFactory extends Facade
 		foreach($classes as $class_name)
 		{
 			$parts = explode("\\", $class_name);
+			echo "<h2>".$class_name."</h2>";
 			if($parts[0] != "App") continue;
 			if($parts[ sizeof($parts)-1] == $module_name)
 			{
@@ -130,5 +131,39 @@ class PaymentFactory extends Facade
 			}
 		}
 		return $options;
+	}
+
+
+
+
+	/**
+	 * Return an instance of the required module using the module code.
+	 * - If not found return NULL
+	 *
+	 * Format is 217 => "App\Services\Payments\COD_Payment"
+	 *
+	 * @param	string $module_name
+	 * @return 	mixed
+	 */
+	public static function getModuleByCode($module_code)
+	{
+		echo "Need: $module_code <br>";
+		$parts = explode("-", $module_code);
+		$module_code = $parts[0];
+		$classes = array_filter( get_declared_classes(),
+				function($className)
+				{
+					return in_array("App\Services\Payments\IPaymentService", class_implements($className)); 
+				}
+			);
+		foreach($classes as $class_name)
+		{
+			$c = new $class_name;
+			if($c->getModuleCode() == $module_code)
+			{
+				return  $c;
+			}
+		}
+		return null;
 	}
 }
