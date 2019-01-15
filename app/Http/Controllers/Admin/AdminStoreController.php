@@ -92,8 +92,9 @@ use Logger;
 	public function ShowStoresPage()
 	{
 		$this->LogFunction("ShowStoresPage()");
+		$store = app('store');
 		$stores = Store::all();
-		return view('Admin.Stores.showstores',['stores'=>$stores]);
+		return view('Admin.Stores.showstores',['stores'=>$stores,'store'=>$store]);
 	}
 
 
@@ -108,12 +109,13 @@ use Logger;
 	public function ShowAddStorePage()
 	{
 		$this->LogFunction("ShowAddStorePage()");
+		$store = app('store');
 		$stores = Store::all();
 		$countries = Country::get();
 		$currencies = Currency::get();
 		$tzdata = explode("/",date_default_timezone_get());
 
-		return view('Admin.Stores.addstore',['stores'=>$stores,'countries'=>$countries,'tzdata'=>$tzdata[0],'currencies'=>$currencies]);
+		return view('Admin.Stores.addstore',['store'=>$store,'stores'=>$stores,'countries'=>$countries,'tzdata'=>$tzdata[0],'currencies'=>$currencies]);
 	}
 
 
