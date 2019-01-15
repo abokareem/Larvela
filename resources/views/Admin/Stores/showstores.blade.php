@@ -32,7 +32,7 @@
 				</thead>
 				<tbody>
 				@foreach($stores as $st)
-					<tr onclick='editrow( {{ $store->id }} );'>
+					<tr onclick='editrow( {{ $st->id }} );'>
 						<td>{{ $st->id }}</td>
 						<td>{{ $st->store_env_code }}</td>
 						<td>{{ $st->store_name }}</td>
