@@ -1,9 +1,15 @@
 # Larvela Jobs
 
-Larvela uses Laravel Jobs to perform many tasks to offload processing from Controllers and for scheduled background tasks. Most Jobs are run using Queuing via Redis as it has a built in Queuing system and also provides session handling so you get more functionality over Memcached.
+Larvela uses Laravel Jobs to perform many tasks to offload processing from Controllers and for scheduled background tasks. Most Jobs are configured to support being run using Queuing via Redis as it has a built in Queuing system.
 
 In the course of developing Larvela, many Jobs were previously used to email customers and the store admins using a crude templating system, but this has mostly been replaced using the Mailable interface and so the Jobs have provided an ideal place to put additonal Business Logic for store Automation and Marketing purposes.
 
+## Current Status ##
+
+Job Classes are being refactored so that all support the Queueable interface and a consistent logging.
+All older email sending code using the /templates directory are also being refactored to use the Mailable interface.
+See /Mail directory for relevant classes and resources/views/Mail/<store_code>/ for the actual templates.
+/templates will be removed in sue course.
 
 ## Why use Jobs
 
@@ -15,6 +21,9 @@ In the course of developing Larvela, many Jobs were previously used to email cus
 
 Please note, **not all the Job files have yet been release**, a refactor is occuring at present to make the code more user friendly and neater.
 
+**Updated 2019-07-22**
+
+- A small refactor is being made to align log file names to larvela-XXX and include support for Queueing.
 **Updated 2018-07-24**
 
 - A number of Job files which only sent emails are now free to be used as "hook" files for additional Business Logic.
