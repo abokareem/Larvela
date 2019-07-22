@@ -3,6 +3,28 @@
  * \date	2017-09-14
  * \author	Sid Young
  * \class	ProcessAbandonedCart
+ * \version 1.0.2
+ *
+ *
+ * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * \addtogroup Cart_Abandonment
  * ProcessAbandonedCart - Retrieve all the cart items and if:
@@ -12,13 +34,14 @@
  */
 namespace App\Jobs;
 
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 use App\Mail\AbandonedCartEmail;
 use App\Mail\AbandonedWeekOldCartEmail;
@@ -37,11 +60,12 @@ use App\Traits\Logger;
 use DB;
 
 
-class ProcessAbandonedCart implements ShouldQueue
+class ProcessAbandonedCart extends Job implements ShouldQueue
 {
+use InteractsWithQueue, Queueable, SerializesModels;
 use Logger;
 
-    use InteractsWithQueue, Queueable, SerializesModels;
+
 
     /**
      * Create a new job instance.
@@ -50,8 +74,27 @@ use Logger;
      */
     public function __construct()
     {
-        //
+		$this->setFileName("larvela-cron");
+		$this->setClassName("ProcessAbandonedCart");
+		$this->LogStart();
     }
+
+
+
+	/**
+	 * Close Log Entry
+	 *
+	 * @return  void
+	 */
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
+
+
+
+
 
     /**
      * Execute the job.

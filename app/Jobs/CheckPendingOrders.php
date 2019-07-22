@@ -3,7 +3,7 @@
  * \class	CheckPendingOrders
  * \date	2017-09-20
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version	1.0.0
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,14 +42,14 @@ use App\Jobs\OrderCancelled;
 use DB;
 
 
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-
-
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+
 
 /**
  * \brief Iterate through the 'orders' table and get all rows that are on 'W" status and NOT PAID and check if they are older than 7 days.
@@ -61,25 +61,53 @@ use Illuminate\Contracts\Queue\ShouldQueue;
  * -- Send an email to the store sales team 
  * -- Send an email to the system admin and
  */
-class CheckPendingOrders implements ShouldQueue
+class CheckPendingOrders extends Job implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
 use Logger;
 
 
     /**
+     *============================================================
      * Create a new job instance.
+     *============================================================
      *
+	 *
      * @return void
      */
     public function __construct()
     {
-        //
+		$this->setFileName("larvela-cron");
+		$this->setClassName("CheckPendingOrders");
+		$this->LogStart();
     }
 
+
+
     /**
-     * Execute the job by calling the Run() method.
+     *============================================================
+     * Close off logs
+     *============================================================
      *
+	 *
+     * @return void
+     */
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
+
+
+
+
+
+    /**
+     *============================================================
+     * Execute the job by calling the Run() method.
+     *============================================================
+     *
+	 *
      * @return void
      */
     public function handle()
@@ -90,10 +118,13 @@ use Logger;
 
 
     /**
+     *============================================================
      * Locate orders that are on waiting status and more than 7 days old.
      * Reverse the order.
 	 *
 	 * @todo inform the Customer and Sales team.
+     *============================================================
+	 *
 	 *
      * @return void
      */

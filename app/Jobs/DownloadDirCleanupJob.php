@@ -42,6 +42,15 @@
  */
 namespace App\Jobs;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+
 
 use App\Models\StoreSetting;
 use App\Traits\Logger;
@@ -51,8 +60,9 @@ use App\Traits\Logger;
  * \brief CRON task to cleanup old files in the public/download/[0-F]/<GUID> directory structure
  * {INFO_2018-09-30} Add code to support store setting DOWNLOAD_LIFESPAN
  */
-class DownloadDirCleanupJob extends Job
+class DownloadDirCleanupJob extends Job implements ShouldQueue
 {
+use InteractsWithQueue, Queueable, SerializesModels;
 use Logger;
 
 

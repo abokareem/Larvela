@@ -3,7 +3,7 @@
  * \class	ProcessSubscriptions
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-03-10
- * \version	1.0.1
+ * \version	1.0.2
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -37,6 +37,11 @@ namespace App\Jobs;
 
 use App\Jobs\Job;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
@@ -55,8 +60,9 @@ use App\Traits\Logger;
 /**
  * \brief Send a templated email asking for confirmation of the email address and subscription to site.
  */
-class ProcessSubscriptions extends Job 
+class ProcessSubscriptions extends Job implements ShouldQueue
 {
+use InteractsWithQueue, Queueable, SerializesModels;
 use Logger;
 
 
@@ -86,11 +92,21 @@ protected $from;
     public function __construct()
     {
 		$store = app('store');
-		$this->setFileName("store-jobs");
+		$this->setFileName("larvela-cron");
+		$this->setClassName("ProcessSubscriptions");
 		$this->LogStart();
 		$this->store = $store;
 		$this->from = ["$store->store_sales_email"=>"Larvela Subcription Engine"];
     }
+
+
+
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
+
 
 
 
@@ -101,7 +117,7 @@ protected $from;
      */
     public function handle()
     {
-		$this->LogFunction("ProcessSubscription::handle()");
+		$this->LogFunction("handle()");
 		$admin_user = Customer::find(1);
 		$admin_email = $admin_user->customer_email;
 
@@ -160,6 +176,7 @@ protected $from;
 						$request->sr_process_value++;
 						$request->sr_date_updated = date("Y-m-d");
 						$request->save();
+						$this->LogMsg("Request Saved");
 						dispatch( new ReSendSubRequest($this->store,$request->sr_email));
 						break;
 				}
@@ -175,7 +192,7 @@ protected $from;
 		$o->subs_resent_count = $counter_resend;
 		$o->subs_date_created = date("Y-m-d");
 		$o->save();
-		$this->LogMsg("Done! - Compile and send Report.");
+		$this->LogMsg("Done!");
 	}
 
 
@@ -189,12 +206,20 @@ protected $from;
 	 */
 	public function SendReport($counter_final,$counter_deleted,$counter_resend,$counter_progressing)
 	{
+		$this->LogFunction("SendReport()");
 
 		$subject = "[Larvela] Subscription Processing for ".date("Y-m-d");
 
 		$file = base_path()."/templates/subscription_processing.tpl";
 
 		$text = "<html><head><title>Subscription Processing Report</title></head><body bgcolour='white'><h2>Todays Subscription Processing</h2>\n";
+		$this->LogMsg("==========================");
+		$this->LogMsg("==                      ==");
+		$this->LogMsg("==                      ==");
+		$this->LogMsg("==  Update to mailable  ==");
+		$this->LogMsg("==                      ==");
+		$this->LogMsg("==                      ==");
+		$this->LogMsg("==========================");
 		if(file_exists($file))
 		{
 			$t1 = file_get_contents($file);
