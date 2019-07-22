@@ -3,7 +3,7 @@
  * \class	AbandonedCart
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2017-08-30
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -31,6 +31,8 @@
  * AbandonedCart -  Provide an entry point for additional business logic when a cart is abandoned after 24 hours.
  * - Send an emial to the store admin informaing them the cart has been abandoned
  * - Does not do anything to the cart.
+ *
+ * {INFO-2019-07-22} AbandonedCart - Added Logging
  */
 namespace App\Jobs;
 
@@ -49,6 +51,7 @@ use App\Jobs\EmailUserJob;
 
 use App\Models\Store;
 use App\Models\Customer;
+use App\Traits\Logger;
 
 
 /**
@@ -57,6 +60,7 @@ use App\Models\Customer;
 class AbandonedCart implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
+use Logger;
 
 /**
  * The Store object
@@ -89,10 +93,27 @@ protected $cart;
      */
     public function __construct($store, $email, $cart)
     {
+		$this->setFileName("larvela-jobs");
+		$this->setClassName("AbandonedCart");
+		$this->LogStart();
 		$this->store = $store;
 		$this->email = $email;
 		$this->cart  = $cart;
     }
+
+
+
+	/**
+	 *============================================================
+	 * Close off the log
+	 *============================================================
+	 *
+	 * @return	void
+	 */
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
 
 
 
@@ -104,9 +125,17 @@ protected $cart;
      */
     public function handle()
     {
+		$this->LogFunction("handle()");
+
 		$text = "Notice: Cart abandoned email sent to: ".$this->email;
 		$subject = "[LARVELA] Cart Abandoned email sent to [".$this->email."]";
 		$from = $this->store->store_sales_email;
+
+		$this->LogMsg("==========================");
+		$this->LogMsg("                          ");
+		$this->LogMsg("   Change to Mailable     ");
+		$this->LogMsg("                          ");
+		$this->LogMsg("==========================");
 
 		$admin_user = Customer::find(1);
 		dispatch( new EmailUserJob($admin_user->customer_email, $from, $subject, $text));

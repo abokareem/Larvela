@@ -2,7 +2,7 @@
 /**
  * \class	UpdateCartLocks
  * \date	2017-09-13
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -37,6 +37,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+
+
 use DB;
 use App\Models\Product;
 use App\Models\ProductLock;
@@ -50,40 +54,80 @@ use App\Traits\Logger;
  * then increment the product qty by the value stored in the
  * row and wrap it all in a database transaction.
  */
-class UpdateCartLocks implements ShouldQueue
+class UpdateCartLocks extends Job implements ShouldQueue
 {
+use InteractsWithQueue, Queueable, SerializesModels;
 use Logger;
 
 
-    use InteractsWithQueue, Queueable, SerializesModels;
 
     /**
+     *============================================================
      * Create a new job instance.
-     *
+     *============================================================
+	 *
+	 *
      * @return void
      */
     public function __construct()
     {
-        //
+		$this->setFileName("larvela-cron");
+		$this->setClassName("UpdateCartLocks");
+		$this->LogStart();
     }
 
+
+
+	/**
+     *============================================================
+	 * Close off the log
+     *============================================================
+	 *
+	 *
+	 * @return	void
+	 */
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
+
+
+
+
     /**
-     * Execute the job.
-     *
+	 *============================================================
+     * Entry point from cron, execute the job by calling Run()
+	 *============================================================
+	 *
+	 *
      * @return void
      */
     public function handle()
     {
+		$this->LogFunction("handle()");
 		$this->Run();
+		return 0;
     }
 
 
+	/**
+	 *============================================================
+	 * Get all product locks in table and decrement, count
+	 *============================================================
+	 *
+	 *
+	 * @return	void
+	 */
+
 	public function Run()
 	{
-		$this->setFileName("larvela-cron");
+		$this->LogFunction("Run()");
+
 		$stale_time = time()-300;
 
 		$product_locks = ProductLock::all();
+		$this->LogMsg("Product Locks in table [".sizeof($product_locks)."]");
 		if(sizeof($product_locks)>0)
 		{
 			$this->LogStart();
@@ -114,7 +158,10 @@ use Logger;
 					$this->LogMsg("TX Complete.");
 				}
 			}
-			$this->LogEnd();
+		}
+		else
+		{
+			$this->LogMsg("No products locked at present... skipping.");
 		}
 	}
 

@@ -108,11 +108,13 @@ use Logger;
      *============================================================
      *
 	 *
-     * @return void
+     * @return int
      */
     public function handle()
     {
+		$this->LogFunction("handle()");
 		$this->Run();
+		return 0;
     }
 
 
@@ -130,13 +132,13 @@ use Logger;
      */
 	public function Run()
 	{
-		$this->setFileName("larvela-cron");
+		$this->LogFunction("Run()");
 		$store = app('store');
 		$one_week_ago = date("Y-m-d", strtotime("-1 week"));
 		$pending_orders = Order::where('order_status','W')->get();
+		$this->LogMsg("Time Scale:  from [".$one_week_ago."] to today");
 		if(sizeof($pending_orders)>0)
 		{
-			$this->LogStart();
 			foreach($pending_orders as $o)
 			{
 				if($o->order_status == "W")
@@ -191,7 +193,10 @@ use Logger;
 					}
 				}
 			}
-			$this->LogEnd();
+		}
+		else
+		{
+			$this->LogMsg("Nothing to process. ending");
 		}
 	}
 }
