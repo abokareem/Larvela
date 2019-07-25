@@ -3,7 +3,7 @@
  * \class	DeleteProductJob
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-01
- * \version	1.0.2
+ * \version	1.0.3
  * 
  * 
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,7 +42,6 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use	App\Models\Image;
 use App\Models\Product;
 use App\Traits\Logger;
-use App\Jobs\EmailUserJob;
 use App\Exceptions\Handler;
 use	App\Models\ProdImageMap;
 use App\Models\ImageProduct;
@@ -70,14 +69,16 @@ protected $product_id;
 
 
     /**
+     *============================================================
      * Create a new job instance.
+     *============================================================
      *
      * @param	integer	$product_id	The row ID
      * @return	void
      */
     public function __construct($product_id)
     {
-		$this->setFileName("larvela-admin");
+		$this->setFileName("larvela-jobs");
 		$this->setClassName("DeleteProductJob");
 		$this->LogStart();
 		$this->product_id = $product_id;
@@ -86,7 +87,9 @@ protected $product_id;
 
 
     /**
+     *============================================================
      * Log the job has cleaned up
+     *============================================================
      *
      * @return	void
      */
@@ -99,7 +102,9 @@ protected $product_id;
 
 
     /**
+     *============================================================
      * Remove all references to product and then remove the product itself.
+     *============================================================
      *
      * @return void
      */

@@ -3,7 +3,7 @@
  * \class	AddToCart
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-09
- * \version	1.0.0
+ * \version	1.0.1
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -44,18 +44,25 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 use App\Models\Cart;
+use App\Models\Store;
+use App\Models\Product;
 use App\Models\CartItem;
 use App\Models\Customer;
-use App\Models\Product;
-use App\Models\Store;
 
+use App\Traits\NotifyAdminTrait;
+use App\Traits\Logger;
 
 /**
  * @brief Place holder for any business logic needed when an item has been added to a Cart.
+ *
+ * {INFO_2019-07-24 AddToCart - Added Logging and NotifyAdminTrait}
  */
 class AddToCart implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
+use NotifyAdminTrait;
+use Logger;
+
 
 /**
  * The Store object
@@ -72,17 +79,39 @@ protected $cart;
 
 
     /**
+	 *============================================================
      * Create a new job instance save store and email details away.
+	 *============================================================
+	 *
 	 *
      * @param  $store	mixed - The Store object
      * @param  $cart	mixed - The Cart onject
      * @return void
      */
-    public function __construct($store, $cart)
+    public function __construct($store, $email, $cart)
     {
+		$this->setFileName("larvela-jobs");
+		$this->setClassName("AddToCart");
+		$this->LogStart();
 		$this->store = $store;
 		$this->cart  = $cart;
     }
+
+
+
+    /**
+	 *============================================================
+     * Close log
+	 *============================================================
+	 *
+	 *
+     * @return void
+	 */
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
 
 
 
@@ -93,12 +122,15 @@ protected $cart;
      */
     public function handle()
     {
-		$text = "Notice: Item added to Cart [] by [] ";
-		$subject = "[LARVELA] Item added to Cart [".$this->cart->id."]";
-		$from = $this->store->store_sales_email;
+		$this->LogFunction("handle()");
 
-		$admin_user = Customer::find(1);
-		dispatch( new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
+		$text = "Notice: Item added to Cart [".$this->cart->id."] by [] ";
+		$subject = "[LARVELA] Item added to Cart [".$this->cart->id."]";
+
+		$customer = Customer::find($this->cart->user_id);
+		$this->NotifyAdmin($this->store, $subject, $text);
+		$this->LogMsg("Done");
+		return 0;
     }
 
 }

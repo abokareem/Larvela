@@ -29,7 +29,7 @@
  *
  * \addtogroup Cart_Abandonment
  * AbandonedCart -  Provide an entry point for additional business logic when a cart is abandoned after 24 hours.
- * - Send an emial to the store admin informaing them the cart has been abandoned
+ * - Send an email to the store admin informaing them the cart has been abandoned
  * - Does not do anything to the cart.
  *
  * {INFO-2019-07-22} AbandonedCart - Added Logging
@@ -52,6 +52,7 @@ use App\Jobs\EmailUserJob;
 use App\Models\Store;
 use App\Models\Customer;
 use App\Traits\Logger;
+use App\Traits\NotifyAdminTrait;
 
 
 /**
@@ -60,6 +61,7 @@ use App\Traits\Logger;
 class AbandonedCart implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
+use NotifyAdminTrait;
 use Logger;
 
 /**
@@ -127,19 +129,9 @@ protected $cart;
     {
 		$this->LogFunction("handle()");
 
-		$text = "Notice: Cart abandoned email sent to: ".$this->email;
-		$subject = "[LARVELA] Cart Abandoned email sent to [".$this->email."]";
-		$from = $this->store->store_sales_email;
-
-		$this->LogMsg("==========================");
-		$this->LogMsg("                          ");
-		$this->LogMsg("   Change to Mailable     ");
-		$this->LogMsg("                          ");
-		$this->LogMsg("==========================");
-
-		$admin_user = Customer::find(1);
-		dispatch( new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
+		$text = "Notice: Cart abandoned email sent to: <b>".$this->email."</b>";
+		$subject = "[LARVELA] Cart Abandoned Email sent to [".$this->email."]";
+		$this->NotifyAdmin($this->store, $subject, $text);
 		return 0;
     }
-
 }

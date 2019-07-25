@@ -3,7 +3,7 @@
  * \class	NewInstallMessage
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-12-11
- * \version 1.0.0
+ * \version 1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -60,7 +60,10 @@ protected $user;
 
 
 	/**
+	 *============================================================
 	 * Take the data given and save it for processing later.
+	 *============================================================
+	 *
 	 *
 	 * @return	void
 	 */
@@ -68,15 +71,36 @@ protected $user;
 	{
 		$this->setFileName('larvela');
 		$this->setClassName('NewInstallMessage');
+		$this->LogStart();
 		$this->store = $store;
 	}
 
 
+
 	/**
+	 *============================================================
+	 * Close logs
+	 *============================================================
+	 *
+	 *
+	 * @return	void
+	 */
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
+
+
+	/**
+	 *============================================================
 	 * Take the data given and format up a JSON response.
 	 *
 	 * Called via the dispatch method in the Abstract Base Class.
 	 * Provides a uniform way to dispatch messages.
+	 *============================================================
+	 *
+	 *
 	 * @return	string;
 	 */
 	protected function processMsg()

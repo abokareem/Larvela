@@ -3,7 +3,7 @@
  * \class	AutoSubscribeJob
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-07-23
- * \version	1.0.0
+ * \version	1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -46,15 +46,21 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 
 
 use App\Models\SubscriptionRequest;
+use App\Traits\Logger;
+use App\Traits\NotifyAdminTrait;
 
 
 /**
  * \brief Subscribe the new Customer to the Subscriptions table and
  * provide a place where additional business logic can be called.
+ *
+ ( {INFO_2019-07-25} AutoSubscribeJob - Added more logging and notify admin call.
  */
 class AutoSubscribeJob implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
+use NotifyAdminTrait;
+use Logger;
 
 
 /**
@@ -73,7 +79,9 @@ protected $store;
 
 
     /**
+	 *============================================================
      * Store away the passed in parameters 
+	 *============================================================
 	 *
      * @param 	mixed	$store	- The Store object.
      * @param	string	$email	- The customer email address.
@@ -81,38 +89,68 @@ protected $store;
      */
     public function __construct($store, $email)
     {
+		$this->setFileName("larvela-jobs");
+		$this->setClassName("AutoSubscribeJob");
+		$this->LogStart();
 		$this->store = $store;
 		$this->email = email;
     }
 
 
+	/**
+	 *============================================================
+	 * Cleanup Log
+	 *============================================================
+	 *
+	 *
+     * @return	void
+	 */
+	public function __destruct()
+	{
+		$this->LogStart();
+	}
+
+
 
     /**
-	 * Call the subscribe method and provide a place for additional Business Logic to be called.
+	 *============================================================
+	 * Subbscribe the email automatically and provide a place for 
+	 * additional Business Logic to be called.
+	 *============================================================
+	 *
 	 *
      * @return integer
      */
     public function handle()
     {
 		$this->SubscribeEmail($this->email);
+		$text = "Customer [".$this->email."] has been auto-subscribed";
+		$subject = "[LARVELA] Auto subscribe for ".$this->email;
+		$this->NotifyAdmin($this->store, $subject, $text);
+
 		#
 		# Your code here - suggestion - use Queued Jobs for async operations.
 		#
+
 		return 0;
     }
 
 
 
-
-
 	/**
-	 * Subscribe the user to the subscription request table and retunr the row ID
+	 *============================================================
+	 * Subscribe the user to the subscription request table and 
+	 * return the row ID.
+	 *============================================================
 	 *
 	 * @param	string	$email
 	 * @return	integer
 	 */
 	protected function SubscribeEmail( $email )
 	{
+		$this->LogFunction("SubscribeEmail()");
+		$this->LogMsg("Subscribe: [".$email."]");
+
 		$today = date("Y-m-d");
 		$o = new SubscriptionRequest;
 		$o->sr_email = $email;
@@ -121,6 +159,7 @@ protected $store;
 		$o->sr_date_created = date("Y-m-d");
 		$o->sr_date_updated= date("Y-m-d");
 		$o->save();
+		$this->LogMsg("Saved ID [".$o->id."]");
 		return $o->id; 
 	}
 }

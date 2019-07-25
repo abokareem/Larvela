@@ -3,7 +3,7 @@
  * \class	MsgTemplate
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-12
- * \version 1.0.2
+ * \version 1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -42,7 +42,7 @@ abstract class MessageTemplate
 
 	/**
 	 * Get the resultant JSON data from the calling Message Generator
-	 * - Dispatch it using the required transport which is configured in cong/app.php
+	 * - Dispatch it using the required transport which is configured in conf/app.php
 	 * - Add more transport options into the directory as needed, the AppServiceProvider will autoload them in.
 	 */
 	public final function dispatch()

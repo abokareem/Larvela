@@ -3,7 +3,7 @@
  * \class	OrderPlaced
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-22
- * \version	1.0.0
+ * \version	1.0.1
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
  *
@@ -36,17 +36,17 @@ namespace App\Jobs;
 
 use App\Jobs\Job;
 
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
-
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 use App\Models\Customer;
 
-
+use App\Traits\Logger;
 
 
 /**
@@ -57,6 +57,7 @@ use App\Models\Customer;
 class OrderPlaced implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
+use Logger;
 
 /**
  * The store object from the database tables stores, has all the details about the selected store.
@@ -81,7 +82,9 @@ protected $email;
 
 
     /**
+	 *============================================================
      * Create a new job instance and save store and email details away.
+	 *============================================================
 	 *
      * @param  mixed	$store	The Store object.
      * @param  string	$email 	email address of customer
@@ -90,6 +93,9 @@ protected $email;
      */
     public function __construct($store, $email, $order)
     {
+		$this->setFileName("larvela-jobs");
+		$this->setClassName("OrderPlaced");
+		$this->LogStart();
 		$this->store = $store;
 		$this->email = $email;
 		$this->order = $order;
@@ -98,13 +104,36 @@ protected $email;
 
 
     /**
+	 *============================================================
+     * Close log
+	 *============================================================
+	 *
+     * @return void
+     */
+    public function __construct($store, $email, $order)
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
+
+
+    /**
+	 *============================================================
 	 * provide a point for additional business logic to be inserted.
 	 * - Send an email to the store admin.
+	 *============================================================
+	 *
 	 *
      * @return void
      */
     public function handle()
     {
+
+		#
+		# Place additional business logic here
+		#
+
 		$admin_user = Customer::find(1);
 		$from = $this->store->store_sales_email;
 		$subject = "[LARVELA] Order #".$this->order->id." placed -> message sent to [".$this->email."]";

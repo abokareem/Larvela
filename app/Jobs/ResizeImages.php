@@ -1,8 +1,9 @@
 <?php
 /**
  * \class	ResizeImage
- * @author	Sid Young <sid@off-grid-engineering.com>
- * @date	2018-04-20
+ * \author	Sid Young <sid@off-grid-engineering.com>
+ * \date	2018-04-20
+ * \version	1.0.1
  *
  * [CC]
  *
@@ -13,6 +14,11 @@ namespace App\Jobs;
 
 
 use App\Jobs\Job;
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+
 use Illuminate\Queue\SerializesModels;
 
 use App\Models\Image;
@@ -27,8 +33,9 @@ use App\Traits\Logger;
  * a series of smaller images that are then mapped to the parent Image.
  * - Resized images are available for the Store front, Product and Category pages.
  */
-class ResizeImages extends Job
+class ResizeImages extends Job implements ShouldQueue
 {
+use InteractsWithQueue, Queueable, SerializesModels;
 use Logger;
 
 
@@ -54,7 +61,10 @@ protected $CONVERT = "/usr/bin/convert";
 
 
     /**
+	 *============================================================
      * Create a new job instance and save the product and image ID's.
+	 *============================================================
+     *
      *
      * @param	int	$product_id	row id from products table.
      * @param	int	$image_id	row id from images table.
@@ -62,17 +72,24 @@ protected $CONVERT = "/usr/bin/convert";
      */
     public function __construct($pid, $iid)
     {
-		$this->setFileName("store");
+		$this->setFileName("larvela-jobs");
+		$this->setClassName("larvela-jobs");
 		$this->LogStart();
-		$this->LogFunction("-- ResizeImageJob -- Constructor");
 		$this->product_id = $pid;
 		$this->image_id = $iid;
     }
 
 
+
+    /**
+	 *============================================================
+     * Close log
+	 *============================================================
+     *
+     * @return void
+     */
 	public function __destruct()
     {
-		$this->LogFunction("-- ResizeImageJob -- Destructor");
 		$this->LogEnd();
 	}
 
@@ -80,15 +97,19 @@ protected $CONVERT = "/usr/bin/convert";
 
 
     /**
+	 *============================================================
      * Create a series of thumb nails.
 	 * 68x68 thumbnail for product page
      * 310x310 and 510x510 for category and front page
+	 *============================================================
+	 *
 	 *
      * @return void
      */
     public function handle()
     {
-		$this->LogFunction("-- ResizeImageJob -- Handler");
+		$this->LogFunction("handle()");
+
 		$Image = new Image;
 		$PIM = new ProdImageMap;
 
@@ -144,7 +165,10 @@ protected $CONVERT = "/usr/bin/convert";
 
 
 	/**
+	 *============================================================
 	 * Convert the image into the new size.
+	 *============================================================
+	 *
 	 *
 	 * @param $dir_name Directory to change into where src file is.
 	 * @param $image_name the source image file name

@@ -3,7 +3,7 @@
  * \class	ShowCartMessage
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2018-08-12
- * \version 1.0.2
+ * \version 1.0.3
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -74,7 +74,10 @@ protected $user;
 
 
 	/**
+	 *============================================================
 	 * Take the data given and save it for processing later.
+	 *============================================================
+	 *
 	 *
 	 * @return	void
 	 */
@@ -82,6 +85,7 @@ protected $user;
 	{
 		$this->setFileName('larvela');
 		$this->setClassName('ShowCartMessage');
+		$this->LogStart();
 		$this->store = $store;
 		$this->user = $user;
 		$this->cart = $cart;
@@ -89,11 +93,31 @@ protected $user;
 	}
 
 
+
 	/**
+	 *============================================================
+	 * Close logs
+	 *============================================================
+	 *
+	 *
+	 * @return	void
+	 */
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
+
+
+	/**
+	 *============================================================
 	 * Take the data given and format up a JSON response.
 	 *
 	 * Called via the dispatch method in the Abstract Base Class.
 	 * Provides a uniform way to dispatch messages.
+	 *============================================================
+	 *
+	 *
 	 * @return	string;
 	 */
 	protected function processMsg()

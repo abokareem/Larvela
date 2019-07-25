@@ -3,7 +3,7 @@
  * \class	AbandonedWeekOldCart
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2017-08-30
- * \version	1.0.1
+ * \version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -54,13 +54,17 @@ use App\Models\Store;
 use App\Models\Customer;
 
 use App\Traits\Logger;
+use App\Traits\NotifyAdminTrait;
 
 /**
  * \brief Cart has been abandoned for 1 week, execute any additional business logic here.
+ *
+ * {INFO_2019-07-24} AbandonedWeekOldCart - Convert to use NotifyAdminTrait
  */
 class AbandonedWeekOldCart implements ShouldQueue
 {
 use InteractsWithQueue, Queueable, SerializesModels;
+use NotifyAdminTrait;
 use Logger;
 
 
@@ -143,18 +147,9 @@ protected $cart;
 		#
 		# Email the store administrator
 		#
-		$from = $this->store->store_sales_email;	
 		$subject = "[LARVELA] Week Old Abandoned cart message sent to [".$this->email."]";
 		$text = "Notice: Cart ".$this->cart->id." abandoned 1 week ago by customer ".$this->email;
-
-		$this->LogMsg("=========================");
-		$this->LogMsg("                         ");
-		$this->LogMsg("   Change to Mailable    ");
-		$this->LogMsg("                         ");
-		$this->LogMsg("=========================");
-
-		$admin_user = Customer::find(1);
-		dispatch(new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
+		$this->NotifyAdmin($this->store, $subject, $text);
 		$this->LogMsg("Done!");
 		return 0;
     }

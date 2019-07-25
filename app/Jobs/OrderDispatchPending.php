@@ -3,6 +3,7 @@
  * \class	OrderDispatchPending
  * \author	Sid Young <sid@off-grid-engineering.com>
  * \date	2016-08-22
+ * \version	1.0.1
  *
  * [CC]
  *
@@ -14,22 +15,29 @@ namespace App\Jobs;
 use App\Jobs\Job;
 use App\Helpers\SEOHelper;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 use App\Models\Store;
 use App\Models\Customer;
 use App\Jobs\EmailUserJob;
-use App\Traits\TemplateTrait;
+use App\Traits\Logger;
+use App\Traits\NotifyAdmin;
 
 
 /**
  * \brief Send a templated email confirming dispatching of the order.
  * Fetch and send the templated email, template mapping is: "ORDER_DISPATCHED"
  */
-class OrderDispatchPending extends Job 
+class OrderDispatchPending extends Job  implements ShouldQueue
 {
-use TemplateTrait;
+use InteractsWithQueue, Queueable, SerializesModels;
+use NotifyAdmin;
+use Logger;
 
 
 /**
@@ -63,6 +71,9 @@ protected $order;
      */
     public function __construct($store, $email, $order)
     {
+		$this->setFileName("larvela-jobs");
+		$this->setClassName("OrderDispatchPending");
+		$this->LogStart();
 		$this->store = $store;
 		$this->email = $email;
 		$this->order = $order;
@@ -70,9 +81,26 @@ protected $order;
 
 
 
+	/**
+	 *============================================================
+	 * Close log
+	 *============================================================
+	 *
+     * @return	void
+	 */
+	public function __destruct()
+	{
+		$this->LogEnd();
+	}
+
+
+
+
     /**
+	 *============================================================
      * Fetch the template, parse with the store helper and
 	 * then send using Job Dispatch.
+	 *============================================================
 	 *
      * @return void
      */
@@ -80,8 +108,6 @@ protected $order;
     {
 		$subject = "[LARVELA] Order Dispatch Pending email sent to [".$this->email."]";
 		$text = "Notice Order Dispatch Pending email sent to [".$this->email."]";
-		$from = $this->store->store_sales_email;
-		$admin_user = Customer::find(1);
-		dispatch(new EmailUserJob($admin_user->customer_email, $from, $subject, $text));
+		$this->NotifyAdmin($this->store, $from, $subject, $text));
     }
 }
