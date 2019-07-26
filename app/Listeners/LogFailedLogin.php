@@ -43,7 +43,7 @@ use Logger;
      */
     public function __construct()
     {
-		$this->setFileName("store-security");
+		$this->setFileName("larvela-security");
     }
 
 
