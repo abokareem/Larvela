@@ -1,5 +1,7 @@
 <?php
 
+Route::get( '/example','Example@Example');
+
 #======================================================================
 #
 # REFACTOR ALL CALLS FROM Cart to be 1 call, PurchaseController@Purchase
@@ -60,8 +62,8 @@ Route::get('/ajax/payment','AjaxController@dumpajax');
 #
 # 2016-12-10 needed for password reset return and post.
 #
-Route::get('/home','StoreFrontController@ShowStoreFront');
-Route::post('/home','StoreFrontController@ShowStoreFront');
+Route::get('/home','StoreFront\ShowStoreFront@ShowStoreFront');
+Route::post('/home','StoreFront\ShowStoreFront@ShowStoreFront');
 
 Route::post('/capture','CaptureController@CaptureForm');
 Route::post('/cart/getcartdata','Ajax\CartData@GetCartData');
@@ -72,8 +74,10 @@ Route::post('/notify/outofstock','Ajax\OutOfStockNotify@OutOfStockNotify');
 #
 # Routes for Pages
 #
-Route::get('/','StoreFrontController@ShowStoreFront');
-Route::get('/attribute/{id}','StoreFrontController@ShopByAttribute');
+#Route::get('/','StoreFrontController@ShowStoreFront');
+
+Route::get('/','StoreFront\ShowStoreFront@ShowStoreFront');
+Route::get('/attribute/{id}','StoreFront\ShopByAttribute@ShopByAttribute');
 #
 # 2018-09-12 refactored this route from StoreFrontController.
 #

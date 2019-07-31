@@ -1,9 +1,9 @@
 <?php
 /**
- * \class	LowestPriceFirst
- * \author	Sid Young <sid@off-grid-engineering.com>
- * \date	2018-11-19
- * \version	1.0.0
+ * @class	LowestPriceFirst
+ * @author	Sid Young <sid@off-grid-engineering.com>
+ * @date	2018-11-19
+ * @version	1.0.0
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -49,7 +49,9 @@ private $lowest_price_flag = 0;
 
 
 	/**
+	 *------------------------------------------------------------
 	 * Setup logging and test cookie
+	 *------------------------------------------------------------
 	 *
 	 * @return	void
 	 */
@@ -63,7 +65,9 @@ private $lowest_price_flag = 0;
 
 
 	/**
+	 *------------------------------------------------------------
 	 * Close off log
+	 *------------------------------------------------------------
 	 *
 	 * @return	void
 	 */
@@ -74,7 +78,10 @@ private $lowest_price_flag = 0;
 
 
 	/**
-	 *
+	 *------------------------------------------------------------
+	 * Pre-Process the data and find the configuration settings
+	 * for the LOWEST_PRICE_FIRST flag being set.
+	 *------------------------------------------------------------
 	 *
 	 * @param	integer	$state
 	 * @param	App/Models/StoreSetting	$setting
@@ -105,8 +112,10 @@ private $lowest_price_flag = 0;
 
 
 	/**
+	 *------------------------------------------------------------
 	 * Select products in random order using the product_id_list as our range.
 	 * Scan through product_rows to find item by ID as its NOT in order.
+	 *------------------------------------------------------------
 	 *
 	 * @param	mixed	$dto
 	 * @return	array
@@ -120,8 +129,10 @@ private $lowest_price_flag = 0;
 	
 	
 	/**
+	 *------------------------------------------------------------
 	 * Filter the results so only in stock products are returned.
 	 * - Depends on if flagged.
+	 *------------------------------------------------------------
 	 *
 	 * @param	mixed	$dto
 	 * @return	array
@@ -139,6 +150,13 @@ private $lowest_price_flag = 0;
 
 
 
+	/**
+	 *------------------------------------------------------------
+	 * Simple price comparison tets, returns true f A less than B
+	 *------------------------------------------------------------
+	 *
+	 * @return	boolean
+	 */
 	public function cmp($a,$b)
 	{
 		return ($a->prod_retail_cost< $b->prod_retail_cost) ? false:true;
