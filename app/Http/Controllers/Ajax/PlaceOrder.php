@@ -3,7 +3,7 @@
  * \class	PlaceOrder
  * \date	2018-12-06
  * \author	Sid Young <sid@off-grid-engineering.com>
- * \version 1.0.0
+ * \version 1.0.1
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -51,6 +51,8 @@ use App\Jobs\OrderPlaced;
 use App\Mail\OrderPaidEmail;
 use App\Mail\OrderPlacedEmail;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Order\CreateOrder;
+use App\Http\Controllers\Order\OrderController;
 use Illuminate\Support\Facades\Mail;
 
 use App\Traits\Logger;
@@ -123,8 +125,9 @@ use CreateOrderItemsTrait;
 			#
 			$cartitems = CartItem::where('cart_id',$id)->get();
 
-			$order = $this->CreateOrder($customer,$cartdata,$cartitems,$payment_ref);
-			$item_count = $this->CreateOrderItems($order);
+			$oc = new CreateOrder;
+			$order = $oc->CreateOrder($customer,$cartdata,$cartitems,$payment_ref);
+			$item_count = $oc->CreateOrderItems($order);
 
 			dispatch(new OrderPlaced($store,$customer->customer_email, $order));
 			Mail::to($customer->customer_email)->send(new OrderPlacedEmail($store, $customer->customer_email, $order));
@@ -161,7 +164,6 @@ use CreateOrderItemsTrait;
 	 * @param	App\Models\CartItem	$cartitems
 	 * @param	string	$payment_ref
 	 * @return	mixed
-	 */
 	protected function CreateOrder($customer,$cartdata,$cartitems,$payment_ref)
 	{
 		$this->LogFunction("CreateOrder()");
@@ -184,4 +186,5 @@ use CreateOrderItemsTrait;
 		$this->LogMsg("inserted order id [".$order->id."]");
 		return $order;
 	}
+	 */
 }
