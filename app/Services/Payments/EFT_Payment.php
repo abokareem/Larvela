@@ -1,9 +1,9 @@
 <?php
 /**
- * \class	EFT_Payments
- * \date	2019-09-13
- * \author	Sid Young
- * \version	1.0.2
+ * @class	EFT_Payments
+ * @date	2019-09-13
+ * @author	Sid Young
+ * @version	1.0.2
  *
  *
  * Copyright 2018 Sid Young, Present & Future Holdings Pty Ltd
@@ -91,6 +91,57 @@ private $MODULE_NAME = "EFT Payment";
 	}
 
 
+	/**
+	 * Construct the HTML and variables for this module.
+	 * These are returned to the controller and should be injected into the Payment view
+	 *
+	 *
+	 * @return	mixed
+	 */
+	public function getPaymentHTML()
+	{
+		$vars = array('BSB'=>"","AC"=>"",'ACNAME'=>"",'BANKNAME'=>"");
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)
+			->where('setting_name','LIKE','LARVELA_EFT_PAYMENT-%')
+			->get();
+		if($settings->isEmpty())
+		{
+			return "No EFT details are available";
+		}
+		foreach($settings as $s)
+		{
+			$parts = explode("-",$s->setting_name);
+			$vars[$parts[1]]=$s->setting_value;
+		}
+		$html=<<<EXIT
+
+		<table class='table'>
+		<tr>
+			<td class='eft-acnum'>Account Name</td>
+			<td class='eft-acnum-var'>{$vars['ACNAME']}</td>
+		</tr>
+		<tr>
+			<td class='eft-bsb'>BSB</td>
+			<td class='eft-bsb-var'>{$vars['BSB']}</td>
+		</tr>
+		<tr>
+			<td class='eft-acnum'>Account Number</td>
+			<td class='eft-acnum-var'>{$vars['AC']}</td>
+		</tr>
+		<tr>
+			<td class='eft-acnum'>Financial Institution</td>
+			<td class='eft-acnum-var'>{$vars['BANKNAME']}</td>
+		</tr>
+		</table>
+EXIT;
+		$view_data = new \stdClass;
+		$view_data->vars = $vars;
+		$view_data->html = $html;
+		$view_data->settings = $settings;
+		return $view_data;
+	}
+
 
 
 	/**
@@ -104,8 +155,10 @@ private $MODULE_NAME = "EFT Payment";
 	}
 
 
+
 	/**
-	 *
+	 * Return an object that has the details/form data
+	 * to display back to the user for selection.
 	 *
 	 * @return	array
 	 */

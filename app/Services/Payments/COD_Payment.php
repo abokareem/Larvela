@@ -69,8 +69,36 @@ private $MODULE_NAME = "Cash On Delivery";
 	}
 
 
+
+	/**
+	 * Return "vars" and "html" in a STD Class object which gets rendered
+	 * back to the confirm screen before placing the order.
+	 *
+	 * @return	string
+	 */
+	public function getPaymentHTML()
+	{
+		$view_data = new \stdClass;
+		$view_data->vars = array();
+		$view_data->html = "Cash On Delivery";
+		return $view_data;
+	}
+
+
+	
+	/**
+	 *
+	 *
+	 *
+	 *
+	 *
+	 */
 	public function getHTMLOptions()
 	{
+		$store = app('store');
+		$settings = StoreSetting::where('setting_store_id',$store->id)
+			->where('setting_name','LIKE','LARVELA_EFT_PAYMENT-%')
+			->get();
 		$options = array();
 
 		$option = new \stdClass;
@@ -80,6 +108,7 @@ private $MODULE_NAME = "Cash On Delivery";
 		$option->value = $this->MODULE_CODE."-0";
 		$option->code = $this->MODULE_CODE;
 		$option->name = $this->MODULE_NAME;
+		$option->settings = $settings;
 		
 		array_push($options, $option);
 		return $options;
