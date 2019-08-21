@@ -11,10 +11,10 @@ cache:
     - node_modules
     - vendor
 before_install:
-  - mysql -e 'create database if not exists testing;'
 
 before_script:
   - cp .env.travis .env
+  - mysql -e 'create database if not exists testing;'
   - composer install --no-interaction
   - php artisan key:generate
   - php artisan migrate -vvv
