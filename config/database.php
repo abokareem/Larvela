@@ -70,7 +70,7 @@ return [
 			'driver'=>'mysql',
 			'host'=>env('DB_TEST_HOST', 'localhost'),
 			'database'=>env('DB_TEST_DATABASE', 'testing'),
-			'username'=>env('DB_TEST_USERNAME', 'travis'),
+			'username'=>env('DB_TEST_USERNAME', 'root'),
 			'password'=>env('DB_TEST_PASSWORD', ''),
 			'charset'=>'utf8',
 			'collation'=>'utf8_unicode_ci',
