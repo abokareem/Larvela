@@ -13,7 +13,7 @@ cache:
 
 before_script:
   - cp .env.travis .env
-  - sudo mysql -e 'CREATE DATABASE larvela;'
+  - sudo mysql -e 'CREATE DATABASE testing;'
   - composer install --no-interaction
   - php artisan key:generate
   - php artisan migrate -vvv
