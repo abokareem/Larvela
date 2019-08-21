@@ -15,8 +15,9 @@ before_script:
   - cp .env.travis .env
   - sudo mysql -e 'CREATE DATABASE larvela;'
   - composer install --no-interaction
-  - php artisan migrate --no-interaction -vvv
-  - php artisan db:seed --no-interaction -vvv
+  - php artisan key:generate
+  - php artisan migrate -vvv
+  - php artisan db:seed -vvv
 
 script:
   - vendor/bin/phpunit
