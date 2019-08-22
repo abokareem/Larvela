@@ -17,8 +17,8 @@ before_script:
   - sudo mysql_upgrade
   - sudo service mysql restart
   - sudo mysqladmin create testing
-  - sudo mysql -e "grant all privileges on testing.* to 'root'@'localhost'"
-  - sudo mysql -e "select * from mysql.User;"
+  - sudo mysql -e "create user 'larvelatest'@'localhost' identified by '[P8rs3w0rd]';
+  - sudo mysql -e "grant all privileges on testing.* to 'larvelatest'@'localhost'"
   - composer install --no-interaction
   - php artisan key:generate
   - php artisan migrate -vvv
