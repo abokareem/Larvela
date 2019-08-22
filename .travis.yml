@@ -18,7 +18,7 @@ before_script:
   - sudo service mysql restart
   - sudo mysqladmin create testing
   - sudo mysql -e "grant all privileges on testing.* to 'root'@'localhost'"
-  - mysql -e "update mysql.user set user.Password=PASSWORD('password') where user.User='root' and user.Host='localhost'"
+  - sudo mysql -e "update mysql.user set user.Password=PASSWORD('password') where user.User='root' and user.Host='localhost'"
   - composer install --no-interaction
   - php artisan key:generate
   - php artisan migrate -vvv
