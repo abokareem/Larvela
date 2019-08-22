@@ -15,7 +15,8 @@ before_install:
 before_script:
   - cp .env.travis .env
   - sudo mysqladmin create testing
-  - sudo mysql -e "GRANT ALL PRIVILEGES ON testing.* to 'root'@'localhost'";
+  - sudo mysql -e "grant all privileges on testing.* to 'root'@'localhost'";
+  - sudo mysql -e "update mysql.user set password=PASSWORD('password') where user='root'";
   - composer install --no-interaction
   - php artisan key:generate
   - php artisan migrate -vvv
