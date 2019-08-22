@@ -21,8 +21,8 @@ before_script:
   - sudo mysql -e "grant all privileges on testing.* to 'larvelatest'@'localhost'"
   - composer install --no-interaction
   - php artisan key:generate
-  - php artisan migrate -vvv
-  - php artisan db:seed -vvv
+  - php artisan migrate 
+  - php artisan db:seed
 
 script:
   - vendor/bin/phpunit
